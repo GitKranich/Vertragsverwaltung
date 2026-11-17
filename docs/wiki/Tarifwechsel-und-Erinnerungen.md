@@ -19,6 +19,16 @@ Unter **Einstellungen → Integrationen → Tariffy → [Vertrag] → Optionen**
 Am Wechseldatum übernimmt HA den neuen Tarif automatisch — geprüft täglich exakt um 00:00:01 Uhr, zusätzlich beim regulären 6h-Poll und beim HA-Start als Fallback. Nicht angegebene Felder behalten ihren aktuellen Wert.
 
 
+## Preisänderung im laufenden Vertrag (Strom und Gas)
+
+Erhöht der Anbieter die Preise, ohne dass ein neuer Vertrag beginnt (gleicher Beginn, gleiches Ende, gleicher Zähler), trägst du das im Panel im Tab "Verträge" im Block **"Preisänderungen im Vertrag"** ein (Administratoren): **Gültig ab**, dazu der neue Arbeitspreis, Grundpreis und/oder Abschlag. Ein leeres Feld behält den bisherigen Wert. Es sind beliebig viele Änderungen möglich, auch geplante in der Zukunft.
+
+- Ab dem Datum zeigen die Sensoren Arbeitspreis, Grundpreis und Abschlag die neuen Werte.
+- **Kosten bisher, Saldo heute, gezahlte Abschläge, Prognose zum Vertragsende und Abschlag-Empfehlung** rechnen je Zeitabschnitt mit dessen Preisen. Der Verbrauch bis zum Stichtag kommt aus der Langzeitstatistik des Zählers. Reicht sie nicht bis zum Stichtag zurück, trägst du den **Zählerstand am Stichtag** ein; ohne beides wird der Verbrauch zeitanteilig aufgeteilt.
+- Eine geplante Änderung in der Zukunft fließt sofort in die Prognose ein und gilt ab ihrem Datum automatisch.
+- "Vertrag bearbeiten" ändert weiterhin die Werte **ab Vertragsbeginn**; die Preisänderungen bleiben dabei erhalten. Beim Tarifwechsel beginnt der Folgevertrag ohne Preisänderungen.
+- Nicht verfügbar bei dynamischem Tarif (Börsenpreis-Sensor) und beim Zweizählertarif (HT/NT).
+
 ## Kündigungs-Erinnerung
 
 Wenn Vertragsende gesetzt und der Erinnerungszeitraum erreicht ist:

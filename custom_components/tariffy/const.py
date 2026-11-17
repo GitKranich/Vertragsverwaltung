@@ -194,6 +194,17 @@ NOTIFY_ID_ABSCHLAG_PREFIX = "tariffy_abschlag_warnung_"
 CONF_ABSCHLAG_AB_DATUM = "_abschlag_ab_datum"
 CONF_ABSCHLAG_VORHERIGER_WERT = "_abschlag_vorheriger_wert"
 
+# Preisaenderungen innerhalb der laufenden Vertragslaufzeit (interner Schluessel, nur Strom
+# und Gas): Liste aus {datum, arbeitspreis, grundpreis, abschlag, zaehlerstand}. Ab `datum`
+# gelten die neuen Werte, der Vertrag (Beginn, Ende, Verbrauchsmessung) laeuft unveraendert
+# weiter. Leere Werte = unveraendert gegenueber dem vorherigen Stand. `zaehlerstand` ist
+# optional (roher Zaehlerstand am Stichtag) und nur noetig, wenn die Langzeitstatistik des
+# Zaehlers den Stichtag nicht abdeckt. Die Vertragsdaten (arbeitspreis, grundpreis, abschlag)
+# bleiben die Werte ab Vertragsbeginn; die Sensoren zeigen den jeweils gueltigen Wert.
+CONF_PREISAENDERUNGEN = "_preisaenderungen"
+PREISAENDERUNGEN_MAX = 50
+PREISAENDERUNG_SPARTEN = ("electricity", "gas")
+
 # Zukünftiger Vertrag
 NEXT_PREFIX = "next_"
 

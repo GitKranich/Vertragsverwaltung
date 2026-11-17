@@ -26,6 +26,10 @@ from .const import (
     CONF_ABSCHLAG,
     CONF_ANBIETER,
     CONF_ARBEITSPREIS,
+    CONF_ARBEITSPREIS_SENSOR,
+    CONF_PREISAENDERUNGEN,
+    PREISAENDERUNG_SPARTEN,
+    PREISAENDERUNGEN_MAX,
     AUSSENZAEHLER_MAX,
     CONF_ARCHIVIERT,
     CONF_AUSSENZAEHLER,
@@ -480,3 +484,62 @@ def delete_aussenzaehler(hass: HomeAssistant, entry: ConfigEntry, index: int) ->
         data.pop(CONF_AUSSENZAEHLER, None)
     hass.config_entries.async_update_entry(entry, data=data)
     return not liste
+
+
+# ------------------------------------------- Preisaenderungen im Vertrag (Strom/Gas)
+def _preisaenderung(values: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
+    try:
+        datum = date.fromisoformat(str(values.get("datum")))
+    except ValueError as err:
+        raise HistoryError("invalid_preis_datum") from err
+    beginn = coord._parse_date(data.get(CONF_BEGINN))
+    ende = coord._parse_date(data.get(CONF_ENDE))
+    if beginn is None or datum <= beginn or (ende is not None and datum > ende):
+        raise HistoryError("invalid_preis_datum")
+    eintrag: dict[str, Any] = {"datum": datum.isoformat()}
+    for feld in ("arbeitspreis", "grundpreis", "abschlag"):
+        wert = _number(values.get(feld), feld)
+        if wert is not None:
+            eintrag[feld] = wert
+    if len(eintrag) == 1:
+        raise HistoryError("invalid_preis_leer")
+    zaehlerstand = _number(values.get("zaehlerstand"), "zaehlerstand")
+    if zaehlerstand is not None:
+        eintrag["zaehlerstand"] = zaehlerstand
+    return eintrag
+
+
+def save_preisaenderung(
+    hass: HomeAssistant, entry: ConfigEntry, values: dict[str, Any], index: int | None = None
+) -> None:
+    """Legt eine Preisaenderung (neue Preise ab einem Datum, der Vertrag laeuft weiter) an oder
+    ersetzt die mit `index`. Nur Strom und Gas mit festem Arbeitspreis."""
+    data = entry.data
+    if data.get(CONF_SPARTE) not in PREISAENDERUNG_SPARTEN or data.get(CONF_ARBEITSPREIS_SENSOR):
+        raise HistoryError("not_available")
+    eintrag = _preisaenderung(values, data)
+    liste = [item for item in data.get(CONF_PREISAENDERUNGEN) or [] if isinstance(item, dict)]
+    if index is not None:
+        if not 0 <= index < len(liste):
+            raise HistoryError("not_found")
+        del liste[index]
+    elif len(liste) >= PREISAENDERUNGEN_MAX:
+        raise HistoryError("too_many")
+    if any(item.get("datum") == eintrag["datum"] for item in liste):
+        raise HistoryError("duplicate_datum")
+    liste.append(eintrag)
+    liste.sort(key=lambda item: str(item.get("datum") or ""))
+    hass.config_entries.async_update_entry(entry, data={**data, CONF_PREISAENDERUNGEN: liste})
+
+
+def delete_preisaenderung(hass: HomeAssistant, entry: ConfigEntry, index: int) -> None:
+    liste = [item for item in entry.data.get(CONF_PREISAENDERUNGEN) or [] if isinstance(item, dict)]
+    if not 0 <= index < len(liste):
+        raise HistoryError("not_found")
+    del liste[index]
+    data = dict(entry.data)
+    if liste:
+        data[CONF_PREISAENDERUNGEN] = liste
+    else:
+        data.pop(CONF_PREISAENDERUNGEN, None)
+    hass.config_entries.async_update_entry(entry, data=data)

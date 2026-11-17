@@ -7,6 +7,14 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.31.0-custom.1] - 2026-11-17
+
+Eigene Version (Fork von weskona/tariffy 1.30.0).
+
+### Hinzugefügt
+
+- **Preisänderungen im laufenden Strom- oder Gasvertrag.** Im Panel (Block "Preisänderungen im Vertrag", Administratoren) lassen sich ab einem Datum ein neuer Arbeitspreis, Grundpreis und/oder Abschlag eintragen; der Vertrag läuft mit gleichem Beginn, Ende und Zähler weiter. Kosten bisher, Saldo, gezahlte Abschläge, die Prognose zum Vertragsende und die Abschlag-Empfehlung rechnen je Zeitabschnitt mit dessen Preisen. Der Verbrauch bis zum Stichtag kommt aus der Langzeitstatistik (oder einem optionalen Zählerstand am Stichtag). Eine geplante Änderung zählt sofort in der Prognose. Die Preis-Sensoren zeigen den heute gültigen Wert; der Arbeitspreis-Sensor listet die Änderungen als Attribute. Verträge ohne Preisänderung bleiben unverändert.
+
 ## [1.30.0] - 2026-11-16
 
 Dieses Release fasst alles zusammen, was in den Betas `1.30.0-beta.1` und `1.30.0-beta.2` getestet wurde. **Bestehende Verträge laufen ohne jede Änderung weiter.** Die neue Sparte ist freiwillig; neue Sensoren gibt es nur für Kredite.

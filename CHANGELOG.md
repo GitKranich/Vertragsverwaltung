@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.31.0-custom.1] - 2026-11-17
+
+Own version (fork of weskona/tariffy 1.30.0).
+
+### Added
+
+- **Price changes within a running electricity or gas contract.** In the panel (block "Price changes in this contract", administrators) new unit price, standing charge and/or instalment can be entered from a date; the contract keeps running with the same start, end and meter. Cost so far, balance, instalments paid, the forecast at contract end and the recommended instalment are calculated per period with its prices. The consumption up to the date comes from the long-term statistics (or an optional meter reading on that date). A future change counts in the forecast right away. The price sensors show the value valid today; the unit price sensor lists the changes as attributes. Contracts without price changes are unchanged.
+
 ## [1.30.0] - 2026-11-16
 
 This release brings together everything that was tested in the betas `1.30.0-beta.1` and `1.30.0-beta.2`. **Existing contracts keep working without any change.** The new category is optional; new sensors exist only for loans.

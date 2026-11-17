@@ -49,6 +49,8 @@ from .const import (
     CONF_GRUNDPREIS,
     CONF_AUSSENZAEHLER,
     CONF_EINMALPOSTEN,
+    CONF_PREISAENDERUNGEN,
+    PREISAENDERUNG_SPARTEN,
     CONF_HISTORIE,
     CONF_JAHRESVERBRAUCH,
     CONF_KUENDIGUNG_BESTAETIGT,
@@ -306,6 +308,189 @@ def _abschlag_nach_zahlungen(
     return round(summe, 2), naechste
 
 
+# ------------------------------------------------- Preisaenderungen im Vertrag
+_MONAT_TAGE = 30.44
+_PREIS_FELDER = ("arbeitspreis", "grundpreis", "abschlag")
+
+
+def _preis_segmente(data: dict[str, Any], beginn: date) -> list[dict[str, Any]]:
+    """Zeitabschnitte des Vertrags mit den jeweils gueltigen Preisen.
+
+    Der erste Abschnitt beginnt am Vertragsbeginn mit den Werten aus den Vertragsdaten; jede
+    Preisaenderung (CONF_PREISAENDERUNGEN) beginnt einen neuen Abschnitt. Ein leerer Wert in
+    einer Preisaenderung uebernimmt den Wert des vorherigen Abschnitts. Aenderungen am oder vor
+    dem Vertragsbeginn werden ignoriert (sie gehoeren zu keinem Abschnitt dieses Vertrags)."""
+    basis = {
+        "von": beginn,
+        "arbeitspreis": _f(data.get(CONF_ARBEITSPREIS)),
+        "grundpreis": _f(data.get(CONF_GRUNDPREIS)),
+        "abschlag": _f(data.get(CONF_ABSCHLAG)),
+        "zaehlerstand": None,
+    }
+    aenderungen = []
+    for item in data.get(CONF_PREISAENDERUNGEN) or []:
+        if not isinstance(item, dict):
+            continue
+        tag = _parse_date(item.get("datum"))
+        if tag is None or tag <= beginn:
+            continue
+        aenderungen.append((tag, item))
+    aenderungen.sort(key=lambda paar: paar[0])
+    segmente = [basis]
+    for tag, item in aenderungen:
+        vorher = segmente[-1]
+        segment = {"von": tag, "zaehlerstand": _f(item.get("zaehlerstand"))}
+        for feld in _PREIS_FELDER:
+            wert = _f(item.get(feld))
+            segment[feld] = wert if wert is not None else vorher[feld]
+        if vorher["von"] == tag:  # zwei Aenderungen am selben Tag: die spaetere zaehlt
+            segmente[-1] = segment
+        else:
+            segmente.append(segment)
+    return segmente
+
+
+def _segment_am(segmente: list[dict[str, Any]], tag: date) -> dict[str, Any]:
+    """Der am `tag` gueltige Abschnitt (vor dem ersten Abschnitt: der erste)."""
+    aktiv = segmente[0]
+    for segment in segmente:
+        if segment["von"] <= tag:
+            aktiv = segment
+    return aktiv
+
+
+def _abschlag_segmente(
+    segmente: list[dict[str, Any]], beginn: date, data: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Abschnitte fuer den Abschlag. Beruecksichtigt zusaetzlich eine Abschlags-Aenderung beim
+    Bearbeiten des Vertrags (CONF_ABSCHLAG_AB_DATUM, siehe _abschlag_bisher_gezahlt), aber nur,
+    wenn sie im ersten Abschnitt liegt: dort hat sie den Abschlag ab Vertragsbeginn geaendert."""
+    ab_datum = _parse_date(data.get(CONF_ABSCHLAG_AB_DATUM))
+    vorher = _f(data.get(CONF_ABSCHLAG_VORHERIGER_WERT))
+    naechster = segmente[1]["von"] if len(segmente) > 1 else None
+    if (
+        ab_datum is None
+        or not vorher
+        or ab_datum <= beginn
+        or (naechster is not None and ab_datum >= naechster)
+    ):
+        return segmente
+    erster = segmente[0]
+    return [
+        {**erster, "abschlag": vorher},
+        {**erster, "von": ab_datum},
+        *segmente[1:],
+    ]
+
+
+def _monat_von(beginn: date, tag: date) -> float:
+    return (tag - beginn).days / _MONAT_TAGE
+
+
+def _integral_monate(
+    segmente: list[dict[str, Any]], feld: str, beginn: date, von_m: float, bis_m: float
+) -> float | None:
+    """Summe eines Monatsbetrags (Grundpreis, Abschlag) ueber den Zeitraum [von_m, bis_m] in
+    Monaten ab Vertragsbeginn, je Abschnitt mit dessen Wert. None, wenn ein Abschnitt im
+    Zeitraum keinen Wert hat."""
+    if bis_m <= von_m:
+        return 0.0
+    summe = 0.0
+    for index, segment in enumerate(segmente):
+        start = 0.0 if index == 0 else _monat_von(beginn, segment["von"])
+        ende = (
+            _monat_von(beginn, segmente[index + 1]["von"])
+            if index + 1 < len(segmente)
+            else float("inf")
+        )
+        anteil = min(ende, bis_m) - max(start, von_m)
+        if anteil <= 0:
+            continue
+        wert = segment[feld]
+        if wert is None:
+            return None
+        summe += wert * anteil
+    return summe
+
+
+def _arbeitspreis_kosten(
+    segmente: list[dict[str, Any]],
+    grenzen: list[float],
+    faktor: float,
+) -> float | None:
+    """Arbeitspreis-Kosten des bisherigen Verbrauchs: `grenzen` ist der kumulierte Verbrauch
+    seit Vertragsbeginn zu Beginn jedes Abschnitts, mit dem Verbrauch bis heute als letztem
+    Wert (len(grenzen) == Anzahl der bisherigen Abschnitte + 1)."""
+    summe = 0.0
+    for index in range(len(grenzen) - 1):
+        menge = grenzen[index + 1] - grenzen[index]
+        if menge == 0:
+            continue
+        preis = segmente[index]["arbeitspreis"]
+        if preis is None:
+            return None
+        summe += menge * faktor * preis
+    return summe
+
+
+def _rest_arbeitspreis_kosten(
+    segmente: list[dict[str, Any]],
+    heute: date,
+    vertrag_ende: date,
+    rest_menge: float,
+) -> float | None:
+    """Arbeitspreis-Kosten des fuer die Restlaufzeit hochgerechneten Verbrauchs, gleichmaessig
+    auf die verbleibenden Tage verteilt; ein kuenftiger Abschnitt rechnet ab seinem Datum mit
+    seinem Preis."""
+    rest_tage = (vertrag_ende - heute).days
+    if rest_tage <= 0 or rest_menge <= 0:
+        return 0.0
+    summe = 0.0
+    for index, segment in enumerate(segmente):
+        start = segment["von"] if index else date.min
+        ende = segmente[index + 1]["von"] if index + 1 < len(segmente) else date.max
+        tage = (min(ende, vertrag_ende) - max(start, heute)).days
+        if tage <= 0:
+            continue
+        if segment["arbeitspreis"] is None:
+            return None
+        summe += rest_menge * tage / rest_tage * segment["arbeitspreis"]
+    return summe
+
+
+def _preisaenderungen_anzeige(
+    data: dict[str, Any], beginn: date | None, heute: date
+) -> list[dict[str, Any]]:
+    """Die gespeicherten Preisaenderungen fuer Panel und Attribute, in gespeicherter Reihenfolge
+    (der Index ist der zum Bearbeiten), mit den ab dem Datum gueltigen Werten und dem Status
+    (aktiv, kuenftig, vergangen, ungueltig = am oder vor dem Vertragsbeginn)."""
+    liste = [item for item in data.get(CONF_PREISAENDERUNGEN) or [] if isinstance(item, dict)]
+    if not liste:
+        return []
+    segmente = _preis_segmente(data, beginn) if beginn is not None else []
+    aktiv = _segment_am(segmente, heute) if segmente else None
+    ergebnis = []
+    for index, item in enumerate(liste):
+        tag = _parse_date(item.get("datum"))
+        segment = next((s for s in segmente[1:] if s["von"] == tag), None)
+        if segment is None:
+            status = "ungueltig"
+        elif segment is aktiv:
+            status = "aktiv"
+        else:
+            status = "kuenftig" if tag > heute else "vergangen"
+        ergebnis.append(
+            {
+                "index": index,
+                "datum": tag.isoformat() if tag else None,
+                **{feld: _f(item.get(feld)) for feld in (*_PREIS_FELDER, "zaehlerstand")},
+                "gilt": {feld: segment[feld] for feld in _PREIS_FELDER} if segment else None,
+                "status": status,
+            }
+        )
+    return ergebnis
+
+
 def _entry_sum_state(entry: dict) -> tuple[float | None, float | None]:
     s = entry.get("sum")
     st = entry.get("state")
@@ -560,6 +745,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._verbrauch_offset_date_nt: date | None = None
         # Aussenzaehler eines Wasservertrags: Offset je Sensor (Datum, sum, state)
         self._aussen_offsets: dict[str, tuple[date, float, float | None]] = {}
+        # Preisaenderungen: Zaehler-Offset (sum, state) je Stichtag aus der Langzeitstatistik
+        self._preis_offsets: dict[date, tuple[float, float | None]] = {}
         # Fuer den Diagnose-Download und die Warnung im Log: wie der
         # Verbrauch beim letzten Update ermittelt wurde (siehe diagnostics.py).
         self.verbrauch_diag: dict[str, Any] = {}
@@ -616,15 +803,24 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             zahl = _f(wert)
             return round(zahl, 2) if zahl is not None else None
 
+        alt_beginn = _parse_date(alt.get(CONF_BEGINN))
+        if alt.get(CONF_PREISAENDERUNGEN) and alt_beginn is not None:
+            preise = _segment_am(_preis_segmente(alt, alt_beginn), heute)
+        else:
+            preise = {feld: _f(alt.get(key)) for feld, key in zip(
+                _PREIS_FELDER, (CONF_ARBEITSPREIS, CONF_GRUNDPREIS, CONF_ABSCHLAG)
+            )}
+
         return {
             "sparte": alt.get(CONF_SPARTE),
             "anbieter": alt.get(CONF_ANBIETER),
             "tarif": alt.get(CONF_TARIF),
             "beginn": alt.get(CONF_BEGINN),
             "ende": alt.get(CONF_ENDE) or heute.isoformat(),
-            "arbeitspreis": _f(alt.get(CONF_ARBEITSPREIS)),
-            "grundpreis": _f(alt.get(CONF_GRUNDPREIS)),
-            "abschlag": _f(alt.get(CONF_ABSCHLAG)),
+            # bei Preisaenderungen im Vertrag die zuletzt gueltigen Werte
+            "arbeitspreis": preise["arbeitspreis"],
+            "grundpreis": preise["grundpreis"],
+            "abschlag": preise["abschlag"],
             "kosten": _zahl(d.get("kredit_gezahlt") if kredit else d.get("kosten_bisher")),
             "abschlag_gezahlt": _zahl(d.get("abschlag_bisher_gezahlt")),
             "saldo": _zahl(d.get("guthaben_bisher")),
@@ -802,6 +998,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._verbrauch_offset_state_nt = None
         self._verbrauch_offset_date_nt = None
         self._aussen_offsets = {}
+        self._preis_offsets = {}
         self.hass.config_entries.async_update_entry(
             self.entry, data=new_data, options={}
         )
@@ -1125,6 +1322,48 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             aktuell_sum, offset_sum, aktuell_state, offset_state, await _einheit_faktor(self.hass, sensor_id)
         )
 
+    async def _get_preis_offset(
+        self, entity_id: str, stichtag: date
+    ) -> tuple[float | None, float | None]:
+        """(sum, state) des Zaehlers am Stichtag einer Preisaenderung (gecacht)."""
+        if stichtag in self._preis_offsets:
+            return self._preis_offsets[stichtag]
+        sum_val, state_val = await _get_historic_value(self.hass, entity_id, stichtag)
+        if sum_val is not None:
+            self._preis_offsets[stichtag] = (sum_val, state_val)
+        return sum_val, state_val
+
+    async def _verbrauch_grenzen(
+        self,
+        segmente: list[dict[str, Any]],
+        beginn: date,
+        heute: date,
+        verbrauch_bisher: float,
+        sensor_id: str | None,
+    ) -> list[float]:
+        """Kumulierter Verbrauch seit Vertragsbeginn zu Beginn jedes bisherigen Abschnitts, plus
+        der Verbrauch bis heute als letzter Wert. Der Verbrauch ab einem Stichtag kommt aus der
+        Langzeitstatistik (oder aus dem eingetragenen Zaehlerstand am Stichtag); fehlt beides,
+        wird der Verbrauch zeitanteilig aufgeteilt."""
+        grenzen = [0.0]
+        tage_gesamt = max(1, (heute - beginn).days)
+        for segment in segmente[1:]:
+            stichtag = segment["von"]
+            if stichtag > heute:
+                break
+            seit: float | None = None
+            if sensor_id:
+                seit = await self._verbrauch_bisher_fuer_sensor(
+                    sensor_id, segment.get("zaehlerstand"), stichtag, self._get_preis_offset
+                )
+            if seit is not None:
+                bis_stichtag = verbrauch_bisher - seit
+            else:
+                bis_stichtag = verbrauch_bisher * (stichtag - beginn).days / tage_gesamt
+            grenzen.append(min(max(bis_stichtag, grenzen[-1]), verbrauch_bisher))
+        grenzen.append(verbrauch_bisher)
+        return grenzen
+
     def _log_verbrauch_status(
         self, sensor_id: str, verbrauch_bisher: float | None, diag: dict[str, Any]
     ) -> None:
@@ -1277,6 +1516,30 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         grundpreis = _f(data.get(CONF_GRUNDPREIS))
         abschlag = _f(data.get(CONF_ABSCHLAG))
+
+        # ---- Preisaenderungen im laufenden Vertrag (nur Strom/Gas, fester Arbeitspreis) ----
+        # Ab hier sind arbeitspreis/grundpreis/abschlag die heute gueltigen Werte. Die Summen
+        # ueber die Laufzeit (Abschlaege, Kosten, Prognose) rechnet weiter unten der Block
+        # "Preisaenderungen: Summen je Abschnitt" je Abschnitt mit dessen Preisen.
+        preis_segmente: list[dict[str, Any]] = []
+        if (
+            data.get(CONF_SPARTE) in PREISAENDERUNG_SPARTEN
+            and data.get(CONF_PREISAENDERUNGEN)
+            and beginn is not None
+            and not arbeitspreis_sensor
+        ):
+            preis_segmente = _preis_segmente(data, beginn)
+            if len(preis_segmente) > 1:
+                gueltig = _segment_am(preis_segmente, heute)
+                arbeitspreis = gueltig["arbeitspreis"]
+                grundpreis = gueltig["grundpreis"]
+                abschlag = gueltig["abschlag"]
+            else:
+                preis_segmente = []
+        naechste_preisaenderung = next(
+            (s["von"] for s in preis_segmente if s["von"] > heute), None
+        )
+
         verbrauch = _f(data.get(CONF_JAHRESVERBRAUCH))
         brennwert = _f(data.get(CONF_BRENNWERT))
         zustandszahl = _f(data.get(CONF_ZUSTANDSZAHL))
@@ -1608,6 +1871,60 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             2,
                         )
 
+        # ---- Preisaenderungen: Summen je Abschnitt ----
+        # Mit Preisaenderungen im Vertrag rechnen Abschlaege, Grundpreis und Arbeitspreis je
+        # Abschnitt mit dessen Werten; die einfachen Formeln oben (ein Preis fuer die ganze
+        # Laufzeit) werden hier ersetzt. Ohne Preisaenderung bleibt alles wie oben.
+        if preis_segmente:
+            ab_segmente = _abschlag_segmente(preis_segmente, beginn, data)
+            m_heute = max(0, (heute - beginn).days) / _MONAT_TAGE
+            if abschlag is not None:
+                abschlagssumme_neu = _integral_monate(ab_segmente, "abschlag", beginn, 0, laufzeit_monate)
+                abschlagssumme = round(abschlagssumme_neu, 2) if abschlagssumme_neu is not None else None
+                gezahlt = _integral_monate(
+                    ab_segmente, "abschlag", beginn, 0, min(m_heute, laufzeit_monate)
+                )
+                abschlag_bisher_gezahlt_wert = round(gezahlt, 2) if gezahlt is not None else None
+            gas_faktor = (
+                brennwert * zustandszahl
+                if sparte == GAS_SPARTE and brennwert and zustandszahl
+                else 1.0
+            )
+            kosten_bisher = None
+            guthaben_bisher = None
+            prognose_real = None
+            abschlag_anpassung_empfohlen = None
+            if verbrauch_bisher is not None and heute >= beginn:
+                grenzen = await self._verbrauch_grenzen(
+                    preis_segmente, beginn, heute, verbrauch_bisher, verbrauch_sensor
+                )
+                ap_kosten = _arbeitspreis_kosten(preis_segmente, grenzen, gas_faktor)
+                gp_bisher = _integral_monate(preis_segmente, "grundpreis", beginn, 0, m_heute)
+                if ap_kosten is not None:
+                    kosten_bisher = round(ap_kosten + (gp_bisher or 0.0), 2)
+                    ab_bisher = _integral_monate(ab_segmente, "abschlag", beginn, 0, m_heute)
+                    if abschlag is not None and ab_bisher is not None:
+                        guthaben_bisher = round(ab_bisher - kosten_bisher, 2)
+                    # Prognose zum Vertragsende: bisherige Kosten plus der hochgerechnete
+                    # Restverbrauch, je Abschnitt mit dessen Arbeitspreis
+                    if verbrauch_hochgerechnet is not None and (heute - beginn).days > 0:
+                        vertrag_ende = ende if ende is not None else beginn + timedelta(days=365)
+                        rest_menge = max(0.0, verbrauch_hochgerechnet - verbrauch_bisher) * gas_faktor
+                        rest_ap = _rest_arbeitspreis_kosten(preis_segmente, heute, vertrag_ende, rest_menge)
+                        rest_gp = _integral_monate(
+                            preis_segmente, "grundpreis", beginn, m_heute, laufzeit_monate
+                        )
+                        if rest_ap is not None:
+                            geschaetzt = ap_kosten + (gp_bisher or 0.0) + rest_ap + (rest_gp or 0.0)
+                            ab_gesamt = _integral_monate(ab_segmente, "abschlag", beginn, 0, laufzeit_monate)
+                            if abschlag is not None and ab_gesamt is not None:
+                                prognose_real = round(ab_gesamt - geschaetzt, 2)
+                            rest_monate = laufzeit_monate - m_heute
+                            if abschlag is not None and ab_bisher is not None and rest_monate > 0:
+                                abschlag_anpassung_empfohlen = round(
+                                    (geschaetzt - ab_bisher) / rest_monate, 2
+                                )
+
         # Tag/Nacht-Tarif (Economy 7 / TOU)
         arbeitspreis_nacht = _f(data.get(CONF_ARBEITSPREIS_NACHT))
         verbrauch_tag = _f(data.get(CONF_JAHRESVERBRAUCH_TAG))
@@ -1771,6 +2088,23 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "erste_zahlung": _parse_date(data.get(CONF_ERSTE_ZAHLUNG)),
             "naechste_zahlung": naechste_zahlung,
             "abschlag_bisher_gezahlt": abschlag_bisher_gezahlt_wert,
+            "preisaenderungen": _preisaenderungen_anzeige(data, beginn, heute),
+            "naechste_preisaenderung": naechste_preisaenderung,
+            "preisaenderung_moeglich": bool(
+                sparte in PREISAENDERUNG_SPARTEN
+                and not arbeitspreis_sensor
+                and beginn is not None
+                and not archiviert
+            ),
+            "preis_basis": (
+                {
+                    "arbeitspreis": _f(data.get(CONF_ARBEITSPREIS)),
+                    "grundpreis": _f(data.get(CONF_GRUNDPREIS)),
+                    "abschlag": _f(data.get(CONF_ABSCHLAG)),
+                }
+                if data.get(CONF_PREISAENDERUNGEN)
+                else None
+            ),
             "verbrauch_bisher": verbrauch_bisher,
             "verbrauch_hochgerechnet": verbrauch_hochgerechnet,
             "prognose_real": prognose_real,

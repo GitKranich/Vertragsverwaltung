@@ -120,6 +120,22 @@ def _arbeitspreis_attrs(d: dict[str, Any]) -> dict[str, Any]:
         ),
         "dynamischer_tarif": bool(d.get(CONF_ARBEITSPREIS_SENSOR)),
         "arbeitspreis_aktuell": d.get("arbeitspreis_aktuell"),
+        # nur mit Preisaenderungen im Vertrag, sonst bleiben die Attribute wie bisher
+        **(
+            {
+                "naechste_preisaenderung": (
+                    d["naechste_preisaenderung"].isoformat()
+                    if d.get("naechste_preisaenderung")
+                    else None
+                ),
+                "preisaenderungen": [
+                    {"datum": p.get("datum"), "status": p.get("status"), **(p.get("gilt") or {})}
+                    for p in d["preisaenderungen"]
+                ],
+            }
+            if d.get("preisaenderungen")
+            else {}
+        ),
     }
 
 

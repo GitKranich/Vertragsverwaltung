@@ -109,6 +109,17 @@ const I18N = {
     secOnce: "One-time items", onceAdd: "Add item", onceEdit: "Edit item", onceTitleAdd: "Add a one-time item", onceTitleEdit: "Edit item",
     onceHint: "A positive amount is a credit (e.g. a switching bonus), a negative one a bill (e.g. a broker's fee). It counts in the balance and in the total cost from its date.",
     onceName: "Description", onceAmount: "Amount (+ credit, − bill)", onceDate: "Date", onceDelete: "Delete item", onceDeleteAsk: "Delete this item?", onceDeleteYes: "Yes, delete", onceSum: "Net",
+    secPriceChanges: "Price changes in this contract", priceAdd: "Add price change", priceEdit: "Edit price change",
+    priceTitleAdd: "Add a price change", priceTitleEdit: "Edit price change",
+    priceHint: "New prices from a date, for example after a price increase by the provider. The contract keeps running (same start, end and meter); from this date costs, balance and forecast use the new values. Leave a field empty to keep its previous value.",
+    priceDate: "Valid from", priceUnit: "Unit price (per kWh)", priceBase: "Standing charge (per month)", priceInstalment: "Instalment (per month)",
+    priceMeter: "Meter reading on that date (optional, only if the statistics do not reach back that far)",
+    priceFromStart: "From contract start", priceActive: "valid now", priceFuture: "upcoming", priceInvalid: "outside the contract term",
+    priceDelete: "Delete price change", priceDeleteAsk: "Delete this price change?", priceNext: "Next price change",
+    termErr_invalid_preis_datum: "The date must be after the contract start and not after its end.",
+    termErr_invalid_preis_leer: "Enter at least one new value (unit price, standing charge or instalment).",
+    termErr_duplicate_datum: "There already is a price change on this date.",
+    termErr_invalid_zaehlerstand: "Enter a meter reading of zero or more.",
     termErr_invalid_bezeichnung: "Enter a description.", termErr_invalid_betrag: "Enter an amount other than zero (with a minus for a bill).",
     minTerm: "Minimum term", noticePeriod: "Notice period", cancelBy: "Cancel by", untilDate: "until {d}",
     chartTitle: "Cost split", chartSoFar: "Cost so far", chartYear: "Per year", chartMetered: "Consumption contracts", chartFlat: "Flat-rate contracts", chartEmpty: "Nothing to show yet.", secAussen: "Outdoor meters", aussenAdd: "Add outdoor meter", aussenEdit: "Edit outdoor meter", aussenTitleAdd: "Add an outdoor meter", aussenTitleEdit: "Edit outdoor meter",
@@ -262,6 +273,17 @@ const I18N = {
     secOnce: "Einmalposten", onceAdd: "Posten hinzufügen", onceEdit: "Posten bearbeiten", onceTitleAdd: "Einmalposten hinzufügen", onceTitleEdit: "Posten bearbeiten",
     onceHint: "Ein positiver Betrag ist eine Gutschrift (z. B. Wechselbonus), ein negativer eine Rechnung (z. B. Honorar für den Makler). Er zählt ab seinem Datum im Saldo und in den Gesamtkosten.",
     onceName: "Bezeichnung", onceAmount: "Betrag (+ Gutschrift, − Rechnung)", onceDate: "Datum", onceDelete: "Posten löschen", onceDeleteAsk: "Diesen Posten löschen?", onceDeleteYes: "Ja, löschen", onceSum: "Saldo",
+    secPriceChanges: "Preisänderungen im Vertrag", priceAdd: "Preisänderung hinzufügen", priceEdit: "Preisänderung bearbeiten",
+    priceTitleAdd: "Preisänderung hinzufügen", priceTitleEdit: "Preisänderung bearbeiten",
+    priceHint: "Neue Preise ab einem Datum, zum Beispiel nach einer Preiserhöhung des Anbieters. Der Vertrag läuft weiter (gleicher Beginn, gleiches Ende, gleicher Zähler); ab dem Datum rechnen Kosten, Saldo und Prognose mit den neuen Werten. Ein leeres Feld behält den bisherigen Wert.",
+    priceDate: "Gültig ab", priceUnit: "Arbeitspreis (pro kWh)", priceBase: "Grundpreis (pro Monat)", priceInstalment: "Abschlag (pro Monat)",
+    priceMeter: "Zählerstand am Stichtag (optional, nur nötig, wenn die Statistik nicht so weit zurückreicht)",
+    priceFromStart: "Ab Vertragsbeginn", priceActive: "gilt aktuell", priceFuture: "geplant", priceInvalid: "außerhalb der Laufzeit",
+    priceDelete: "Preisänderung löschen", priceDeleteAsk: "Diese Preisänderung löschen?", priceNext: "Nächste Preisänderung",
+    termErr_invalid_preis_datum: "Das Datum muss nach dem Vertragsbeginn und spätestens am Vertragsende liegen.",
+    termErr_invalid_preis_leer: "Trage mindestens einen neuen Wert ein (Arbeitspreis, Grundpreis oder Abschlag).",
+    termErr_duplicate_datum: "Für dieses Datum gibt es schon eine Preisänderung.",
+    termErr_invalid_zaehlerstand: "Trage einen Zählerstand von null oder mehr ein.",
     termErr_invalid_bezeichnung: "Trage eine Bezeichnung ein.", termErr_invalid_betrag: "Trage einen Betrag ungleich null ein (mit Minus für eine Rechnung).",
     minTerm: "Mindestlaufzeit", noticePeriod: "Kündigungsfrist", cancelBy: "Kündigen bis", untilDate: "bis {d}",
     chartTitle: "Kostenaufteilung", chartSoFar: "Kosten bisher", chartYear: "Pro Jahr", chartMetered: "Verbrauchsverträge", chartFlat: "Pauschalverträge", chartEmpty: "Noch nichts darzustellen.", secAussen: "Außenzähler", aussenAdd: "Außenzähler hinzufügen", aussenEdit: "Außenzähler bearbeiten", aussenTitleAdd: "Außenzähler hinzufügen", aussenTitleEdit: "Außenzähler bearbeiten",
@@ -1792,6 +1814,7 @@ class TariffyPanel extends HTMLElement {
     if (dlg.mode === "term") { this._renderTermDialog(); return; }
     if (dlg.mode === "renew") { this._renderRenewDialog(); return; }
     if (dlg.mode === "once") { this._renderOnceDialog(); return; }
+    if (dlg.mode === "preis") { this._renderPreisDialog(); return; }
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
     const busy = dlg.stage === "saving";
     const body = [h("h2", { id: "dlg-title", text: this._t({ edit: "dlgTitleEdit", create: "dlgTitleCreate", next: "dlgTitle" }[dlg.mode], { name: dlg.name }) })];
@@ -2279,6 +2302,138 @@ class TariffyPanel extends HTMLElement {
       this._isAdmin ? h("div", { class: "once-add" }, h("button", {
         class: "btn", type: "button", onclick: () => this._openOnce(c, null),
       }, icon("plus"), this._t("onceAdd"))) : null);
+  }
+
+  /* ----- price changes within a running electricity/gas contract, administrators only ----- */
+  _openPreis(c, index) {
+    this._closeFlow();
+    const spec = (name, kind, label, extra = {}) => ({
+      name, kind, label, required: false, min: null, domains: [], custom: false, options: [], initial: "", ...extra,
+    });
+    const item = index === null ? {} : (c.preisaenderungen || []).find((p) => p.index === index) || {};
+    const str = (v) => (isNum(v) ? String(v) : "");
+    this._dlg = {
+      mode: "preis", stage: "form", id: c.entry_id, name: c.title, index, flowId: null, localize: () => "", asking: null,
+      fields: [
+        spec("datum", "date", this._t("priceDate"), { required: true }),
+        spec("arbeitspreis", "number", this._t("priceUnit"), { min: 0 }),
+        spec("grundpreis", "number", this._t("priceBase"), { min: 0 }),
+        spec("abschlag", "number", this._t("priceInstalment"), { min: 0 }),
+        spec("zaehlerstand", "number", this._t("priceMeter"), { min: 0 }),
+      ],
+      values: {
+        datum: item.datum || "", arbeitspreis: str(item.arbeitspreis), grundpreis: str(item.grundpreis),
+        abschlag: str(item.abschlag), zaehlerstand: str(item.zaehlerstand),
+      },
+      fieldErrors: {}, message: null,
+    };
+    this._renderPreisDialog();
+  }
+
+  async _savePreis() {
+    const dlg = this._dlg;
+    const { values, errors } = this._collectFlow(dlg);
+    dlg.fieldErrors = errors;
+    dlg.message = null;
+    if (Object.keys(errors).length) { this._renderPreisDialog(); return; }
+    if (!["arbeitspreis", "grundpreis", "abschlag"].some((k) => k in values)) {
+      dlg.message = this._t("termErr_invalid_preis_leer");
+      this._renderPreisDialog();
+      return;
+    }
+    await this._callPreis(dlg, { type: "tariffy/preis_save", entry_id: dlg.id, values, ...(dlg.index === null ? {} : { index: dlg.index }) });
+  }
+
+  async _deletePreis() {
+    const dlg = this._dlg;
+    await this._callPreis(dlg, { type: "tariffy/preis_delete", entry_id: dlg.id, index: dlg.index });
+  }
+
+  async _callPreis(dlg, message) {
+    dlg.stage = "saving";
+    this._renderPreisDialog();
+    try {
+      await this._hass.callWS(message);
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.asking = null;
+      dlg.message = this._termError(err);
+      this._renderPreisDialog();
+      return;
+    }
+    if (this._dlg === dlg) this._closeFlow();
+    this._render();
+  }
+
+  _renderPreisDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving";
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t(dlg.index === null ? "priceTitleAdd" : "priceTitleEdit") }),
+      h("p", { class: "hint", text: dlg.name }),
+      h("p", { class: "hint", text: this._t("priceHint") }),
+      h("div", { class: "fields" }, dlg.fields.map((f) => {
+        const error = dlg.fieldErrors[f.name];
+        return h("label", { class: `fld${error ? " bad" : ""}`, for: `f-${f.name}` },
+          h("span", { class: "lbl", text: f.label }), this._fieldInput(dlg, f),
+          error ? h("div", { class: "ferr", text: error }) : null);
+      })),
+    ];
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    const buttons = [];
+    if (dlg.asking === "delete") {
+      buttons.push(h("div", { class: "ask" },
+        h("span", { text: this._t("priceDeleteAsk") }),
+        h("button", { class: "btn red", type: "button", disabled: busy ? "" : null, text: this._t("onceDeleteYes"), onclick: () => this._deletePreis() }),
+        h("button", { class: "btn", type: "button", text: this._t("actCancel"), onclick: () => { dlg.asking = null; this._renderPreisDialog(); } })));
+    } else {
+      buttons.push(h("button", { class: "btn go", type: "button", disabled: busy ? "" : null,
+        text: this._t(busy ? "dlgSaving" : "dlgSave"), onclick: () => this._savePreis() }));
+      buttons.push(h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() }));
+      if (dlg.index !== null) {
+        buttons.push(h("button", { class: "btn red", type: "button", disabled: busy ? "" : null, text: this._t("priceDelete"),
+          onclick: () => { dlg.asking = "delete"; this._renderPreisDialog(); } }));
+      }
+    }
+    body.push(h("div", { class: "actions" }, buttons));
+    this._mountDialog(dlg, body, busy);
+    if (!dlg.focused) {
+      dlg.focused = true;
+      const first = this._dlgEl.querySelector("input, select");
+      if (first) first.focus();
+    }
+  }
+
+  /* the "price changes" block of an electricity/gas contract */
+  _preisSection(c) {
+    const items = c.preisaenderungen || [];
+    if (!items.length && !(this._isAdmin && c.preisaenderung_moeglich)) return null;
+    const pu = this._priceUnit(c);
+    const money = (v) => this._money(v, c.currency, { digits: 2 });
+    const describe = (p) => [
+      isNum(p.arbeitspreis) ? this._price(p.arbeitspreis, c.currency, pu) : null,
+      isNum(p.grundpreis) ? `${money(p.grundpreis)} ${this._t("perMonth")}` : null,
+      isNum(p.abschlag) ? `${this._t("instalment")} ${money(p.abschlag)}` : null,
+    ].filter(Boolean).join(" · ");
+    const status = { aktiv: "priceActive", kuenftig: "priceFuture", ungueltig: "priceInvalid" };
+    const rows = [];
+    if (items.length && c.preis_basis) {
+      rows.push(h("div", { class: "row once-row" },
+        h("span", {}, this._t("priceFromStart"), h("span", { class: "t2", text: describe(c.preis_basis) })), h("span", {})));
+    }
+    items.forEach((p) => rows.push(h("div", { class: "row once-row" },
+      h("span", {}, p.datum ? this._date(p.datum) : "–", h("span", { class: "t2", text: describe(p) })),
+      h("span", { class: p.status === "ungueltig" ? "red-t" : p.status === "aktiv" ? "green-t" : "", text: status[p.status] ? this._t(status[p.status]) : "" }),
+      this._isAdmin ? h("button", {
+        class: "icon-btn", type: "button", title: this._t("priceEdit"), "aria-label": this._t("priceEdit"),
+        onclick: () => this._openPreis(c, p.index),
+      }, icon("edit")) : null)));
+    return h("div", { class: "sec" }, h("h4", { text: this._t("secPriceChanges") }), rows,
+      this._isAdmin && c.preisaenderung_moeglich ? h("div", { class: "once-add" }, h("button", {
+        class: "btn", type: "button", onclick: () => this._openPreis(c, null),
+      }, icon("plus"), this._t("priceAdd"))) : null);
   }
 
   /* ----- outdoor meters of a water contract (garden, pool, ...): not charged wastewater, administrators only ----- */
@@ -2909,6 +3064,7 @@ class TariffyPanel extends HTMLElement {
         row(this._t("basePrice"), isNum(c.grundpreis) ? `${money(c.grundpreis)} ${this._t("perMonth")}` : null),
         row(this._t("instalment"), isNum(c.abschlag) ? `${money(c.abschlag)} ${this._t("perMonth")}` : null),
         row(this._t("instalmentYear"), isNum(c.abschlag_jahr) ? money(c.abschlag_jahr) : null),
+        row(this._t("priceNext"), c.naechste_preisaenderung ? this._date(c.naechste_preisaenderung) : null),
         // flat-rate contracts: what the contract costs a year, and how it is paid when not monthly
         row(this._t("costYear"), !METERED.has(c.sparte) && isNum(c.kosten_jahr) ? money(c.kosten_jahr) : null),
         row(this._t("payment"), c.zahlweise && c.zahlweise !== "monthly" && isNum(c.abschlag_je_zahlung)
@@ -2918,6 +3074,7 @@ class TariffyPanel extends HTMLElement {
         row(this._t("costSoFar"), !METERED.has(c.sparte) && isNum(this._costSoFar(c)) ? money(this._costSoFar(c)) : null),
         row(this._t("totalCost"), this._total(c) ? `${this._total(c).value} · ${this._total(c).since}` : null),
       ]),
+      this._preisSection(c),
       this._onceSection(c),
       d.measured || d.hasMetering || isNum(c.verbrauch_letzte_laufzeit) ? section(this._t("secConsumption"), [
         row(this._t("soFar"), amount(c.verbrauch_bisher)),
