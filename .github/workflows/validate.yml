@@ -16,6 +16,9 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
+          # Beschreibung und Themen des Repos braucht nur die Aufnahme in den HACS-Standard-Store;
+          # dieses Repo wird als benutzerdefiniertes Repository installiert.
+          ignore: "description topics"
 
   release-scripts:
     name: Test release scripts
