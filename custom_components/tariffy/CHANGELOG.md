@@ -7,7 +7,7 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
-## [1.31.0-custom.1] - 2026-11-17
+## [1.31.0] - 2026-11-17
 
 Eigene Version (Fork von weskona/tariffy 1.30.0).
 
