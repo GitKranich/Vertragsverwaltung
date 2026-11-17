@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-11-18
+
+### Hinzugefügt
+
+- **Einstellung für die Verbrauchsprognose bei Strom- und Gasverträgen** ("Verbrauchsprognose" im Vertragsformular): **Saisonal** verteilt den Restverbrauch nach den eigenen Monatswerten des Zählers (Durchschnitt je Kalendermonat über die Jahre in der Langzeitstatistik, an den bisherigen Verbrauch der Laufzeit angepasst), Wintermonate zählen also mit ihrem höheren Verbrauch; ohne ein volles Jahr Statistik gilt ein Standardprofil (Strom: Haushaltsprofil, Gas: Gradtagzahlen). **Letzte 30 Tage** rechnet den Verbrauch der letzten 30 Tage linear hoch; **Durchschnitt** behält den Tagesdurchschnitt seit Vertragsbeginn (das bisherige Verhalten). Prognose, Kosten zum Vertragsende, Abschlag-Empfehlung und Warnung rechnen damit; mit Preisänderungen zählt jeder Monat des Restverbrauchs mit dem dann gültigen Preis. Neue Verträge starten saisonal, bestehende behalten den Durchschnitt, bis er umgestellt wird. Das Panel zeigt die genutzte Methode unter "Verbrauch".
+
 ## [1.33.0] - 2026-11-17
 
 ### Hinzugefügt

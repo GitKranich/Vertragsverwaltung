@@ -126,6 +126,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
+      "prognose": "durchschnitt",
+      "prognose_methode": "durchschnitt",
       "prognose_real": -495.29,
       "restlaufzeit": 172,
       "seit": "2024-01-01",
@@ -229,6 +231,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
+      "prognose": "durchschnitt",
+      "prognose_methode": "durchschnitt",
       "prognose_real": 524.42,
       "restlaufzeit": 50,
       "seit": "2025-09-01",
@@ -341,6 +345,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": null,
+      "prognose_methode": null,
       "prognose_real": 15.11,
       "restlaufzeit": 172,
       "seit": "2026-01-01",
@@ -444,6 +450,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": "durchschnitt",
+      "prognose_methode": "durchschnitt",
       "prognose_real": -421.8,
       "restlaufzeit": 203,
       "seit": "2026-02-01",
@@ -547,6 +555,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": null,
+      "prognose_methode": null,
       "prognose_real": null,
       "restlaufzeit": 80,
       "seit": "2025-10-01",
@@ -657,6 +667,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": null,
+      "prognose_methode": null,
       "prognose_real": null,
       "restlaufzeit": 172,
       "seit": "2025-08-01",
@@ -792,6 +804,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": "durchschnitt",
+      "prognose_methode": null,
       "prognose_real": null,
       "restlaufzeit": -193,
       "seit": "2022-01-01",
@@ -895,6 +909,8 @@
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
+      "prognose": null,
+      "prognose_methode": null,
       "prognose_real": null,
       "restlaufzeit": 6442,
       "seit": "2024-03-01",
@@ -1249,6 +1265,25 @@
             }
           },
           {
+            "default": "saisonal",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1504,6 +1539,25 @@
             }
           },
           {
+            "default": "saisonal",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1734,6 +1788,25 @@
             "required": false,
             "selector": {
               "date": {}
+            }
+          },
+          {
+            "default": "saisonal",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
             }
           },
           {
@@ -3362,6 +3435,25 @@
             }
           },
           {
+            "default": "durchschnitt",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -3759,6 +3851,25 @@
             "required": false,
             "selector": {
               "date": {}
+            }
+          },
+          {
+            "default": "durchschnitt",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
             }
           },
           {
@@ -4545,6 +4656,25 @@
             "required": false,
             "selector": {
               "date": {}
+            }
+          },
+          {
+            "default": "durchschnitt",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
             }
           },
           {
@@ -5432,6 +5562,25 @@
             "required": false,
             "selector": {
               "date": {}
+            }
+          },
+          {
+            "default": "durchschnitt",
+            "name": "prognose",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "saisonal",
+                  "letzte_30_tage",
+                  "durchschnitt"
+                ],
+                "sort": false,
+                "translation_key": "prognose"
+              }
             }
           },
           {

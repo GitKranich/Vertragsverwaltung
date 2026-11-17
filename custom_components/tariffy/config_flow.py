@@ -41,6 +41,10 @@ from .const import (
     CONF_BEGINN,
     CONF_BONUS,
     CONF_SOFORTBONUS,
+    CONF_PROGNOSE,
+    PROGNOSE_SAISONAL,
+    PROGNOSE_DURCHSCHNITT,
+    PROGNOSE_METHODEN,
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_ERINNERUNG_MONATE,
@@ -512,6 +516,14 @@ def _energie_schema(d: dict[str, Any], features: dict | None = None) -> vol.Sche
             _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             _opt(CONF_ERSTE_ZAHLUNG, d.get(CONF_ERSTE_ZAHLUNG)): selector.DateSelector(),
             vol.Required(
+                CONF_PROGNOSE,
+                # neue Vertraege saisonal; bestehende ohne Einstellung behalten den Durchschnitt
+                default=d.get(CONF_PROGNOSE)
+                or (PROGNOSE_DURCHSCHNITT if d.get(CONF_ABSCHLAG) is not None else PROGNOSE_SAISONAL),
+            ): _select(
+                list(PROGNOSE_METHODEN), translation_key="prognose"
+            ),
+            vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),
             _opt(CONF_ZAEHLERNUMMER, d.get(CONF_ZAEHLERNUMMER)): selector.TextSelector(),
@@ -563,6 +575,14 @@ def _energie_ht_nt_schema(d: dict[str, Any], features: dict | None = None) -> vo
             _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             _opt(CONF_ERSTE_ZAHLUNG, d.get(CONF_ERSTE_ZAHLUNG)): selector.DateSelector(),
             vol.Required(
+                CONF_PROGNOSE,
+                # neue Vertraege saisonal; bestehende ohne Einstellung behalten den Durchschnitt
+                default=d.get(CONF_PROGNOSE)
+                or (PROGNOSE_DURCHSCHNITT if d.get(CONF_ABSCHLAG) is not None else PROGNOSE_SAISONAL),
+            ): _select(
+                list(PROGNOSE_METHODEN), translation_key="prognose"
+            ),
+            vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),
             _opt(CONF_ZAEHLERNUMMER, d.get(CONF_ZAEHLERNUMMER)): selector.TextSelector(),
@@ -613,6 +633,14 @@ def _gas_schema(d: dict[str, Any], features: dict | None = None) -> vol.Schema:
             _opt(CONF_BONUS, d.get(CONF_BONUS)): _preis(0.01),
             _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             _opt(CONF_ERSTE_ZAHLUNG, d.get(CONF_ERSTE_ZAHLUNG)): selector.DateSelector(),
+            vol.Required(
+                CONF_PROGNOSE,
+                # neue Vertraege saisonal; bestehende ohne Einstellung behalten den Durchschnitt
+                default=d.get(CONF_PROGNOSE)
+                or (PROGNOSE_DURCHSCHNITT if d.get(CONF_ABSCHLAG) is not None else PROGNOSE_SAISONAL),
+            ): _select(
+                list(PROGNOSE_METHODEN), translation_key="prognose"
+            ),
             vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),

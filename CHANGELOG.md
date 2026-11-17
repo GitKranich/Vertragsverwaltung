@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-11-18
+
+### Added
+
+- **Consumption forecast setting for electricity and gas contracts** ("Consumption forecast" in the contract form): **seasonal** distributes the remaining consumption by the meter's own monthly values (average per calendar month over the years in the long-term statistics, scaled to this term's consumption so far), so winter months count with their higher consumption; without a full year of statistics a standard profile is used (electricity: household profile, gas: degree days). **Last 30 days** extrapolates the consumption of the last 30 days linearly; **average** keeps the daily average since the contract start (the previous behaviour). Forecast, cost at contract end, recommended instalment and the warning use it; with price changes each month of the remaining consumption is charged at the price valid then. New contracts start with seasonal; existing contracts keep the average until it is changed. The panel shows the method used under "Consumption".
+
 ## [1.33.0] - 2026-11-17
 
 ### Added

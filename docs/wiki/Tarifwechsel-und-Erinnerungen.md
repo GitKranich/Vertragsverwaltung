@@ -31,6 +31,16 @@ Erhöht der Anbieter die Preise, ohne dass ein neuer Vertrag beginnt (gleicher B
 - Wurde der Abschlag beim Bearbeiten geändert, merkt sich Tariffy den alten Betrag bis zum Änderungstag. War das nur eine Korrektur, lässt sich das im Block "Preisänderungen im Vertrag" mit **"Als Korrektur werten"** aufheben.
 - Nicht verfügbar bei dynamischem Tarif (Börsenpreis-Sensor) und beim Zweizählertarif (HT/NT).
 
+## Verbrauchsprognose (Strom und Gas)
+
+Wie der Verbrauch bis Vertragsende hochgerechnet wird, stellst du im Vertragsformular unter **Verbrauchsprognose** ein:
+
+- **Saisonal** (Standard für neue Verträge): Der Restverbrauch wird nach den eigenen Monatswerten des Zählers verteilt (Durchschnitt je Kalendermonat über alle Jahre in der Langzeitstatistik) und an den bisherigen Verbrauch dieser Laufzeit angepasst. Wintermonate zählen so mit ihrem höheren Verbrauch. Fehlt für einen Monat die Statistik, gilt ein Standardprofil (Strom: Haushaltsprofil, Gas: Gradtagzahlen).
+- **Letzte 30 Tage**: Der Verbrauch der letzten 30 Tage, linear hochgerechnet. Gut für Zähler mit gleichmäßigem Verbrauch.
+- **Durchschnitt**: Der Tagesdurchschnitt seit Vertragsbeginn, linear (bisheriges Verhalten, gilt für Verträge ohne Einstellung).
+
+Die Prognose bestimmt "Hochgerechnet auf die Laufzeit", "Guthaben/Nachzahlung zum Vertragsende", die Abschlag-Empfehlung und die Abschlag-Warnung. Das Panel zeigt unter "Verbrauch", welche Methode gerade rechnet.
+
 ## Kündigungs-Erinnerung
 
 Wenn Vertragsende gesetzt und der Erinnerungszeitraum erreicht ist:

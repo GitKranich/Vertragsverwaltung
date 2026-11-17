@@ -124,6 +124,8 @@ CONTRACT_FIELDS = (
     "bonus",
     "sofortbonus",
     "abschlag_aenderung",
+    "prognose",
+    "prognose_methode",
     "preisaenderungen",
     "naechste_preisaenderung",
     "preis_basis",

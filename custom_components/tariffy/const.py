@@ -30,6 +30,18 @@ CONF_PREISGARANTIE = "preisgarantie"
 # Abschlag-Empfehlung). Sofortbonus: schon ausgezahlt, senkt nur die Gesamtkosten.
 CONF_BONUS = "bonus"
 CONF_SOFORTBONUS = "sofortbonus"
+
+# Verbrauchsprognose bis Vertragsende (nur Strom und Gas):
+#   saisonal       - Monatsprofil aus der Langzeitstatistik des Zaehlers (Durchschnitt je
+#                    Kalendermonat ueber die vorhandenen Jahre); fehlt ein Monat, ein
+#                    Standardprofil (Strom: Haushalt, Gas: Gradtagzahlen)
+#   letzte_30_tage - Verbrauch der letzten 30 Tage, linear (wie EHW+ fuer nicht-saisonale Zaehler)
+#   durchschnitt   - Durchschnitt seit Vertragsbeginn, linear (bisheriges Verhalten)
+CONF_PROGNOSE = "prognose"
+PROGNOSE_SAISONAL = "saisonal"
+PROGNOSE_LETZTE_30 = "letzte_30_tage"
+PROGNOSE_DURCHSCHNITT = "durchschnitt"
+PROGNOSE_METHODEN = (PROGNOSE_SAISONAL, PROGNOSE_LETZTE_30, PROGNOSE_DURCHSCHNITT)
 CONF_OEKOSTROM = "oekostrom"
 
 # Gas-spezifisch

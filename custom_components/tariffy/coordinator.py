@@ -39,6 +39,10 @@ from .const import (
     CONF_BEGINN,
     CONF_BONUS,
     CONF_SOFORTBONUS,
+    CONF_PROGNOSE,
+    PROGNOSE_SAISONAL,
+    PROGNOSE_LETZTE_30,
+    PROGNOSE_DURCHSCHNITT,
     ENERGIE_SPARTEN,
     CONF_BRENNWERT,
     CONF_ENDE,
@@ -407,6 +411,97 @@ def _abschlag_zahlungen(
     return round(bisher, 2), round(gesamt, 2), offen
 
 
+# ------------------------------------------------------------ Verbrauchsprognose
+# Standardprofile als relative Tagesintensitaet je Kalendermonat (1 = Jahresmittel), fuer
+# Vertraege ohne genug eigene Statistik. Strom: Naeherung an das Haushaltsprofil (Winter etwa
+# 15 % ueber, Sommer etwa 15 % unter dem Mittel). Gas: 80 % Heizung nach Gradtagzahlen
+# (VDI 2067, Jahressumme 1000) plus 20 % gleichmaessiger Anteil fuer Warmwasser und Kochen.
+_PROFIL_STROM = {
+    1: 1.15, 2: 1.08, 3: 1.02, 4: 0.93, 5: 0.88, 6: 0.85,
+    7: 0.85, 8: 0.86, 9: 0.90, 10: 1.00, 11: 1.10, 12: 1.18,
+}
+_GRADTAGE = {1: 170, 2: 150, 3: 130, 4: 80, 5: 40, 6: 13.3, 7: 13.3, 8: 13.4, 9: 30, 10: 80, 11: 120, 12: 160}
+
+
+def _standardprofil(sparte: str | None) -> dict[int, float]:
+    if sparte == GAS_SPARTE:
+        return {
+            monat: 0.8 * (_GRADTAGE[monat] / 1000) * 365 / calendar.monthrange(2001, monat)[1] + 0.2
+            for monat in range(1, 13)
+        }
+    return dict(_PROFIL_STROM)
+
+
+def _monatsprofil_aus_statistik(
+    monate: dict[tuple[int, int], float]
+) -> dict[int, float]:
+    """Mittlerer Tagesverbrauch je Kalendermonat aus vollstaendigen Monatswerten
+    {(jahr, monat): verbrauch}, ueber alle vorhandenen Jahre gemittelt."""
+    summen: dict[int, list[float]] = {}
+    for (jahr, monat), menge in monate.items():
+        if menge is None or menge < 0:
+            continue
+        summen.setdefault(monat, []).append(menge / calendar.monthrange(jahr, monat)[1])
+    return {monat: sum(werte) / len(werte) for monat, werte in summen.items()}
+
+
+def _profil_summe(profil: dict[int, float], von: date, bis: date) -> float | None:
+    """Summe der Tagesintensitaeten von `von` (einschliesslich) bis `bis` (ausschliesslich).
+    None, wenn ein beruehrter Kalendermonat im Profil fehlt."""
+    summe = 0.0
+    tag = von
+    while tag < bis:
+        naechster = date(tag.year + (tag.month == 12), tag.month % 12 + 1, 1)
+        ende = min(naechster, bis)
+        wert = profil.get(tag.month)
+        if wert is None:
+            return None
+        summe += wert * (ende - tag).days
+        tag = ende
+    return summe
+
+
+def _prognose_abschnitte(
+    profil: dict[int, float],
+    beginn: date,
+    heute: date,
+    vertrag_ende: date,
+    verbrauch_bisher: float,
+) -> list[tuple[date, date, float]] | None:
+    """Restverbrauch von heute bis Vertragsende je Kalendermonat, nach dem Profil verteilt und an
+    den bisherigen Verbrauch angepasst: Rest = bisher x Profil(Rest) / Profil(bisher)."""
+    bisher_gewicht = _profil_summe(profil, beginn, heute)
+    if not bisher_gewicht or bisher_gewicht <= 0:
+        return None
+    abschnitte: list[tuple[date, date, float]] = []
+    tag = heute
+    while tag < vertrag_ende:
+        naechster = date(tag.year + (tag.month == 12), tag.month % 12 + 1, 1)
+        ende = min(naechster, vertrag_ende)
+        gewicht = _profil_summe(profil, tag, ende)
+        if gewicht is None:
+            return None
+        abschnitte.append((tag, ende, verbrauch_bisher * gewicht / bisher_gewicht))
+        tag = ende
+    return abschnitte
+
+
+def _rest_arbeitspreis_kosten_abschnitte(
+    segmente: list[dict[str, Any]],
+    abschnitte: list[tuple[date, date, float]],
+    faktor: float,
+) -> float | None:
+    """Arbeitspreis-Kosten eines je Monat verteilten Restverbrauchs: jeder Monatsabschnitt
+    rechnet tagesanteilig mit den in ihm gueltigen Preisabschnitten."""
+    summe = 0.0
+    for von, bis, menge in abschnitte:
+        teil = _rest_arbeitspreis_kosten(segmente, von, bis, menge * faktor)
+        if teil is None:
+            return None
+        summe += teil
+    return summe
+
+
 def _monat_von(beginn: date, tag: date) -> float:
     return (tag - beginn).days / _MONAT_TAGE
 
@@ -771,6 +866,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._aussen_offsets: dict[str, tuple[date, float, float | None]] = {}
         # Preisaenderungen: Zaehler-Offset (sum, state) je Stichtag aus der Langzeitstatistik
         self._preis_offsets: dict[date, tuple[float, float | None]] = {}
+        # Monatswerte der Zaehler fuer die saisonale Prognose (einmal pro Tag gelesen)
+        self._monatswerte_cache: tuple[tuple[tuple[str, ...], date], dict[tuple[int, int], float]] | None = None
         # Fuer den Diagnose-Download und die Warnung im Log: wie der
         # Verbrauch beim letzten Update ermittelt wurde (siehe diagnostics.py).
         self.verbrauch_diag: dict[str, Any] = {}
@@ -1365,6 +1462,124 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             aktuell_sum, offset_sum, aktuell_state, offset_state, await _einheit_faktor(self.hass, sensor_id)
         )
 
+    async def _monatswerte(
+        self, sensoren: list[str], heute: date
+    ) -> dict[tuple[int, int], float]:
+        """Vollstaendige Monatsverbraeuche {(jahr, monat): menge} der Zaehler aus der
+        Langzeitstatistik (bis drei Jahre zurueck, ohne den laufenden Monat und ohne den ersten
+        Monat eines Zaehlers, der meist nur teilweise erfasst ist). Einmal pro Tag gelesen."""
+        schluessel = (tuple(sensoren), heute)
+        if self._monatswerte_cache and self._monatswerte_cache[0] == schluessel:
+            return self._monatswerte_cache[1]
+        ergebnis: dict[tuple[int, int], float] = {}
+        try:
+            from homeassistant.components.recorder import get_instance
+            from homeassistant.components.recorder.statistics import statistics_during_period
+
+            tz = dt_util.get_default_time_zone()
+            erster = date(heute.year - 3, heute.month, 1)
+            start_dt = datetime.combine(erster, datetime.min.time()).replace(tzinfo=tz)
+            ende_dt = datetime.combine(date(heute.year, heute.month, 1), datetime.min.time()).replace(tzinfo=tz)
+            stats = await get_instance(self.hass).async_add_executor_job(
+                lambda: statistics_during_period(
+                    self.hass, start_dt, ende_dt, statistic_ids=set(sensoren),
+                    period="month", units={}, types={"change"},
+                )
+            )
+            je_sensor: list[dict[tuple[int, int], float]] = []
+            for sensor in sensoren:
+                werte: dict[tuple[int, int], float] = {}
+                for eintrag in stats.get(sensor, []) or []:
+                    start = eintrag.get("start")
+                    menge = eintrag.get("change")
+                    if start is None or menge is None:
+                        continue
+                    zeit = (
+                        datetime.fromtimestamp(float(start), tz)
+                        if isinstance(start, (int, float))
+                        else dt_util.as_local(start)
+                    )
+                    werte[(zeit.year, zeit.month)] = float(menge)
+                if werte:
+                    erster_monat = min(werte)
+                    if erster_monat > (erster.year, erster.month):
+                        del werte[erster_monat]  # Beginn der Aufzeichnung: Monat unvollstaendig
+                je_sensor.append(werte)
+            if je_sensor and all(je_sensor):
+                gemeinsam = set.intersection(*(set(w) for w in je_sensor))
+                ergebnis = {monat: sum(w[monat] for w in je_sensor) for monat in gemeinsam}
+        except Exception as err:  # noqa: BLE001 - Prognose faellt dann auf das Standardprofil zurueck
+            _LOGGER.debug("Tariffy: Monatswerte fuer %s nicht lesbar: %s", sensoren, err)
+        self._monatswerte_cache = (schluessel, ergebnis)
+        return ergebnis
+
+    async def _rest_prognose(
+        self,
+        data: dict[str, Any],
+        sparte: str,
+        beginn: date,
+        heute: date,
+        vertrag_ende: date,
+        verbrauch_bisher: float,
+    ) -> tuple[list[tuple[date, date, float]] | None, str]:
+        """Restverbrauch von heute bis Vertragsende je Kalendermonat nach der eingestellten
+        Methode, und die tatsaechlich genutzte Methode ("saisonal", "standardprofil",
+        "letzte_30_tage", "durchschnitt"). Faellt eine Methode mangels Daten aus, rechnet die
+        naechst einfachere (saisonal -> Standardprofil, letzte 30 Tage -> Durchschnitt)."""
+        methode = data.get(CONF_PROGNOSE) or PROGNOSE_DURCHSCHNITT
+        sensoren = [s for s in (data.get(CONF_VERBRAUCH_SENSOR),) if s]
+        if sparte == SPARTE_ELECTRICITY_HT_NT and data.get(CONF_VERBRAUCH_SENSOR_NT):
+            sensoren.append(data[CONF_VERBRAUCH_SENSOR_NT])
+        if heute >= vertrag_ende:
+            return [], methode
+
+        if methode == PROGNOSE_SAISONAL:
+            profil = _monatsprofil_aus_statistik(await self._monatswerte(sensoren, heute)) if sensoren else {}
+            abschnitte = _prognose_abschnitte(profil, beginn, heute, vertrag_ende, verbrauch_bisher)
+            if abschnitte is not None:
+                return abschnitte, PROGNOSE_SAISONAL
+            abschnitte = _prognose_abschnitte(
+                _standardprofil(sparte), beginn, heute, vertrag_ende, verbrauch_bisher
+            )
+            return abschnitte, "standardprofil"
+
+        if methode == PROGNOSE_LETZTE_30 and sensoren and (heute - beginn).days >= 30:
+            stichtag = heute - timedelta(days=30)
+            summe: float | None = 0.0
+            for sensor in sensoren:
+                cache: dict[str, tuple[float, float | None]] = {}
+
+                async def _offset(entity_id: str, at_date: date, _cache=cache):
+                    if entity_id not in _cache:
+                        werte = await _get_historic_value(self.hass, entity_id, at_date)
+                        if werte[0] is None:
+                            return werte
+                        _cache[entity_id] = werte
+                    return _cache[entity_id]
+
+                teil = await self._verbrauch_bisher_fuer_sensor(sensor, None, stichtag, _offset)
+                if teil is None:
+                    summe = None
+                    break
+                summe += teil
+            if summe is not None and summe >= 0:
+                pro_tag = summe / 30
+                return [
+                    (von, bis, pro_tag * (bis - von).days)
+                    for von, bis, _ in _prognose_abschnitte(
+                        {m: 1.0 for m in range(1, 13)}, beginn, heute, vertrag_ende, 1.0
+                    ) or []
+                ], PROGNOSE_LETZTE_30
+
+        # Durchschnitt seit Vertragsbeginn (linear), auch als Rueckfall
+        tage = max(1, (heute - beginn).days)
+        return [
+            (von, bis, verbrauch_bisher / tage * (bis - von).days)
+            for von, bis, _ in _prognose_abschnitte(
+                {m: 1.0 for m in range(1, 13)}, beginn, heute, vertrag_ende, 1.0
+            ) or []
+        ], PROGNOSE_DURCHSCHNITT
+
     async def _get_preis_offset(
         self, entity_id: str, stichtag: date
     ) -> tuple[float | None, float | None]:
@@ -1686,6 +1901,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         verbrauch_bisher: float | None = None
         verbrauch_hochgerechnet: float | None = None
         prognose_real: float | None = None
+        # Restverbrauch je Monat bis Vertragsende (Strom/Gas) und die dafuer genutzte Methode
+        prognose_abschnitte: list[tuple[date, date, float]] | None = None
+        prognose_methode: str | None = None
         # Kosten bis Vertragsende (Hochrechnung), fuer die Abschlagszahlungen weiter unten
         geschaetzt_gesamt: float | None = None
         abschlag_anpassung_empfohlen: float | None = None
@@ -1823,6 +2041,21 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 verbrauch_hochgerechnet = round(
                     verbrauch_bisher / vergangene_tage * vertrag_gesamttage, 1
                 )
+                # Strom/Gas: Restverbrauch nach der eingestellten Prognose-Methode (saisonal,
+                # letzte 30 Tage oder Durchschnitt, siehe CONF_PROGNOSE)
+                if sparte in ENERGIE_SPARTEN:
+                    prognose_methode = PROGNOSE_DURCHSCHNITT
+                if sparte in ENERGIE_SPARTEN and data.get(CONF_PROGNOSE) in (
+                    PROGNOSE_SAISONAL, PROGNOSE_LETZTE_30
+                ):
+                    prognose_abschnitte, prognose_methode = await self._rest_prognose(
+                        data, sparte, beginn, heute,
+                        beginn + timedelta(days=vertrag_gesamttage), verbrauch_bisher,
+                    )
+                    if prognose_abschnitte is not None:
+                        verbrauch_hochgerechnet = round(
+                            verbrauch_bisher + sum(m for _, _, m in prognose_abschnitte), 1
+                        )
                 # Bei Gas: m³ hochgerechnet → kWh
                 if sparte == GAS_SPARTE and brennwert and zustandszahl:
                     verbrauch_kwh_real = round(
@@ -1956,8 +2189,15 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     # Restverbrauch, je Abschnitt mit dessen Arbeitspreis
                     if verbrauch_hochgerechnet is not None and (heute - beginn).days > 0:
                         vertrag_ende = ende if ende is not None else beginn + timedelta(days=365)
-                        rest_menge = max(0.0, verbrauch_hochgerechnet - verbrauch_bisher) * gas_faktor
-                        rest_ap = _rest_arbeitspreis_kosten(preis_segmente, heute, vertrag_ende, rest_menge)
+                        if prognose_abschnitte is not None:
+                            # je Monat verteilt: Wintermonate nach einer Preisaenderung zaehlen
+                            # mit ihrem tatsaechlichen Anteil am Restverbrauch
+                            rest_ap = _rest_arbeitspreis_kosten_abschnitte(
+                                preis_segmente, prognose_abschnitte, gas_faktor
+                            )
+                        else:
+                            rest_menge = max(0.0, verbrauch_hochgerechnet - verbrauch_bisher) * gas_faktor
+                            rest_ap = _rest_arbeitspreis_kosten(preis_segmente, heute, vertrag_ende, rest_menge)
                         rest_gp = _integral_monate(
                             preis_segmente, "grundpreis", beginn, m_heute, laufzeit_monate
                         )
@@ -2198,6 +2438,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "abschlag_bisher_gezahlt": abschlag_bisher_gezahlt_wert,
             "preisaenderungen": _preisaenderungen_anzeige(data, beginn, heute),
             "naechste_preisaenderung": naechste_preisaenderung,
+            # ohne gespeicherte Einstellung (Vertraege vor 1.34.0): Durchschnitt wie bisher
+            "prognose": data.get(CONF_PROGNOSE) or (PROGNOSE_DURCHSCHNITT if sparte in ENERGIE_SPARTEN else None),
+            "prognose_methode": prognose_methode,
             "preisaenderung_moeglich": bool(
                 sparte in PREISAENDERUNG_SPARTEN
                 and not arbeitspreis_sensor
