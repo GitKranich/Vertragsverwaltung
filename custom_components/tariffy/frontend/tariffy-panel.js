@@ -109,6 +109,9 @@ const I18N = {
     secOnce: "One-time items", onceAdd: "Add item", onceEdit: "Edit item", onceTitleAdd: "Add a one-time item", onceTitleEdit: "Edit item",
     onceHint: "A positive amount is a credit (e.g. a switching bonus), a negative one a bill (e.g. a broker's fee). It counts in the balance and in the total cost from its date.",
     onceName: "Description", onceAmount: "Amount (+ credit, − bill)", onceDate: "Date", onceDelete: "Delete item", onceDeleteAsk: "Delete this item?", onceDeleteYes: "Yes, delete", onceSum: "Net",
+    firstInstalment: "First instalment", abschlagBefore: "Instalment before", abschlagUntil: "until {d}",
+    abschlagFix: "Treat as a correction", abschlagFixAsk: "Use the current instalment from the contract start?", abschlagFixYes: "Yes",
+    abschlagFixHint: "Saved when the instalment was changed while editing. If the old amount was a typo, treat it as a correction: the current instalment then applies from the contract start.",
     bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
     secPriceChanges: "Price changes in this contract", priceAdd: "Add price change", priceEdit: "Edit price change",
     priceTitleAdd: "Add a price change", priceTitleEdit: "Edit price change",
@@ -274,6 +277,9 @@ const I18N = {
     secOnce: "Einmalposten", onceAdd: "Posten hinzufügen", onceEdit: "Posten bearbeiten", onceTitleAdd: "Einmalposten hinzufügen", onceTitleEdit: "Posten bearbeiten",
     onceHint: "Ein positiver Betrag ist eine Gutschrift (z. B. Wechselbonus), ein negativer eine Rechnung (z. B. Honorar für den Makler). Er zählt ab seinem Datum im Saldo und in den Gesamtkosten.",
     onceName: "Bezeichnung", onceAmount: "Betrag (+ Gutschrift, − Rechnung)", onceDate: "Datum", onceDelete: "Posten löschen", onceDeleteAsk: "Diesen Posten löschen?", onceDeleteYes: "Ja, löschen", onceSum: "Saldo",
+    firstInstalment: "Erster Abschlag", abschlagBefore: "Abschlag vorher", abschlagUntil: "bis {d}",
+    abschlagFix: "Als Korrektur werten", abschlagFixAsk: "Aktuellen Abschlag ab Vertragsbeginn verwenden?", abschlagFixYes: "Ja",
+    abschlagFixHint: "Gemerkt, als der Abschlag beim Bearbeiten geändert wurde. War der alte Betrag ein Tippfehler, als Korrektur werten: dann gilt der aktuelle Abschlag ab Vertragsbeginn.",
     bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
     secPriceChanges: "Preisänderungen im Vertrag", priceAdd: "Preisänderung hinzufügen", priceEdit: "Preisänderung bearbeiten",
     priceTitleAdd: "Preisänderung hinzufügen", priceTitleEdit: "Preisänderung bearbeiten",
@@ -2411,7 +2417,8 @@ class TariffyPanel extends HTMLElement {
   /* the "price changes" block of an electricity/gas contract */
   _preisSection(c) {
     const items = c.preisaenderungen || [];
-    if (!items.length && !(this._isAdmin && c.preisaenderung_moeglich)) return null;
+    const change = c.abschlag_aenderung;
+    if (!items.length && !change && !(this._isAdmin && c.preisaenderung_moeglich)) return null;
     const pu = this._priceUnit(c);
     const money = (v) => this._money(v, c.currency, { digits: 2 });
     const describe = (p) => [
@@ -2432,6 +2439,24 @@ class TariffyPanel extends HTMLElement {
         class: "icon-btn", type: "button", title: this._t("priceEdit"), "aria-label": this._t("priceEdit"),
         onclick: () => this._openPreis(c, p.index),
       }, icon("edit")) : null)));
+    if (change) {
+      const asking = this._fixAsk === c.entry_id;
+      rows.push(h("div", { class: "row once-row" },
+        h("span", {}, this._t("abschlagBefore"),
+          h("span", { class: "t2", text: `${money(change.vorher)} ${this._t("abschlagUntil", { d: this._date(change.datum) })}` }),
+          this._isAdmin ? h("span", { class: "t2", text: this._t("abschlagFixHint") }) : null),
+        h("span", {}),
+        this._isAdmin ? (asking
+          ? h("span", {},
+            h("button", { class: "btn red", type: "button", text: this._t("abschlagFixYes"), onclick: async () => {
+              this._fixAsk = null;
+              try { await this._hass.callWS({ type: "tariffy/abschlag_korrektur", entry_id: c.entry_id }); } catch (err) { /* the next snapshot shows the state */ }
+              this._render();
+            } }),
+            h("button", { class: "btn", type: "button", text: this._t("actCancel"), onclick: () => { this._fixAsk = null; this._render(); } }))
+          : h("button", { class: "btn", type: "button", title: this._t("abschlagFixAsk"), text: this._t("abschlagFix"),
+            onclick: () => { this._fixAsk = c.entry_id; this._render(); } })) : null));
+    }
     return h("div", { class: "sec" }, h("h4", { text: this._t("secPriceChanges") }), rows,
       this._isAdmin && c.preisaenderung_moeglich ? h("div", { class: "once-add" }, h("button", {
         class: "btn", type: "button", onclick: () => this._openPreis(c, null),
@@ -3067,6 +3092,7 @@ class TariffyPanel extends HTMLElement {
         row(this._t("instalment"), isNum(c.abschlag) ? `${money(c.abschlag)} ${this._t("perMonth")}` : null),
         row(this._t("instalmentYear"), isNum(c.abschlag_jahr) ? money(c.abschlag_jahr) : null),
         row(this._t("priceNext"), c.naechste_preisaenderung ? this._date(c.naechste_preisaenderung) : null),
+        row(this._t("firstInstalment"), METERED.has(c.sparte) && c.erste_zahlung ? this._date(c.erste_zahlung) : null),
         row(this._t("bonusSignup"), isNum(c.bonus) && c.bonus ? `${money(c.bonus)} · ${this._t("bonusSignupHint")}` : null),
         row(this._t("bonusInstant"), isNum(c.sofortbonus) && c.sofortbonus ? `${money(c.sofortbonus)} · ${this._t("bonusInstantHint")}` : null),
         // flat-rate contracts: what the contract costs a year, and how it is paid when not monthly

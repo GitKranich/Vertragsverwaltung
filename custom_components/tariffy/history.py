@@ -27,6 +27,8 @@ from .const import (
     CONF_ANBIETER,
     CONF_ARBEITSPREIS,
     CONF_ARBEITSPREIS_SENSOR,
+    CONF_ABSCHLAG_AB_DATUM,
+    CONF_ABSCHLAG_VORHERIGER_WERT,
     CONF_PREISAENDERUNGEN,
     PREISAENDERUNG_SPARTEN,
     PREISAENDERUNGEN_MAX,
@@ -542,4 +544,17 @@ def delete_preisaenderung(hass: HomeAssistant, entry: ConfigEntry, index: int) -
         data[CONF_PREISAENDERUNGEN] = liste
     else:
         data.pop(CONF_PREISAENDERUNGEN, None)
+    hass.config_entries.async_update_entry(entry, data=data)
+
+
+def abschlag_aenderung_entfernen(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Wertet eine beim Bearbeiten gemerkte Abschlagsaenderung als Korrektur: der eingetragene
+    Abschlag gilt dann ab Vertragsbeginn (bis zu einer Preisaenderung)."""
+    if CONF_ABSCHLAG_AB_DATUM not in entry.data and CONF_ABSCHLAG_VORHERIGER_WERT not in entry.data:
+        raise HistoryError("not_found")
+    data = {
+        key: value
+        for key, value in entry.data.items()
+        if key not in (CONF_ABSCHLAG_AB_DATUM, CONF_ABSCHLAG_VORHERIGER_WERT)
+    }
     hass.config_entries.async_update_entry(entry, data=data)

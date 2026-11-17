@@ -2,6 +2,7 @@
   "contracts": [
     {
       "abschlag": 40.0,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": 127.66,
       "abschlag_bisher_gezahlt": 252.3,
       "abschlag_jahr": 480.0,
@@ -146,6 +147,7 @@
     },
     {
       "abschlag": 140.0,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": -179.27,
       "abschlag_bisher_gezahlt": 1444.15,
       "abschlag_jahr": 1680.0,
@@ -248,6 +250,7 @@
     },
     {
       "abschlag": 28.0,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": 25.33,
       "abschlag_bisher_gezahlt": 176.61,
       "abschlag_jahr": 336.0,
@@ -359,6 +362,7 @@
     },
     {
       "abschlag": 55.0,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": 118.25,
       "abschlag_bisher_gezahlt": 290.9,
       "abschlag_jahr": 660.0,
@@ -461,6 +465,7 @@
     },
     {
       "abschlag": 39.99,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": null,
       "abschlag_bisher_gezahlt": 399.9,
       "abschlag_jahr": 479.88,
@@ -563,6 +568,7 @@
     },
     {
       "abschlag": 19.99,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": null,
       "abschlag_bisher_gezahlt": 239.88,
       "abschlag_jahr": 239.88,
@@ -672,6 +678,7 @@
     },
     {
       "abschlag": 35.0,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": null,
       "abschlag_bisher_gezahlt": 839.36,
       "abschlag_jahr": 420.0,
@@ -806,6 +813,7 @@
     },
     {
       "abschlag": null,
+      "abschlag_aenderung": null,
       "abschlag_anpassung_empfohlen": null,
       "abschlag_bisher_gezahlt": null,
       "abschlag_jahr": null,
@@ -1233,6 +1241,14 @@
             }
           },
           {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1480,6 +1496,14 @@
             }
           },
           {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1702,6 +1726,14 @@
                 "mode": "box",
                 "step": 0.01
               }
+            }
+          },
+          {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
             }
           },
           {
@@ -3322,6 +3354,14 @@
             }
           },
           {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -3711,6 +3751,14 @@
                 "mode": "box",
                 "step": 0.01
               }
+            }
+          },
+          {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
             }
           },
           {
@@ -4489,6 +4537,14 @@
                 "mode": "box",
                 "step": 0.01
               }
+            }
+          },
+          {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
             }
           },
           {
@@ -5368,6 +5424,14 @@
                 "mode": "box",
                 "step": 0.01
               }
+            }
+          },
+          {
+            "name": "erste_zahlung",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
             }
           },
           {

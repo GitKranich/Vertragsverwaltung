@@ -27,6 +27,8 @@ Erhöht der Anbieter die Preise, ohne dass ein neuer Vertrag beginnt (gleicher B
 - **Kosten bisher, Saldo heute, gezahlte Abschläge, Prognose zum Vertragsende und Abschlag-Empfehlung** rechnen je Zeitabschnitt mit dessen Preisen. Der Verbrauch bis zum Stichtag kommt aus der Langzeitstatistik des Zählers. Reicht sie nicht bis zum Stichtag zurück, trägst du den **Zählerstand am Stichtag** ein; ohne beides wird der Verbrauch zeitanteilig aufgeteilt.
 - Eine geplante Änderung in der Zukunft fließt sofort in die Prognose ein und gilt ab ihrem Datum automatisch.
 - "Vertrag bearbeiten" ändert weiterhin die Werte **ab Vertragsbeginn**; die Preisänderungen bleiben dabei erhalten. Beim Tarifwechsel beginnt der Folgevertrag ohne Preisänderungen.
+- **Erste Abschlagszahlung** (Feld im Vertragsformular): War der erste Abschlag erst später fällig (z. B. im Monat nach Vertragsbeginn), zählt Tariffy die monatlich gebuchten Abschläge ab diesem Tag statt tagesgenau ab Vertragsbeginn.
+- Wurde der Abschlag beim Bearbeiten geändert, merkt sich Tariffy den alten Betrag bis zum Änderungstag. War das nur eine Korrektur, lässt sich das im Block "Preisänderungen im Vertrag" mit **"Als Korrektur werten"** aufheben.
 - Nicht verfügbar bei dynamischem Tarif (Börsenpreis-Sensor) und beim Zweizählertarif (HT/NT).
 
 ## Kündigungs-Erinnerung

@@ -123,6 +123,7 @@ CONTRACT_FIELDS = (
     "einmalposten",
     "bonus",
     "sofortbonus",
+    "abschlag_aenderung",
     "preisaenderungen",
     "naechste_preisaenderung",
     "preis_basis",
@@ -467,6 +468,29 @@ async def ws_einmal_delete(hass: HomeAssistant, connection, msg: dict[str, Any])
 @websocket_api.require_admin
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): "tariffy/abschlag_korrektur",
+        vol.Required("entry_id"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_abschlag_korrektur(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Wertet die gemerkte Abschlagsaenderung als Korrektur (Abschlag gilt ab Vertragsbeginn)."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    try:
+        history.abschlag_aenderung_entfernen(hass, entry)
+    except history.HistoryError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    await entry.runtime_data.async_refresh()
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): "tariffy/preis_save",
         vol.Required("entry_id"): str,
         vol.Required("values"): HISTORY_VALUES,
@@ -664,6 +688,7 @@ async def async_setup_panel(hass: HomeAssistant) -> None:
             websocket_api.async_register_command(hass, ws_renew)
             websocket_api.async_register_command(hass, ws_einmal_save)
             websocket_api.async_register_command(hass, ws_einmal_delete)
+            websocket_api.async_register_command(hass, ws_abschlag_korrektur)
             websocket_api.async_register_command(hass, ws_preis_save)
             websocket_api.async_register_command(hass, ws_preis_delete)
             websocket_api.async_register_command(hass, ws_aussen_save)

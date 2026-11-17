@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-11-17
+
+### Hinzugefügt
+
+- **Erste Abschlagszahlung bei Strom- und Gasverträgen** (freiwilliges Feld im Vertragsformular). Ist sie gesetzt, zählen die Abschläge als monatliche Abbuchungen ab diesem Tag (eine Rate zählt ab Beginn ihres Monats, mit dem dann gültigen Abschlag, Preisänderungen eingeschlossen) bis zum Vertragsende, statt tagesgenau ab Vertragsbeginn. Gezahlte Abschläge, Saldo, Prognose, Abschlag über die Laufzeit und die Abschlag-Empfehlung (verteilt auf die offenen Raten) rechnen mit diesen Abbuchungen.
+- **Eine beim Bearbeiten gemerkte Abschlagsänderung lässt sich im Panel als Korrektur werten** (Block "Preisänderungen im Vertrag"): Dann gilt der aktuelle Abschlag ab Vertragsbeginn.
+
 ## [1.32.0] - 2026-11-17
 
 ### Hinzugefügt

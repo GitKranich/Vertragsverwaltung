@@ -39,6 +39,7 @@ from .const import (
     CONF_BEGINN,
     CONF_BONUS,
     CONF_SOFORTBONUS,
+    ENERGIE_SPARTEN,
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_ERINNERUNG_MONATE,
@@ -382,6 +383,28 @@ def _abschlag_segmente(
         {**erster, "von": ab_datum},
         *segmente[1:],
     ]
+
+
+def _abschlag_zahlungen(
+    ab_segmente: list[dict[str, Any]], erste: date, ende: date, heute: date
+) -> tuple[float, float, int]:
+    """Monatliche Abschlagszahlungen ab `erste` bis `ende`: (bis heute gezahlt, Summe ueber die
+    Laufzeit, Anzahl der noch offenen Raten). Eine Rate zaehlt als gezahlt, sobald ihr Monat
+    begonnen hat; ihr Betrag ist der am Zahltag gueltige Abschlag."""
+    bisher = gesamt = 0.0
+    offen = 0
+    monat_heute = (heute.year, heute.month)
+    for nummer in range(240):
+        termin = _plus_months(erste, nummer)
+        if termin > ende:
+            break
+        betrag = _segment_am(ab_segmente, termin)["abschlag"] or 0.0
+        gesamt += betrag
+        if (termin.year, termin.month) <= monat_heute:
+            bisher += betrag
+        else:
+            offen += 1
+    return round(bisher, 2), round(gesamt, 2), offen
 
 
 def _monat_von(beginn: date, tag: date) -> float:
@@ -1663,6 +1686,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         verbrauch_bisher: float | None = None
         verbrauch_hochgerechnet: float | None = None
         prognose_real: float | None = None
+        # Kosten bis Vertragsende (Hochrechnung), fuer die Abschlagszahlungen weiter unten
+        geschaetzt_gesamt: float | None = None
         abschlag_anpassung_empfohlen: float | None = None
 
         diag: dict[str, Any] = {}
@@ -1820,6 +1845,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         + (grundpreis or 0) * laufzeit_monate,
                         2,
                     )
+                    geschaetzt_gesamt = geschaetzte_kosten_real
                     if abschlag is not None:
                         # Abschlaege ueber die gesamte Laufzeit: das, was bis
                         # heute wirklich gezahlt wurde (eine Abschlags-Aenderung
@@ -1914,6 +1940,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             guthaben_bisher = None
             prognose_real = None
             abschlag_anpassung_empfohlen = None
+            geschaetzt_gesamt = None
             if verbrauch_bisher is not None and heute >= beginn:
                 grenzen = await self._verbrauch_grenzen(
                     preis_segmente, beginn, heute, verbrauch_bisher, verbrauch_sensor
@@ -1936,6 +1963,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         )
                         if rest_ap is not None:
                             geschaetzt = ap_kosten + (gp_bisher or 0.0) + rest_ap + (rest_gp or 0.0)
+                            geschaetzt_gesamt = geschaetzt
                             ab_gesamt = _integral_monate(ab_segmente, "abschlag", beginn, 0, laufzeit_monate)
                             if abschlag is not None and ab_gesamt is not None:
                                 prognose_real = round(ab_gesamt - geschaetzt, 2)
@@ -1944,6 +1972,37 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                                 abschlag_anpassung_empfohlen = round(
                                     (geschaetzt - ab_bisher) / rest_monate, 2
                                 )
+
+        # ---- Abschlaege als gebuchte Monatsraten (Strom/Gas mit "Erste Abschlagszahlung") ----
+        # Statt tagesgenau ab Vertragsbeginn zaehlen die monatlichen Abbuchungen ab dem ersten
+        # Abschlag: eine Rate zaehlt ab Beginn ihres Monats, mit dem dann gueltigen Abschlag
+        # (Preisaenderungen und eine Abschlagsaenderung beim Bearbeiten eingeschlossen).
+        erste_abschlag = _parse_date(data.get(CONF_ERSTE_ZAHLUNG))
+        if (
+            erste_abschlag is not None
+            and sparte in ENERGIE_SPARTEN
+            and beginn is not None
+            and abschlag is not None
+        ):
+            basis_segmente = preis_segmente or [
+                {"von": beginn, "arbeitspreis": None, "grundpreis": None,
+                 "abschlag": _f(data.get(CONF_ABSCHLAG)), "zaehlerstand": None}
+            ]
+            vertrag_ende_z = ende if ende is not None else beginn + timedelta(days=365)
+            bisher_z, gesamt_z, rest_z = _abschlag_zahlungen(
+                _abschlag_segmente(basis_segmente, beginn, data), erste_abschlag, vertrag_ende_z, heute
+            )
+            abschlag_bisher_gezahlt_wert = bisher_z
+            abschlagssumme = gesamt_z
+            guthaben_bisher = round(bisher_z - kosten_bisher, 2) if kosten_bisher is not None else None
+            if geschaetzt_gesamt is not None:
+                prognose_real = round(gesamt_z - geschaetzt_gesamt, 2)
+                abschlag_anpassung_empfohlen = (
+                    round((geschaetzt_gesamt - bisher_z) / rest_z, 2) if rest_z > 0 else None
+                )
+            rest_zahlungen_bonus: int | None = rest_z
+        else:
+            rest_zahlungen_bonus = None
 
         # ---- Neukundenbonus: wird mit der Jahresrechnung verrechnet ----
         # Er verbessert das Ergebnis zum Vertragsende (Prognose) und senkt den Abschlag, der fuer
@@ -1954,7 +2013,11 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if neukundenbonus and beginn is not None:
             if prognose_real is not None:
                 prognose_real = round(prognose_real + neukundenbonus, 2)
-            rest_monate_bonus = laufzeit_monate - max(0, (heute - beginn).days) / _MONAT_TAGE
+            rest_monate_bonus = (
+                rest_zahlungen_bonus
+                if rest_zahlungen_bonus is not None
+                else laufzeit_monate - max(0, (heute - beginn).days) / _MONAT_TAGE
+            )
             if abschlag_anpassung_empfohlen is not None and rest_monate_bonus > 0:
                 abschlag_anpassung_empfohlen = round(
                     abschlag_anpassung_empfohlen - neukundenbonus / rest_monate_bonus, 2
@@ -2112,6 +2175,15 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_PREISGARANTIE: _parse_date(data.get(CONF_PREISGARANTIE)),
             CONF_BONUS: _f(data.get(CONF_BONUS)),
             CONF_SOFORTBONUS: _f(data.get(CONF_SOFORTBONUS)),
+            # eine beim Bearbeiten gemerkte Abschlagsaenderung (vorheriger Wert bis zum Datum)
+            "abschlag_aenderung": (
+                {
+                    "datum": data.get(CONF_ABSCHLAG_AB_DATUM),
+                    "vorher": _f(data.get(CONF_ABSCHLAG_VORHERIGER_WERT)),
+                }
+                if data.get(CONF_ABSCHLAG_AB_DATUM) and _f(data.get(CONF_ABSCHLAG_VORHERIGER_WERT))
+                else None
+            ),
             CONF_OEKOSTROM: bool(data.get(CONF_OEKOSTROM)),
             CONF_BEGINN: beginn,
             CONF_ENDE: ende,

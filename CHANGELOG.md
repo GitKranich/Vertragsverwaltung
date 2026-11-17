@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-11-17
+
+### Added
+
+- **First instalment payment for electricity and gas contracts** (optional field in the contract form). When set, the instalments are counted as monthly debits from that day (a rate counts from the start of its month, with the instalment valid then, price changes included) until the contract end, instead of pro rata by day from the contract start. Instalments paid, balance, forecast, instalment over the term and the recommended instalment (spread over the open rates) use these debits.
+- **An instalment change remembered while editing can be treated as a correction** in the panel (block "Price changes in this contract"): the current instalment then applies from the contract start.
+
 ## [1.32.0] - 2026-11-17
 
 ### Added
