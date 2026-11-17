@@ -92,3 +92,31 @@ async def test_contracts_without_a_setting_keep_the_average(contract):
     assert d["prognose_methode"] == "durchschnitt"
     assert d["prognose"] == "durchschnitt"
     assert d["verbrauch_hochgerechnet"] == pytest.approx(d["verbrauch_bisher"] / 192 * 364, abs=0.1)
+
+
+async def test_monthly_values_skip_the_running_and_the_first_partial_month(contract, hass):
+    from datetime import datetime
+
+    from homeassistant.util import dt as dt_util
+
+    entry, _ = await contract.setup(STROM, **GOLDEN)
+    tz = dt_util.get_default_time_zone()
+
+    def _row(jahr, monat, menge):
+        return {"start": datetime(jahr, monat, 1, tzinfo=tz).timestamp(), "change": menge}
+
+    rows = [_row(2025, 2, 50.0), _row(2025, 3, 500.0), _row(2026, 6, 300.0), _row(2026, 7, 99.0)]
+
+    class _Recorder:
+        async def async_add_executor_job(self, func):
+            return func()
+
+    with (
+        patch("homeassistant.components.recorder.get_instance", return_value=_Recorder()),
+        patch(
+            "homeassistant.components.recorder.statistics.statistics_during_period",
+            return_value={"sensor.strom": rows},
+        ),
+    ):
+        werte = await entry.runtime_data._monatswerte(["sensor.strom"], date(2026, 7, 12))
+    assert werte == {(2025, 3): 500.0, (2026, 6): 300.0}

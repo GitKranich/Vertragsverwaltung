@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.34.1] - 2026-11-18
+
+### Behoben
+
+- Saisonale Prognose: Der laufende, noch unvollständige Monat zählt nicht mehr zum Monatsprofil (Home Assistant liefert ihn mit den vollständigen Monaten mit); er hat den Anteil dieses Monats gesenkt.
+
 ## [1.34.0] - 2026-11-18
 
 ### Hinzugefügt

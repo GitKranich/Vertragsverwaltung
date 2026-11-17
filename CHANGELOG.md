@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.34.1] - 2026-11-18
+
+### Fixed
+
+- Seasonal forecast: the running, still incomplete month is no longer part of the monthly profile (Home Assistant returns it together with the complete months), which lowered that month's share.
+
 ## [1.34.0] - 2026-11-18
 
 ### Added

@@ -1499,6 +1499,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         if isinstance(start, (int, float))
                         else dt_util.as_local(start)
                     )
+                    if (zeit.year, zeit.month) >= (heute.year, heute.month):
+                        continue  # laufender Monat: noch unvollstaendig (HA liefert ihn mit)
                     werte[(zeit.year, zeit.month)] = float(menge)
                 if werte:
                     erster_monat = min(werte)
