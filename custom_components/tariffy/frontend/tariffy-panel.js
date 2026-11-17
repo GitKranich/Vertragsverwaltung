@@ -109,6 +109,7 @@ const I18N = {
     secOnce: "One-time items", onceAdd: "Add item", onceEdit: "Edit item", onceTitleAdd: "Add a one-time item", onceTitleEdit: "Edit item",
     onceHint: "A positive amount is a credit (e.g. a switching bonus), a negative one a bill (e.g. a broker's fee). It counts in the balance and in the total cost from its date.",
     onceName: "Description", onceAmount: "Amount (+ credit, − bill)", onceDate: "Date", onceDelete: "Delete item", onceDeleteAsk: "Delete this item?", onceDeleteYes: "Yes, delete", onceSum: "Net",
+    bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
     secPriceChanges: "Price changes in this contract", priceAdd: "Add price change", priceEdit: "Edit price change",
     priceTitleAdd: "Add a price change", priceTitleEdit: "Edit price change",
     priceHint: "New prices from a date, for example after a price increase by the provider. The contract keeps running (same start, end and meter); from this date costs, balance and forecast use the new values. Leave a field empty to keep its previous value.",
@@ -273,6 +274,7 @@ const I18N = {
     secOnce: "Einmalposten", onceAdd: "Posten hinzufügen", onceEdit: "Posten bearbeiten", onceTitleAdd: "Einmalposten hinzufügen", onceTitleEdit: "Posten bearbeiten",
     onceHint: "Ein positiver Betrag ist eine Gutschrift (z. B. Wechselbonus), ein negativer eine Rechnung (z. B. Honorar für den Makler). Er zählt ab seinem Datum im Saldo und in den Gesamtkosten.",
     onceName: "Bezeichnung", onceAmount: "Betrag (+ Gutschrift, − Rechnung)", onceDate: "Datum", onceDelete: "Posten löschen", onceDeleteAsk: "Diesen Posten löschen?", onceDeleteYes: "Ja, löschen", onceSum: "Saldo",
+    bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
     secPriceChanges: "Preisänderungen im Vertrag", priceAdd: "Preisänderung hinzufügen", priceEdit: "Preisänderung bearbeiten",
     priceTitleAdd: "Preisänderung hinzufügen", priceTitleEdit: "Preisänderung bearbeiten",
     priceHint: "Neue Preise ab einem Datum, zum Beispiel nach einer Preiserhöhung des Anbieters. Der Vertrag läuft weiter (gleicher Beginn, gleiches Ende, gleicher Zähler); ab dem Datum rechnen Kosten, Saldo und Prognose mit den neuen Werten. Ein leeres Feld behält den bisherigen Wert.",
@@ -3065,6 +3067,8 @@ class TariffyPanel extends HTMLElement {
         row(this._t("instalment"), isNum(c.abschlag) ? `${money(c.abschlag)} ${this._t("perMonth")}` : null),
         row(this._t("instalmentYear"), isNum(c.abschlag_jahr) ? money(c.abschlag_jahr) : null),
         row(this._t("priceNext"), c.naechste_preisaenderung ? this._date(c.naechste_preisaenderung) : null),
+        row(this._t("bonusSignup"), isNum(c.bonus) && c.bonus ? `${money(c.bonus)} · ${this._t("bonusSignupHint")}` : null),
+        row(this._t("bonusInstant"), isNum(c.sofortbonus) && c.sofortbonus ? `${money(c.sofortbonus)} · ${this._t("bonusInstantHint")}` : null),
         // flat-rate contracts: what the contract costs a year, and how it is paid when not monthly
         row(this._t("costYear"), !METERED.has(c.sparte) && isNum(c.kosten_jahr) ? money(c.kosten_jahr) : null),
         row(this._t("payment"), c.zahlweise && c.zahlweise !== "monthly" && isNum(c.abschlag_je_zahlung)

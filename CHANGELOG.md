@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.32.0] - 2026-11-17
+
+### Added
+
+- **Sign-up bonus and instant bonus are calculated.** The existing field "sign-up bonus" now means a bonus credited with the annual bill: it raises the forecast at contract end and lowers the recommended instalment for the rest of the term (and counts for the low-instalment warning); the balance today is unchanged. The new field **instant bonus** is a bonus already paid out: it lowers only the total cost of the contract. On a tariff switch both go into the history entry of the term (cost lowered, balance including the sign-up bonus) and do not carry over to the next contract. The panel shows both under "Prices".
+
 ## [1.31.0] - 2026-11-17
 
 Own version (fork of weskona/tariffy 1.30.0).

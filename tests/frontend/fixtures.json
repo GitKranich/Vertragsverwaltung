@@ -21,6 +21,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2026-01-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 55.0,
@@ -127,6 +128,7 @@
       "prognose_real": -495.29,
       "restlaufzeit": 172,
       "seit": "2024-01-01",
+      "sofortbonus": null,
       "sparte": "electricity",
       "tarif": "Öko Fix 12",
       "title": "Strom Haus",
@@ -163,6 +165,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2025-09-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -227,6 +230,7 @@
       "prognose_real": 524.42,
       "restlaufzeit": 50,
       "seit": "2025-09-01",
+      "sofortbonus": null,
       "sparte": "gas",
       "tarif": "Gas Basis",
       "title": "Gas Heizung",
@@ -272,6 +276,7 @@
         }
       ],
       "beginn": "2026-01-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -336,6 +341,7 @@
       "prognose_real": 15.11,
       "restlaufzeit": 172,
       "seit": "2026-01-01",
+      "sofortbonus": null,
       "sparte": "water",
       "tarif": "Trinkwasser",
       "title": "Wasser",
@@ -372,6 +378,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2026-02-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -436,6 +443,7 @@
       "prognose_real": -421.8,
       "restlaufzeit": 203,
       "seit": "2026-02-01",
+      "sofortbonus": null,
       "sparte": "electricity_ht_nt",
       "tarif": "Zweitarif",
       "title": "Strom Wohnung (HT/NT)",
@@ -472,6 +480,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2025-10-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -536,6 +545,7 @@
       "prognose_real": null,
       "restlaufzeit": 80,
       "seit": "2025-10-01",
+      "sofortbonus": null,
       "sparte": "internet",
       "tarif": "FTTH 300",
       "title": "Internet",
@@ -572,6 +582,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2025-08-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -643,6 +654,7 @@
       "prognose_real": null,
       "restlaufzeit": 172,
       "seit": "2025-08-01",
+      "sofortbonus": null,
       "sparte": "mobile",
       "tarif": "Flat 10 GB",
       "title": "Mobilfunk",
@@ -679,6 +691,7 @@
       "archiviert_am": "2026-01-15",
       "aussenzaehler": [],
       "beginn": "2024-01-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -775,6 +788,7 @@
       "prognose_real": null,
       "restlaufzeit": -193,
       "seit": "2022-01-01",
+      "sofortbonus": null,
       "sparte": "electricity",
       "tarif": "Basis 24",
       "title": "Strom Altvertrag",
@@ -811,6 +825,7 @@
       "archiviert_am": null,
       "aussenzaehler": [],
       "beginn": "2024-03-01",
+      "bonus": null,
       "currency": "EUR",
       "effektiver_arbeitspreis": null,
       "einmal_summe": 0.0,
@@ -875,6 +890,7 @@
       "prognose_real": null,
       "restlaufzeit": 6442,
       "seit": "2024-03-01",
+      "sofortbonus": null,
       "sparte": "loan",
       "tarif": "Annuitätendarlehen",
       "title": "Baufinanzierung",
@@ -1205,6 +1221,18 @@
             }
           },
           {
+            "name": "sofortbonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1440,6 +1468,18 @@
             }
           },
           {
+            "name": "sofortbonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -1642,6 +1682,18 @@
           },
           {
             "name": "bonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
+            "name": "sofortbonus",
             "optional": true,
             "required": false,
             "selector": {
@@ -3258,6 +3310,18 @@
             }
           },
           {
+            "name": "sofortbonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
             "default": false,
             "name": "oekostrom",
             "required": true,
@@ -3627,6 +3691,18 @@
           },
           {
             "name": "bonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
+            "name": "sofortbonus",
             "optional": true,
             "required": false,
             "selector": {
@@ -4393,6 +4469,18 @@
           },
           {
             "name": "bonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
+            "name": "sofortbonus",
             "optional": true,
             "required": false,
             "selector": {
@@ -5260,6 +5348,18 @@
           },
           {
             "name": "bonus",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "min": 0.0,
+                "mode": "box",
+                "step": 0.01
+              }
+            }
+          },
+          {
+            "name": "sofortbonus",
             "optional": true,
             "required": false,
             "selector": {

@@ -323,7 +323,8 @@ Auf dem Handy werden die Karten zu aufklappbaren Zeilen:
 | Jahresverbrauch | – | kWh/Jahr – für die Kostenprognose |
 | Verbrauchssensor | – | HA-Sensor des Stromzählers – für echte Verbrauchsmessung |
 | Einspeisevergütung | – | €/kWh – Vergütung für eingespeisten Strom |
-| Neukundenbonus | – | Einmaliger Bonus in € |
+| Neukundenbonus | – | Bonus in €, der mit der Jahresrechnung verrechnet wird: zählt in der Prognose zum Vertragsende und in der Abschlag-Empfehlung, nicht im Saldo heute |
+| Sofortbonus | – | Schon ausgezahlter Bonus in €: senkt nur die Gesamtkosten des Vertrags |
 | Ökostrom | ✅ | Ja/Nein |
 | Zählernummer | – | Für Dokumentation |
 | Marktlokation (MaLo-ID) | – | Für Dokumentation |

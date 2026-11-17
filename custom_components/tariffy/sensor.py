@@ -28,6 +28,7 @@ from .const import (
     CONF_ARBEITSPREIS_SENSOR,
     CONF_EINSPEISEVERGUETUNG,
     CONF_BONUS,
+    CONF_SOFORTBONUS,
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_GRUNDPREIS,
@@ -113,6 +114,7 @@ def _arbeitspreis_attrs(d: dict[str, Any]) -> dict[str, Any]:
         "marktlokation": d.get(CONF_MARKTLOKATION),
         "oekostrom": d.get(CONF_OEKOSTROM),
         "bonus": d.get(CONF_BONUS),
+        "sofortbonus": d.get(CONF_SOFORTBONUS),
         "preisgarantie_bis": (
             d.get(CONF_PREISGARANTIE).isoformat()
             if d.get(CONF_PREISGARANTIE)

@@ -38,6 +38,7 @@ from .const import (
     CONF_ARBEITSPREIS,
     CONF_BEGINN,
     CONF_BONUS,
+    CONF_SOFORTBONUS,
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_ERINNERUNG_MONATE,
@@ -821,9 +822,23 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "arbeitspreis": preise["arbeitspreis"],
             "grundpreis": preise["grundpreis"],
             "abschlag": preise["abschlag"],
-            "kosten": _zahl(d.get("kredit_gezahlt") if kredit else d.get("kosten_bisher")),
+            # die Boni gehoeren zu dieser Laufzeit: Sofortbonus und Neukundenbonus senken ihre
+            # Kosten, der Neukundenbonus ist im Saldo der Jahresrechnung enthalten
+            "kosten": _zahl(
+                d.get("kredit_gezahlt")
+                if kredit
+                else (
+                    d["kosten_bisher"] - (_f(alt.get(CONF_BONUS)) or 0) - (_f(alt.get(CONF_SOFORTBONUS)) or 0)
+                    if d.get("kosten_bisher") is not None
+                    else None
+                )
+            ),
             "abschlag_gezahlt": _zahl(d.get("abschlag_bisher_gezahlt")),
-            "saldo": _zahl(d.get("guthaben_bisher")),
+            "saldo": _zahl(
+                d["guthaben_bisher"] + (0 if kredit else (_f(alt.get(CONF_BONUS)) or 0))
+                if d.get("guthaben_bisher") is not None
+                else None
+            ),
             "verbrauch": _zahl(d.get("verbrauch_bisher")),
             "abgeschlossen": heute.isoformat(),
             **(
@@ -966,6 +981,11 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         }
         for feld in BASIS_FELDER:
             wert = nxt.get(NEXT_PREFIX + feld)
+            if feld == CONF_BONUS:
+                # ein Bonus gehoert zu genau einer Laufzeit und geht nicht auf den Folgevertrag ueber
+                if wert not in (None, ""):
+                    new_data[feld] = wert
+                continue
             new_data[feld] = wert if wert not in (None, "") else self.entry.data.get(feld)
         # Verbrauch der letzten Laufzeit einfrieren — inkl. ihrer tatsächlichen
         # Dauer in Monaten, damit empfohlener_abschlag nicht von einem festen
@@ -1925,6 +1945,21 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                                     (geschaetzt - ab_bisher) / rest_monate, 2
                                 )
 
+        # ---- Neukundenbonus: wird mit der Jahresrechnung verrechnet ----
+        # Er verbessert das Ergebnis zum Vertragsende (Prognose) und senkt den Abschlag, der fuer
+        # die Restlaufzeit noetig ist. Den Saldo heute aendert er nicht: gutgeschrieben wird er
+        # erst mit der Rechnung. Der Sofortbonus (schon ausgezahlt) zaehlt nur in den Gesamtkosten.
+        neukundenbonus = _f(data.get(CONF_BONUS)) or 0.0
+        sofortbonus = _f(data.get(CONF_SOFORTBONUS)) or 0.0
+        if neukundenbonus and beginn is not None:
+            if prognose_real is not None:
+                prognose_real = round(prognose_real + neukundenbonus, 2)
+            rest_monate_bonus = laufzeit_monate - max(0, (heute - beginn).days) / _MONAT_TAGE
+            if abschlag_anpassung_empfohlen is not None and rest_monate_bonus > 0:
+                abschlag_anpassung_empfohlen = round(
+                    abschlag_anpassung_empfohlen - neukundenbonus / rest_monate_bonus, 2
+                )
+
         # Tag/Nacht-Tarif (Economy 7 / TOU)
         arbeitspreis_nacht = _f(data.get(CONF_ARBEITSPREIS_NACHT))
         verbrauch_tag = _f(data.get(CONF_JAHRESVERBRAUCH_TAG))
@@ -2076,6 +2111,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_MARKTLOKATION: data.get(CONF_MARKTLOKATION),
             CONF_PREISGARANTIE: _parse_date(data.get(CONF_PREISGARANTIE)),
             CONF_BONUS: _f(data.get(CONF_BONUS)),
+            CONF_SOFORTBONUS: _f(data.get(CONF_SOFORTBONUS)),
             CONF_OEKOSTROM: bool(data.get(CONF_OEKOSTROM)),
             CONF_BEGINN: beginn,
             CONF_ENDE: ende,
@@ -2143,7 +2179,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 kredit.get("kredit_gezahlt") if ist_kredit else kosten_bisher,
                 abschlag_bisher_gezahlt_wert,
                 archiviert,
-                einmal_gesamt,
+                # der Sofortbonus der laufenden Laufzeit (bei einer archivierten steht er schon
+                # in ihrem Historien-Eintrag)
+                einmal_gesamt + (0.0 if archiviert else sofortbonus),
             ),
             **{key: value for key, value in kredit.items() if key != "ende"},
             **(

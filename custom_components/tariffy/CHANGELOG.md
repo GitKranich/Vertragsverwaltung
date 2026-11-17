@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.32.0] - 2026-11-17
+
+### Hinzugefügt
+
+- **Neukundenbonus und Sofortbonus werden eingerechnet.** Das vorhandene Feld "Neukundenbonus" steht jetzt für einen Bonus, der mit der Jahresrechnung verrechnet wird: Er verbessert die Prognose zum Vertragsende und senkt die Abschlag-Empfehlung für die Restlaufzeit (und zählt für die Abschlag-Warnung); der Saldo heute bleibt gleich. Das neue Feld **Sofortbonus** ist ein schon ausgezahlter Bonus: Er senkt nur die Gesamtkosten des Vertrags. Beim Tarifwechsel kommen beide in den Historien-Eintrag der Laufzeit (Kosten gesenkt, Saldo mit Neukundenbonus) und gehen nicht auf den Folgevertrag über. Das Panel zeigt beide unter "Preise".
+
 ## [1.31.0] - 2026-11-17
 
 Eigene Version (Fork von weskona/tariffy 1.30.0).

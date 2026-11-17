@@ -26,7 +26,10 @@ CONF_GAS_EINHEIT = "gas_einheit"
 CONF_ZAEHLERNUMMER = "zaehlernummer"
 CONF_MARKTLOKATION = "marktlokation"
 CONF_PREISGARANTIE = "preisgarantie"
+# Neukundenbonus: wird mit der Jahresrechnung verrechnet (Prognose zum Vertragsende und
+# Abschlag-Empfehlung). Sofortbonus: schon ausgezahlt, senkt nur die Gesamtkosten.
 CONF_BONUS = "bonus"
+CONF_SOFORTBONUS = "sofortbonus"
 CONF_OEKOSTROM = "oekostrom"
 
 # Gas-spezifisch

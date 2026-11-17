@@ -121,6 +121,8 @@ CONTRACT_FIELDS = (
     "verlaengerbar",
     "historie",
     "einmalposten",
+    "bonus",
+    "sofortbonus",
     "preisaenderungen",
     "naechste_preisaenderung",
     "preis_basis",

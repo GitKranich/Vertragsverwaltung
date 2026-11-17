@@ -80,7 +80,7 @@ Im Tab **Verträge** hat jeder Vertrag in den Details den Block **Einmalposten**
 - ein **positiver** Betrag ist eine **Gutschrift**, zum Beispiel ein Wechselbonus,
 - ein **negativer** Betrag ist eine **Rechnung**, zum Beispiel das Honorar eines Maklers, der sich um die Verträge kümmert.
 
-Ein Posten zählt ab seinem Datum (ohne Datum sofort). Er verändert den **Saldo bisher** (der Posten gehört zur Laufzeit, in der sein Datum liegt) und die **Kosten gesamt** über alle Laufzeiten: ein Bonus senkt die Kosten, eine Rechnung erhöht sie. **Prognose zum Vertragsende und die Warnung bei zu niedrigem Abschlag hängen weiter nur vom Verbrauch ab.** Die Einmalposten gelten für jede Art von Vertrag, bleiben beim Verlängern und beim Tarifwechsel erhalten und stehen in der Sicherung. Das Feld **Neukundenbonus** im Vertragsformular bleibt wie es war und wird nur angezeigt.
+Ein Posten zählt ab seinem Datum (ohne Datum sofort). Er verändert den **Saldo bisher** (der Posten gehört zur Laufzeit, in der sein Datum liegt) und die **Kosten gesamt** über alle Laufzeiten: ein Bonus senkt die Kosten, eine Rechnung erhöht sie. **Prognose zum Vertragsende und die Warnung bei zu niedrigem Abschlag hängen weiter nur vom Verbrauch ab.** Die Einmalposten gelten für jede Art von Vertrag, bleiben beim Verlängern und beim Tarifwechsel erhalten und stehen in der Sicherung. Für einen Bonus des Anbieters gibt es zusätzlich die Felder **Neukundenbonus** (wird mit der Jahresrechnung verrechnet und zählt in Prognose und Abschlag-Empfehlung) und **Sofortbonus** (schon ausgezahlt, senkt nur die Gesamtkosten) im Vertragsformular.
 
 ## Folgevertrag planen
 

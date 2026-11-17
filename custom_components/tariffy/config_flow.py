@@ -40,6 +40,7 @@ from .const import (
     CONF_ARBEITSPREIS,
     CONF_BEGINN,
     CONF_BONUS,
+    CONF_SOFORTBONUS,
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_ERINNERUNG_MONATE,
@@ -508,6 +509,7 @@ def _energie_schema(d: dict[str, Any], features: dict | None = None) -> vol.Sche
             **_abschlag_warnung_fields(d),
             **_einspeisung_fields(d),
             _opt(CONF_BONUS, d.get(CONF_BONUS)): _preis(0.01),
+            _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),
@@ -557,6 +559,7 @@ def _energie_ht_nt_schema(d: dict[str, Any], features: dict | None = None) -> vo
             **_abschlag_warnung_fields(d),
             **_einspeisung_fields(d),
             _opt(CONF_BONUS, d.get(CONF_BONUS)): _preis(0.01),
+            _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),
@@ -606,6 +609,7 @@ def _gas_schema(d: dict[str, Any], features: dict | None = None) -> vol.Schema:
             ): _dezimal_feld(),
             **_abschlag_warnung_fields(d),
             _opt(CONF_BONUS, d.get(CONF_BONUS)): _preis(0.01),
+            _opt(CONF_SOFORTBONUS, d.get(CONF_SOFORTBONUS)): _preis(0.01),
             vol.Required(
                 CONF_OEKOSTROM, default=bool(d.get(CONF_OEKOSTROM, False))
             ): selector.BooleanSelector(),
