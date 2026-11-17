@@ -1,0 +1,841 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Neuen Vertrag anlegen",
+        "description": "Allgemeine Vertragsdaten.",
+        "data": {
+          "name": "Bezeichnung (z. B. Strom Haus)",
+          "sparte": "Sparte",
+          "anbieter": "Anbieter",
+          "kundennummer": "Kundennummer",
+          "tarif": "Tarifname",
+          "beginn": "Vertragsbeginn",
+          "ende": "Vertragsende / Laufzeit bis",
+          "mindestlaufzeit": "Mindestlaufzeit (Monate)",
+          "kuendigungsfrist": "Kündigungsfrist (Monate)",
+          "erinnerung_monate": "Kündigung erinnern",
+          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)"
+        },
+        "data_description": {
+          "name": "Kurze Bezeichnung, die im Gerätenamen erscheint, z. B. 'Strom Haus'",
+          "anbieter": "Name des Energieversorgers oder Anbieters",
+          "kundennummer": "Deine Kundennummer aus den Vertragsunterlagen",
+          "tarif": "Bezeichnung des Tarifs, z. B. 'Ökostrom Plus'",
+          "beginn": "Datum, ab dem der Vertrag gilt",
+          "ende": "Letzter Gültigkeitstag des Vertrags",
+          "mindestlaufzeit": "Optional. Das Panel zeigt, bis wann der Vertrag mindestens läuft (Beginn + Mindestlaufzeit).",
+          "kuendigungsfrist": "Optional. Monate vor Vertragsende, bis zu denen die Kündigung vorliegen muss. Wenn eingetragen, bezieht sich die Erinnerung auf diese Frist statt auf das Vertragsende.",
+          "erinnerung_monate": "Wie viele Monate vor Ablauf der Kündigungsfrist soll erinnert werden (ohne eingetragene Frist: vor Vertragsende)?",
+          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)"
+        }
+      },
+      "reconfigure": {
+        "title": "Vertrag bearbeiten",
+        "description": "Allgemeine Vertragsdaten.",
+        "data": {
+          "name": "Name",
+          "sparte": "Sparte",
+          "anbieter": "Anbieter",
+          "kundennummer": "Kundennummer",
+          "tarif": "Tarifname",
+          "beginn": "Vertragsbeginn",
+          "ende": "Vertragsende / Laufzeit bis",
+          "mindestlaufzeit": "Mindestlaufzeit (Monate)",
+          "kuendigungsfrist": "Kündigungsfrist (Monate)",
+          "erinnerung_monate": "Kündigung erinnern",
+          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)"
+        },
+        "data_description": {
+          "name": "Name des Vertrags: wird im Panel gezeigt und ist der Name seines Geräts",
+          "anbieter": "Name des Energieversorgers oder Anbieters",
+          "kundennummer": "Deine Kundennummer aus den Vertragsunterlagen",
+          "tarif": "Bezeichnung des Tarifs, z. B. 'Ökostrom Plus'",
+          "beginn": "Datum, ab dem der Vertrag gilt",
+          "ende": "Letzter Gültigkeitstag des Vertrags",
+          "mindestlaufzeit": "Optional. Das Panel zeigt, bis wann der Vertrag mindestens läuft (Beginn + Mindestlaufzeit).",
+          "kuendigungsfrist": "Optional. Monate vor Vertragsende, bis zu denen die Kündigung vorliegen muss. Wenn eingetragen, bezieht sich die Erinnerung auf diese Frist statt auf das Vertragsende.",
+          "erinnerung_monate": "Wie viele Monate vor Ablauf der Kündigungsfrist soll erinnert werden (ohne eingetragene Frist: vor Vertragsende)?",
+          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)"
+        }
+      },
+      "energie": {
+        "title": "Strom-Details",
+        "description": "Preise, Verbrauch und Zählerdaten.",
+        "data": {
+          "arbeitspreis": "Arbeitspreis (€/kWh)",
+          "arbeitspreis_sensor": "Preissensor für dynamischen Tarif (optional)",
+          "arbeitspreis_aufschlag": "Aufschlag dynamischer Tarif (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (kWh)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "einspeiseverguetung": "Einspeisevergütung (€/kWh, optional)",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis",
+          "arbeitspreis_nacht": "Nachttarif (z.B. Economy 7, TOU Nebenzeit)",
+          "jahresverbrauch_tag": "Jahresverbrauch Tag",
+          "jahresverbrauch_nacht": "Jahresverbrauch Nacht"
+        },
+        "data_description": {
+          "arbeitspreis": "Preis pro verbrauchter kWh — steht auf deiner Stromrechnung. Dient außerdem als Fallback, solange für den Preissensor unten noch keine Statistik vorliegt",
+          "arbeitspreis_sensor": "HA-Sensor mit einem live Börsen-/Spotpreis (z.B. Tibber, aWATTar, Nordpool) — wenn gesetzt, wird der Arbeitspreis aus dem Durchschnitt dieses Sensors berechnet statt aus dem festen Wert oben",
+          "arbeitspreis_aufschlag": "Fester Aufschlag, der auf den Preis des dynamischen Tarif-Sensors aufgeschlagen wird (z.B. die Marge des Anbieters in ct/kWh)",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in kWh — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor deines Stromzählers — ermöglicht echte Verbrauchsmessung und Abrechnungsprognose",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "einspeiseverguetung": "Vergütung pro eingespeister kWh ins Netz (z. B. bei Photovoltaik)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer auf deiner Stromrechnung",
+          "marktlokation": "Marktlokations-ID (MaLo-ID) oder Messlokations-ID — steht auf der Rechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "reconfigure_energie": {
+        "title": "Strom-Details",
+        "description": "Preise, Verbrauch und Zählerdaten.",
+        "data": {
+          "arbeitspreis": "Arbeitspreis (€/kWh)",
+          "arbeitspreis_sensor": "Preissensor für dynamischen Tarif (optional)",
+          "arbeitspreis_aufschlag": "Aufschlag dynamischer Tarif (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (kWh)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "einspeiseverguetung": "Einspeisevergütung (€/kWh, optional)",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis",
+          "arbeitspreis_nacht": "Nachttarif (z.B. Economy 7, TOU Nebenzeit)",
+          "jahresverbrauch_tag": "Jahresverbrauch Tag",
+          "jahresverbrauch_nacht": "Jahresverbrauch Nacht"
+        },
+        "data_description": {
+          "arbeitspreis": "Preis pro verbrauchter kWh — steht auf deiner Stromrechnung. Dient außerdem als Fallback, solange für den Preissensor unten noch keine Statistik vorliegt",
+          "arbeitspreis_sensor": "HA-Sensor mit einem live Börsen-/Spotpreis (z.B. Tibber, aWATTar, Nordpool) — wenn gesetzt, wird der Arbeitspreis aus dem Durchschnitt dieses Sensors berechnet statt aus dem festen Wert oben",
+          "arbeitspreis_aufschlag": "Fester Aufschlag, der auf den Preis des dynamischen Tarif-Sensors aufgeschlagen wird (z.B. die Marge des Anbieters in ct/kWh)",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in kWh — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor deines Stromzählers — ermöglicht echte Verbrauchsmessung und Abrechnungsprognose",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "einspeiseverguetung": "Vergütung pro eingespeister kWh ins Netz (z. B. bei Photovoltaik)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer auf deiner Stromrechnung",
+          "marktlokation": "Marktlokations-ID (MaLo-ID) oder Messlokations-ID — steht auf der Rechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "gas": {
+        "title": "Gas-Details",
+        "description": "Preise, Verbrauch (m³) und Umrechnung auf kWh über Brennwert und Zustandszahl.",
+        "data": {
+          "gas_einheit": "Gaseinheit",
+          "arbeitspreis": "Arbeitspreis (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (m³)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "brennwert": "Brennwert (kWh/m³)",
+          "zustandszahl": "Zustandszahl",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis",
+          "arbeitspreis_nacht": "Nachttarif (z.B. Economy 7, TOU Nebenzeit)",
+          "jahresverbrauch_tag": "Jahresverbrauch Tag",
+          "jahresverbrauch_nacht": "Jahresverbrauch Nacht"
+        },
+        "data_description": {
+          "gas_einheit": "Abrechnungseinheit laut Gasrechnung",
+          "arbeitspreis": "Preis pro kWh Gas — steht auf deiner Gasrechnung",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in der gewählten Einheit",
+          "verbrauch_sensor": "HA-Sensor deines Gaszählers — ermöglicht echte Verbrauchsmessung",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "brennwert": "Brennwert Hs in kWh pro Einheit — steht auf der Gasrechnung",
+          "zustandszahl": "Zustandszahl Z für die Gasvolumenumrechnung — steht auf der Gasrechnung (meist 0,9–1,0)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer auf deiner Gasrechnung",
+          "marktlokation": "Marktlokations-ID — steht auf der Gasrechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "reconfigure_gas": {
+        "title": "Gas-Details",
+        "description": "Preise, Verbrauch (m³) und Umrechnung auf kWh über Brennwert und Zustandszahl.",
+        "data": {
+          "gas_einheit": "Gaseinheit",
+          "arbeitspreis": "Arbeitspreis (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (m³)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "brennwert": "Brennwert (kWh/m³)",
+          "zustandszahl": "Zustandszahl",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis",
+          "arbeitspreis_nacht": "Nachttarif (z.B. Economy 7, TOU Nebenzeit)",
+          "jahresverbrauch_tag": "Jahresverbrauch Tag",
+          "jahresverbrauch_nacht": "Jahresverbrauch Nacht"
+        },
+        "data_description": {
+          "gas_einheit": "Abrechnungseinheit laut Gasrechnung",
+          "arbeitspreis": "Preis pro kWh Gas — steht auf deiner Gasrechnung",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in der gewählten Einheit",
+          "verbrauch_sensor": "HA-Sensor deines Gaszählers — ermöglicht echte Verbrauchsmessung",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "brennwert": "Brennwert Hs in kWh pro Einheit — steht auf der Gasrechnung",
+          "zustandszahl": "Zustandszahl Z für die Gasvolumenumrechnung — steht auf der Gasrechnung (meist 0,9–1,0)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer auf deiner Gasrechnung",
+          "marktlokation": "Marktlokations-ID — steht auf der Gasrechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "pauschal": {
+        "title": "Kosten",
+        "description": "Kosten des Vertrags. Trage ein, wie hoch eine Zahlung ist und wie oft du zahlst; die Integration rechnet mit dem Monatsbetrag.",
+        "data": {
+          "zahlweise": "Zahlweise",
+          "abschlag": "Betrag pro Zahlung (€)",
+          "erste_zahlung": "Erste Abbuchung am",
+          "grundpreis": "Grundpreis (€/Monat)"
+        },
+        "data_description": {
+          "zahlweise": "Wie oft der Betrag bezahlt wird (Versicherungen werden oft jährlich bezahlt)",
+          "abschlag": "Der Betrag einer Zahlung in der Zahlweise darüber (zum Beispiel der Jahresbeitrag)",
+          "erste_zahlung": "Nur bei vierteljährlicher, halbjährlicher oder jährlicher Zahlung: der Tag, an dem der erste Betrag abgebucht wird. Leer = Vertragsbeginn. Die weiteren Abbuchungen folgen im Abstand der Zahlweise.",
+          "grundpreis": "Optionale Grundgebühr, wenn sie getrennt vom Abschlag abgerechnet wird"
+        }
+      },
+      "versicherung": {
+        "title": "Versicherung",
+        "description": "Was versichert der Vertrag? Nur eine Kfz-Versicherung fragt nach weiteren Angaben.",
+        "data": {
+          "versicherungsart": "Art der Versicherung"
+        },
+        "data_description": {
+          "versicherungsart": "Optional: was die Versicherung abdeckt"
+        }
+      },
+      "versicherung_kfz": {
+        "title": "Kfz-Versicherung",
+        "description": "Angaben zur Kfz-Versicherung. Alles optional, es dokumentiert nur den Vertrag.",
+        "data": {
+          "kennzeichen": "Kennzeichen",
+          "km_start": "Kilometerstand bei Vertragsbeginn (km)",
+          "km_pro_jahr": "Erlaubte Kilometer pro Jahr (km)"
+        },
+        "data_description": {
+          "kennzeichen": "Wird wie die Kundennummer behandelt: im Seitenleisten-Panel nicht sichtbar",
+          "km_start": "Kilometerstand zu Beginn des Vertrags",
+          "km_pro_jahr": "Im Vertrag vereinbarte Kilometer pro Jahr"
+        }
+      },
+      "reconfigure_pauschal": {
+        "title": "Kosten",
+        "description": "Kosten des Vertrags. Trage ein, wie hoch eine Zahlung ist und wie oft du zahlst; die Integration rechnet mit dem Monatsbetrag.",
+        "data": {
+          "zahlweise": "Zahlweise",
+          "abschlag": "Betrag pro Zahlung (€)",
+          "erste_zahlung": "Erste Abbuchung am",
+          "grundpreis": "Grundpreis (€/Monat)"
+        },
+        "data_description": {
+          "zahlweise": "Wie oft der Betrag bezahlt wird (Versicherungen werden oft jährlich bezahlt)",
+          "abschlag": "Der Betrag einer Zahlung in der Zahlweise darüber (zum Beispiel der Jahresbeitrag)",
+          "erste_zahlung": "Nur bei vierteljährlicher, halbjährlicher oder jährlicher Zahlung: der Tag, an dem der erste Betrag abgebucht wird. Leer = Vertragsbeginn. Die weiteren Abbuchungen folgen im Abstand der Zahlweise.",
+          "grundpreis": "Optionale Grundgebühr, wenn sie getrennt vom Abschlag abgerechnet wird"
+        }
+      },
+      "reconfigure_versicherung": {
+        "title": "Versicherung",
+        "description": "Was versichert der Vertrag? Nur eine Kfz-Versicherung fragt nach weiteren Angaben.",
+        "data": {
+          "versicherungsart": "Art der Versicherung"
+        },
+        "data_description": {
+          "versicherungsart": "Optional: was die Versicherung abdeckt"
+        }
+      },
+      "reconfigure_versicherung_kfz": {
+        "title": "Kfz-Versicherung",
+        "description": "Angaben zur Kfz-Versicherung. Alles optional, es dokumentiert nur den Vertrag.",
+        "data": {
+          "kennzeichen": "Kennzeichen",
+          "km_start": "Kilometerstand bei Vertragsbeginn (km)",
+          "km_pro_jahr": "Erlaubte Kilometer pro Jahr (km)"
+        },
+        "data_description": {
+          "kennzeichen": "Wird wie die Kundennummer behandelt: im Seitenleisten-Panel nicht sichtbar",
+          "km_start": "Kilometerstand zu Beginn des Vertrags",
+          "km_pro_jahr": "Im Vertrag vereinbarte Kilometer pro Jahr"
+        }
+      },
+      "wasser": {
+        "title": "Wasservertrag Details",
+        "data": {
+          "wasser_einheit": "Wassereinheit",
+          "arbeitspreis": "Frischwasserpreis (pro Einheit)",
+          "grundpreis": "Grundpreis (pro Monat)",
+          "abschlag": "Monatlicher Abschlag",
+          "jahresverbrauch": "Jahresverbrauch",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "abwasser_typ": "Abwasser-Abrechnungstyp",
+          "arbeitspreis_abwasser": "Abwassergebühr",
+          "zaehlernummer": "Zählernummer",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis"
+        },
+        "data_description": {
+          "wasser_einheit": "Abrechnungseinheit laut Wasserrechnung",
+          "arbeitspreis": "Preis pro Einheit Frischwasser",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor deines Wasserzählers — ermöglicht echte Verbrauchsmessung",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "abwasser_typ": "Art der Abwasserberechnung: Festpreis pro Einheit, % des Frischwasserpreises oder Monatspauschale",
+          "arbeitspreis_abwasser": "Betrag pro Einheit / Prozentsatz / Monatspauschale — je nach gewähltem Typ",
+          "zaehlernummer": "Zählernummer auf deiner Wasserrechnung"
+        }
+      },
+      "reconfigure_wasser": {
+        "title": "Wasservertrag Details",
+        "data": {
+          "wasser_einheit": "Wassereinheit",
+          "arbeitspreis": "Frischwasserpreis (pro Einheit)",
+          "grundpreis": "Grundpreis (pro Monat)",
+          "abschlag": "Monatlicher Abschlag",
+          "jahresverbrauch": "Jahresverbrauch",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "abwasser_typ": "Abwasser-Abrechnungstyp",
+          "arbeitspreis_abwasser": "Abwassergebühr",
+          "zaehlernummer": "Zählernummer",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis"
+        },
+        "data_description": {
+          "wasser_einheit": "Abrechnungseinheit laut Wasserrechnung",
+          "arbeitspreis": "Preis pro Einheit Frischwasser",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor deines Wasserzählers — ermöglicht echte Verbrauchsmessung",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "abwasser_typ": "Art der Abwasserberechnung: Festpreis pro Einheit, % des Frischwasserpreises oder Monatspauschale",
+          "arbeitspreis_abwasser": "Betrag pro Einheit / Prozentsatz / Monatspauschale — je nach gewähltem Typ",
+          "zaehlernummer": "Zählernummer auf deiner Wasserrechnung"
+        }
+      },
+      "energie_ht_nt": {
+        "title": "Strom-Details (Zweizählertarif, Hoch-/Niedertarif)",
+        "description": "Preise, Verbrauch und Zählerdaten für beide Register (Hochtarif / Niedertarif).",
+        "data": {
+          "arbeitspreis": "Arbeitspreis Hochtarif / HT (€/kWh)",
+          "arbeitspreis_nt": "Arbeitspreis Niedertarif / NT (€/kWh)",
+          "arbeitspreis_sensor": "Preissensor für dynamischen Tarif (optional)",
+          "arbeitspreis_aufschlag": "Aufschlag dynamischer Tarif (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (kWh)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "verbrauch_sensor_nt": "Verbrauchssensor Niedertarif / NT (optional)",
+          "verbrauch_start_wert_nt": "Zählerstand bei Vertragsbeginn, NT (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "einspeiseverguetung": "Einspeisevergütung (€/kWh, optional)",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "zaehlernummer_nt": "Zählernummer Niedertarif / NT",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis"
+        },
+        "data_description": {
+          "arbeitspreis": "Preis pro verbrauchter kWh — steht auf deiner Stromrechnung. Dient außerdem als Fallback, solange für den Preissensor unten noch keine Statistik vorliegt Das ist der Hochtarif (HT).",
+          "arbeitspreis_nt": "Preis pro verbrauchter kWh im Niedertarif (NT) — steht auf deiner Stromrechnung.",
+          "arbeitspreis_sensor": "HA-Sensor mit einem live Börsen-/Spotpreis (z.B. Tibber, aWATTar, Nordpool) — wenn gesetzt, wird der Arbeitspreis aus dem Durchschnitt dieses Sensors berechnet statt aus dem festen Wert oben",
+          "arbeitspreis_aufschlag": "Fester Aufschlag, der auf den Preis des dynamischen Tarif-Sensors aufgeschlagen wird (z.B. die Marge des Anbieters in ct/kWh)",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in kWh — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor für dein Hochtarif-Register (HT) — ermöglicht echte Verbrauchsmessung und Abrechnungsprognose.",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "verbrauch_sensor_nt": "HA-Sensor für dein Niedertarif-Register (NT).",
+          "verbrauch_start_wert_nt": "Manueller Override/Fallback für das Niedertarif-Register (NT), analog zum Hochtarif-Feld oben.",
+          "einspeiseverguetung": "Vergütung pro eingespeister kWh ins Netz (z. B. bei Photovoltaik)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer des Hochtarif-Registers (HT), von deiner Stromrechnung.",
+          "zaehlernummer_nt": "Zählernummer des Niedertarif-Registers (NT), falls abweichend vom HT-Register.",
+          "marktlokation": "Marktlokations-ID (MaLo-ID) oder Messlokations-ID — steht auf der Rechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "reconfigure_energie_ht_nt": {
+        "title": "Strom-Details (Zweizählertarif, Hoch-/Niedertarif)",
+        "description": "Preise, Verbrauch und Zählerdaten für beide Register (Hochtarif / Niedertarif).",
+        "data": {
+          "arbeitspreis": "Arbeitspreis Hochtarif / HT (€/kWh)",
+          "arbeitspreis_nt": "Arbeitspreis Niedertarif / NT (€/kWh)",
+          "arbeitspreis_sensor": "Preissensor für dynamischen Tarif (optional)",
+          "arbeitspreis_aufschlag": "Aufschlag dynamischer Tarif (€/kWh)",
+          "grundpreis": "Grundpreis (€/Monat)",
+          "abschlag": "Monatlicher Abschlag (€/Monat)",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch (kWh)",
+          "verbrauch_sensor": "Verbrauchssensor (optional)",
+          "verbrauch_start_wert": "Zählerstand bei Vertragsbeginn (optional)",
+          "verbrauch_sensor_nt": "Verbrauchssensor Niedertarif / NT (optional)",
+          "verbrauch_start_wert_nt": "Zählerstand bei Vertragsbeginn, NT (optional)",
+          "abschlag_warnung": "Warnen, wenn Abschlag zu niedrig ist",
+          "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
+          "einspeiseverguetung": "Einspeisevergütung (€/kWh, optional)",
+          "bonus": "Neukundenbonus / Sofortbonus (€)",
+          "oekostrom": "Ökostrom",
+          "zaehlernummer": "Zählernummer",
+          "zaehlernummer_nt": "Zählernummer Niedertarif / NT",
+          "marktlokation": "Marktlokation (MaLo-ID) / Zählpunkt",
+          "preisgarantie": "Preisgarantie bis",
+          "tiered": "Staffelpreise aktivieren",
+          "tier_limit_0": "Block 1 Obergrenze",
+          "tier_price_0": "Block 1 Preis",
+          "tier_limit_1": "Block 2 Obergrenze",
+          "tier_price_1": "Block 2 Preis",
+          "tier_limit_2": "Block 3 Obergrenze",
+          "tier_price_2": "Block 3 Preis",
+          "tier_limit_3": "Block 4 Obergrenze",
+          "tier_price_3": "Block 4 Preis",
+          "tier_limit_4": "Block 5 Obergrenze",
+          "tier_price_4": "Block 5 Preis"
+        },
+        "data_description": {
+          "arbeitspreis": "Preis pro verbrauchter kWh — steht auf deiner Stromrechnung. Dient außerdem als Fallback, solange für den Preissensor unten noch keine Statistik vorliegt Das ist der Hochtarif (HT).",
+          "arbeitspreis_nt": "Preis pro verbrauchter kWh im Niedertarif (NT) — steht auf deiner Stromrechnung.",
+          "arbeitspreis_sensor": "HA-Sensor mit einem live Börsen-/Spotpreis (z.B. Tibber, aWATTar, Nordpool) — wenn gesetzt, wird der Arbeitspreis aus dem Durchschnitt dieses Sensors berechnet statt aus dem festen Wert oben",
+          "arbeitspreis_aufschlag": "Fester Aufschlag, der auf den Preis des dynamischen Tarif-Sensors aufgeschlagen wird (z.B. die Marge des Anbieters in ct/kWh)",
+          "grundpreis": "Monatlicher Festbetrag unabhängig vom Verbrauch",
+          "abschlag": "Monatliche Vorauszahlung an den Anbieter",
+          "jahresverbrauch": "Geschätzter Jahresverbrauch in kWh — wird für die Kostenprognose verwendet",
+          "verbrauch_sensor": "HA-Sensor für dein Hochtarif-Register (HT) — ermöglicht echte Verbrauchsmessung und Abrechnungsprognose.",
+          "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
+          "verbrauch_sensor_nt": "HA-Sensor für dein Niedertarif-Register (NT).",
+          "verbrauch_start_wert_nt": "Manueller Override/Fallback für das Niedertarif-Register (NT), analog zum Hochtarif-Feld oben.",
+          "einspeiseverguetung": "Vergütung pro eingespeister kWh ins Netz (z. B. bei Photovoltaik)",
+          "bonus": "Einmaliger Wechsel- oder Neukundenbonus des Anbieters",
+          "zaehlernummer": "Zählernummer des Hochtarif-Registers (HT), von deiner Stromrechnung.",
+          "zaehlernummer_nt": "Zählernummer des Niedertarif-Registers (NT), falls abweichend vom HT-Register.",
+          "marktlokation": "Marktlokations-ID (MaLo-ID) oder Messlokations-ID — steht auf der Rechnung",
+          "preisgarantie": "Datum bis zu dem der Arbeitspreis garantiert ist"
+        }
+      },
+      "kredit": {
+        "title": "Kredit / Finanzierung",
+        "description": "Trage den Kredit so ein, wie er im Vertrag steht. Die Rate ist freiwillig: Ohne sie rechnet die Integration die Annuität aus Zins, Laufzeit und Schlussrate. Der Kredit läuft getrennt von deinen Verträgen und zählt nicht in deren Summen.",
+        "data": {
+          "kredit_summe": "Kreditsumme (€)",
+          "sollzins": "Sollzins (% pro Jahr)",
+          "effektivzins": "Effektiver Jahreszins (%)",
+          "laufzeit_monate": "Laufzeit (Monate)",
+          "zahlweise": "Zahlweise",
+          "kredit_rate": "Rate je Zahlung (€)",
+          "schlussrate": "Schlussrate / Restwert (€)",
+          "erste_zahlung": "Datum der ersten Rate"
+        },
+        "data_description": {
+          "kredit_summe": "Der geliehene Betrag laut Vertrag",
+          "sollzins": "Mit ihm rechnen die Banken die Rate. Bleibt er leer, wird der effektive Jahreszins genommen.",
+          "effektivzins": "Freiwillig, zur Information und als Ersatz, wenn es keinen Sollzins gibt",
+          "laufzeit_monate": "Anzahl der Monate vom Beginn des Vertrags bis zu seinem Ende",
+          "zahlweise": "Wie oft eine Rate gezahlt wird",
+          "kredit_rate": "Freiwillig. Die Rate aus deinem Vertrag; leer = berechnet. Eine Rate, die nicht zum Zins passt, wird gemeldet.",
+          "schlussrate": "Freiwillig: ein Betrag, der am Ende noch offen ist und mit der letzten Rate gezahlt wird (Autofinanzierung, Restwert)",
+          "erste_zahlung": "Leer = ein Zahlungsintervall nach dem Beginn (bei monatlicher Zahlung: Ende des ersten Monats). Die weiteren Raten folgen im Abstand der Zahlweise."
+        }
+      },
+      "reconfigure_kredit": {
+        "title": "Kredit / Finanzierung",
+        "description": "Trage den Kredit so ein, wie er im Vertrag steht. Die Rate ist freiwillig: Ohne sie rechnet die Integration die Annuität aus Zins, Laufzeit und Schlussrate. Der Kredit läuft getrennt von deinen Verträgen und zählt nicht in deren Summen.",
+        "data": {
+          "kredit_summe": "Kreditsumme (€)",
+          "sollzins": "Sollzins (% pro Jahr)",
+          "effektivzins": "Effektiver Jahreszins (%)",
+          "laufzeit_monate": "Laufzeit (Monate)",
+          "zahlweise": "Zahlweise",
+          "kredit_rate": "Rate je Zahlung (€)",
+          "schlussrate": "Schlussrate / Restwert (€)",
+          "erste_zahlung": "Datum der ersten Rate"
+        },
+        "data_description": {
+          "kredit_summe": "Der geliehene Betrag laut Vertrag",
+          "sollzins": "Mit ihm rechnen die Banken die Rate. Bleibt er leer, wird der effektive Jahreszins genommen.",
+          "effektivzins": "Freiwillig, zur Information und als Ersatz, wenn es keinen Sollzins gibt",
+          "laufzeit_monate": "Anzahl der Monate vom Beginn des Vertrags bis zu seinem Ende",
+          "zahlweise": "Wie oft eine Rate gezahlt wird",
+          "kredit_rate": "Freiwillig. Die Rate aus deinem Vertrag; leer = berechnet. Eine Rate, die nicht zum Zins passt, wird gemeldet.",
+          "schlussrate": "Freiwillig: ein Betrag, der am Ende noch offen ist und mit der letzten Rate gezahlt wird (Autofinanzierung, Restwert)",
+          "erste_zahlung": "Leer = ein Zahlungsintervall nach dem Beginn (bei monatlicher Zahlung: Ende des ersten Monats). Die weiteren Raten folgen im Abstand der Zahlweise."
+        }
+      }
+    },
+    "abort": {
+      "reconfigure_successful": "Vertrag wurde aktualisiert.",
+      "invalid_backup": "Die Sicherung ist nicht gültig."
+    },
+    "error": {
+      "invalid_number": "Keine gültige Zahl. Bitte Punkt oder Komma als Dezimaltrennzeichen verwenden (z.B. 11.2 oder 11,2).",
+      "kredit_summe": "Trage eine Kreditsumme über null ein.",
+      "kredit_zins": "Trage den Sollzins oder den effektiven Jahreszins ein."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Nächsten Vertrag planen",
+        "description": "Kommenden Tarif eintragen. Am Wechseldatum übernimmt Home Assistant alles automatisch. Nicht ausgefüllte Felder behalten den aktuellen Wert. 'Wechseldatum' leer lassen entfernt einen geplanten Wechsel.",
+        "data": {
+          "next_beginn": "Wechseldatum (Beginn neuer Vertrag)",
+          "next_anbieter": "Anbieter (neu)",
+          "next_kundennummer": "Kundennummer (neu)",
+          "next_tarif": "Tarifname (neu)",
+          "next_arbeitspreis": "Arbeitspreis neu (€/kWh)",
+          "next_arbeitspreis_nt": "Arbeitspreis neu, Niedertarif / NT (€/kWh)",
+          "next_verbrauch_sensor_nt": "Verbrauchssensor neu, Niedertarif / NT (optional)",
+          "next_zaehlernummer_nt": "Zählernummer neu, Niedertarif / NT",
+          "next_arbeitspreis_sensor": "Preissensor dynamischer Tarif neu (optional)",
+          "next_arbeitspreis_aufschlag": "Aufschlag dynamischer Tarif neu (€/kWh)",
+          "next_grundpreis": "Grundpreis neu (€/Monat)",
+          "next_abschlag": "Abschlag neu (€/Monat)",
+          "next_jahresverbrauch": "Jahresverbrauch neu (kWh bzw. m³)",
+          "next_gas_einheit": "Gas-Einheit neu",
+          "next_brennwert": "Brennwert neu",
+          "next_zustandszahl": "Zustandszahl neu",
+          "next_ende": "Vertragsende neu / Laufzeit bis"
+        }
+      }
+    },
+    "error": {
+      "invalid_number": "Keine gültige Zahl. Bitte Punkt oder Komma als Dezimaltrennzeichen verwenden (z.B. 11.2 oder 11,2)."
+    }
+  },
+  "selector": {
+    "sparte": {
+      "options": {
+        "electricity": "Strom",
+        "gas": "Gas",
+        "water": "Wasser",
+        "internet": "Internet",
+        "mobile": "Mobilfunk",
+        "streaming": "Streaming",
+        "insurance": "Versicherung",
+        "other": "Sonstiges",
+        "electricity_ht_nt": "Strom (Zweizählertarif, Hoch-/Niedertarif)",
+        "loan": "Kredit / Finanzierung"
+      }
+    },
+    "erinnerung": {
+      "options": {
+        "0": "Keine Erinnerung",
+        "1": "1 Monat vorher",
+        "2": "2 Monate vorher",
+        "3": "3 Monate vorher",
+        "4": "4 Monate vorher"
+      }
+    },
+    "abwasser_typ": {
+      "options": {
+        "price_per_unit": "Fixer Preis pro Einheit (z.B. DE, AT, CH)",
+        "percentage": "Prozentsatz des Frischwasserpreises (z.B. US, UK, AU)",
+        "flat_rate": "Monatliche Pauschale (z.B. FR, BE)"
+      }
+    },
+    "zahlweise": {
+      "options": {
+        "monthly": "Monatlich",
+        "quarterly": "Vierteljährlich",
+        "halfyearly": "Halbjährlich",
+        "yearly": "Jährlich"
+      }
+    },
+    "versicherungsart": {
+      "options": {
+        "car": "Auto (Kfz)",
+        "house": "Gebäude / Haus",
+        "household": "Hausrat",
+        "liability": "Haftpflicht",
+        "health": "Kranken",
+        "life": "Leben",
+        "legal": "Rechtsschutz",
+        "accident": "Unfall",
+        "other": "Sonstige"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "arbeitspreis": {
+        "name": "Arbeitspreis"
+      },
+      "grundpreis": {
+        "name": "Grundpreis"
+      },
+      "jahreskosten": {
+        "name": "Abschlag (Vertragslaufzeit)"
+      },
+      "verbrauch_kwh": {
+        "name": "Jahresverbrauch (kWh)"
+      },
+      "restlaufzeit": {
+        "name": "Restlaufzeit"
+      },
+      "beginn": {
+        "name": "Vertragsbeginn"
+      },
+      "ende": {
+        "name": "Vertragsende"
+      },
+      "anbieter": {
+        "name": "Anbieter"
+      },
+      "kundennummer": {
+        "name": "Kundennummer"
+      },
+      "zaehlernummer": {
+        "name": "Zählernummer"
+      },
+      "tarif": {
+        "name": "Tarif"
+      },
+      "naechster_wechsel": {
+        "name": "Nächster Wechsel"
+      },
+      "garten_verbrauch": {
+        "name": "Gartenwasser (Verbrauch)"
+      },
+      "garten_kosten": {
+        "name": "Gartenwasser (Kosten)"
+      },
+      "abwasserpflichtiger_verbrauch": {
+        "name": "Abwasserpflichtiger Verbrauch"
+      },
+      "abwasser_kosten": {
+        "name": "Abwasserkosten"
+      },
+      "kuendigung_erinnerung": {
+        "name": "Kündigungs-Erinnerung"
+      },
+      "verbrauch_bisher": {
+        "name": "Verbrauch (Bisher)"
+      },
+      "verbrauch_hochgerechnet": {
+        "name": "Verbrauch (Vertragslaufzeit hochgerechnet)"
+      },
+      "prognose_real": {
+        "name": "Guthaben/Nachzahlung (Vertragsende)"
+      },
+      "arbeitspreis_abwasser": {
+        "name": "Arbeitspreis (Abwasser)"
+      },
+      "arbeitspreis_gesamt_wasser": {
+        "name": "Wasserpreis (Gesamt)"
+      },
+      "effektiver_arbeitspreis": {
+        "name": "Arbeitspreis (Effektiv)"
+      },
+      "arbeitspreis_nacht": {
+        "name": "Arbeitspreis (Nacht)"
+      },
+      "einspeiseverguetung": {
+        "name": "Einspeisevergütung"
+      },
+      "kosten_bisher": {
+        "name": "Kosten (Bisher)"
+      },
+      "guthaben_bisher": {
+        "name": "Guthaben/Nachzahlung (Bisher)"
+      },
+      "verbrauch_letzte_laufzeit": {
+        "name": "Verbrauch (Letzte Laufzeit)"
+      },
+      "empfohlener_abschlag": {
+        "name": "Abschlag (Empfohlen)"
+      },
+      "abschlag_anpassung_empfohlen": {
+        "name": "Abschlag (Anpassung empfohlen)"
+      },
+      "abschlag": {
+        "name": "Abschlag"
+      },
+      "arbeitspreis_nt": {
+        "name": "Arbeitspreis (Niedertarif / NT)"
+      },
+      "zaehlernummer_nt": {
+        "name": "Zählernummer (Niedertarif / NT)"
+      },
+      "verbrauch_ht_bisher": {
+        "name": "Verbrauch Hochtarif (Bisher)"
+      },
+      "verbrauch_nt_bisher": {
+        "name": "Verbrauch Niedertarif (Bisher)"
+      },
+      "kosten_ht_bisher": {
+        "name": "Kosten Hochtarif (Bisher)"
+      },
+      "kosten_nt_bisher": {
+        "name": "Kosten Niedertarif (Bisher)"
+      },
+      "versicherungsart": {
+        "name": "Art der Versicherung",
+        "state": {
+          "car": "Auto (Kfz)",
+          "house": "Gebäude / Haus",
+          "household": "Hausrat",
+          "liability": "Haftpflicht",
+          "health": "Kranken",
+          "life": "Leben",
+          "legal": "Rechtsschutz",
+          "accident": "Unfall",
+          "other": "Sonstige"
+        }
+      },
+      "kennzeichen": {
+        "name": "Kennzeichen"
+      },
+      "km_start": {
+        "name": "Kilometerstand bei Vertragsbeginn"
+      },
+      "km_pro_jahr": {
+        "name": "Erlaubte Kilometer pro Jahr"
+      },
+      "kredit_restschuld": {
+        "name": "Restschuld"
+      },
+      "kredit_gezahlt": {
+        "name": "Gezahlt bisher"
+      },
+      "kredit_restsumme": {
+        "name": "Restsumme"
+      },
+      "kredit_zinsen_bisher": {
+        "name": "Zinsen bisher"
+      }
+    },
+    "button": {
+      "jetzt_wechseln": {
+        "name": "Jetzt wechseln"
+      },
+      "kuendigung_bestaetigen": {
+        "name": "Kündigung bestätigen"
+      },
+      "abschlag_warnung_bestaetigen": {
+        "name": "Abschlag-Warnung bestätigen"
+      }
+    }
+  }
+}

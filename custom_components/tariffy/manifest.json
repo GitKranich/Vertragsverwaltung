@@ -1,0 +1,21 @@
+{
+  "domain": "tariffy",
+  "name": "Tariffy",
+  "after_dependencies": [
+    "frontend",
+    "http",
+    "panel_custom",
+    "recorder",
+    "websocket_api"
+  ],
+  "codeowners": [
+    "@GitKranich"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/GitKranich/tariffy-custom",
+  "integration_type": "hub",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/GitKranich/tariffy-custom/issues",
+  "requirements": [],
+  "version": "1.30.0"
+}

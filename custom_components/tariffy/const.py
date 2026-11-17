@@ -1,0 +1,289 @@
+"""Konstanten für die Tariffy-Integration."""
+
+from __future__ import annotations
+
+from homeassistant.const import Platform
+
+DOMAIN = "tariffy"
+PLATFORMS = [Platform.SENSOR, Platform.BUTTON]
+
+# Allgemeine Schlüssel
+CONF_SPARTE = "sparte"
+CONF_ANBIETER = "anbieter"
+CONF_KUNDENNUMMER = "kundennummer"
+CONF_TARIF = "tarif"
+CONF_BEGINN = "beginn"
+CONF_ENDE = "ende"
+
+# Kosten
+CONF_ARBEITSPREIS = "arbeitspreis"
+CONF_GRUNDPREIS = "grundpreis"
+CONF_ABSCHLAG = "abschlag"
+
+# Energie-spezifisch (Strom/Gas)
+CONF_JAHRESVERBRAUCH = "jahresverbrauch"
+CONF_GAS_EINHEIT = "gas_einheit"
+CONF_ZAEHLERNUMMER = "zaehlernummer"
+CONF_MARKTLOKATION = "marktlokation"
+CONF_PREISGARANTIE = "preisgarantie"
+CONF_BONUS = "bonus"
+CONF_OEKOSTROM = "oekostrom"
+
+# Gas-spezifisch
+CONF_BRENNWERT = "brennwert"
+CONF_ZUSTANDSZAHL = "zustandszahl"
+
+# Wasser-spezifisch
+CONF_ARBEITSPREIS_ABWASSER = "arbeitspreis_abwasser"
+CONF_ABWASSER_TYP = "abwasser_typ"
+CONF_WASSER_EINHEIT = "wasser_einheit"
+
+# Abwasser-Berechnungstypen
+ABWASSER_TYP_PREIS = "price_per_unit"    # fixer Preis pro Einheit (DE/AT/CH)
+ABWASSER_TYP_PROZENT = "percentage"      # % des Frischwasserpreises (US/UK/AU)
+ABWASSER_TYP_PAUSCHAL = "flat_rate"      # Pauschal pro Monat (FR/BE)
+ABWASSER_TYPEN = [ABWASSER_TYP_PREIS, ABWASSER_TYP_PROZENT, ABWASSER_TYP_PAUSCHAL]
+
+# Tiered / gestaffelte Preise (Strom, Gas, Wasser)
+CONF_TIERED = "tiered"                   # aktiviert Staffelpreise
+CONF_TIER_LIMITS = "tier_limits"         # Liste von Obergrenzen je Block [5, 10, 20]
+CONF_TIER_PRICES = "tier_prices"         # Liste von Preisen je Block [0.5, 0.8, 1.2]
+MAX_TIERS = 5                            # max. Anzahl Blöcke
+
+# Tag/Nacht-Tarif (Time-of-Use)
+CONF_ARBEITSPREIS_NACHT = "arbeitspreis_nacht"
+CONF_JAHRESVERBRAUCH_NACHT = "jahresverbrauch_nacht"
+CONF_JAHRESVERBRAUCH_TAG = "jahresverbrauch_tag"
+
+# Länder mit Tag/Nacht-Tarifen (Economy 7, TOU)
+LAENDER_TAG_NACHT = {"GB", "US", "CA", "AU", "NZ", "IE"}
+
+# Länder mit gestaffelten Preisen (Tiered)
+LAENDER_TIERED = {"US", "CA", "AU", "NZ", "ES", "PT", "IT", "GR", "IL", "IN", "BR", "MX", "ZA", "CN", "JP", "KR"}
+
+# Länder mit Abwasser als % (water sewerage percentage)
+LAENDER_ABWASSER_PROZENT = {"US", "CA", "AU", "NZ", "GB", "IE"}
+
+# Länder mit Abwasser-Pauschale
+LAENDER_ABWASSER_PAUSCHAL = {"FR", "BE", "LU"}
+
+# Echte Verbrauchsmessung
+CONF_VERBRAUCH_SENSOR = "verbrauch_sensor"
+CONF_VERBRAUCH_LETZTE_LAUFZEIT = "verbrauch_letzte_laufzeit"
+CONF_VERBRAUCH_LETZTE_LAUFZEIT_MONATE = "verbrauch_letzte_laufzeit_monate"
+# Optionaler manueller Fallback/Override fuer den Zaehlerstand bei
+# Vertragsbeginn -- deckt den Fall ab, dass die Recorder-Statistik des
+# verbrauch_sensor nicht bis zum Vertragsbeginn zurueckreicht (z.B. weil der
+# Sensor zwischenzeitlich umbenannt oder neu angelegt wurde). Bewusst NICHT
+# in BASIS_FELDER, da ein Vertragswechsel ein neues Beginn-Datum hat, fuer
+# das die automatische Erkennung normalerweise funktioniert.
+CONF_VERBRAUCH_START_WERT = "verbrauch_start_wert"
+
+# Versicherung (nur Sparte "insurance"): Art der Versicherung und, fuer eine
+# Kfz-Versicherung, Kennzeichen, Kilometerstand bei Vertragsbeginn und die
+# vereinbarten Kilometer pro Jahr. Nur zur Dokumentation, es wird nichts
+# berechnet. Das Kennzeichen gilt wie die Kundennummer als persoenlich.
+SPARTE_INSURANCE = "insurance"
+CONF_VERSICHERUNGSART = "versicherungsart"
+CONF_KENNZEICHEN = "kennzeichen"
+CONF_KM_START = "km_start"
+CONF_KM_PRO_JAHR = "km_pro_jahr"
+VERSICHERUNGSART_KFZ = "car"
+VERSICHERUNGSARTEN = [
+    VERSICHERUNGSART_KFZ,
+    "house",
+    "household",
+    "liability",
+    "health",
+    "life",
+    "legal",
+    "accident",
+    "other",
+]
+
+# Einspeiseverguetung (nur Strom)
+CONF_EINSPEISEVERGUETUNG = "einspeiseverguetung"
+
+# Zweizaehlertarif (Hoch-/Niedertarif, zwei echte Zaehler-Register) --
+# eigene Sparte "electricity_ht_nt" statt Zusatzfelder auf "electricity",
+# da die Kombination aus zweitem Arbeitspreis + zweitem Verbrauchssensor +
+# eigener Kosten-Aufschluesselung eigene Sensoren braucht (siehe sensor.py).
+# Die vorhandenen CONF_ARBEITSPREIS/CONF_VERBRAUCH_SENSOR/CONF_ZAEHLERNUMMER
+# werden dabei implizit als Hochtarif-Register weiterverwendet.
+SPARTE_ELECTRICITY_HT_NT = "electricity_ht_nt"
+CONF_ARBEITSPREIS_NT = "arbeitspreis_nt"
+CONF_VERBRAUCH_SENSOR_NT = "verbrauch_sensor_nt"
+CONF_ZAEHLERNUMMER_NT = "zaehlernummer_nt"
+# Analog CONF_VERBRAUCH_START_WERT, aber fuer das Niedertarif-Register --
+# aus demselben Grund bewusst NICHT in BASIS_FELDER.
+CONF_VERBRAUCH_START_WERT_NT = "verbrauch_start_wert_nt"
+
+# Feed-in tariff: available worldwide, no country restriction
+
+# Dynamischer Tarif (Boersen-/Spotpreis, z.B. Tibber, aWATTar, Nordpool):
+# statt eines festen Arbeitspreises wird ein externer HA-Sensor referenziert,
+# der den aktuellen Spotpreis liefert, plus ein optionaler fester Aufschlag.
+CONF_ARBEITSPREIS_SENSOR = "arbeitspreis_sensor"
+CONF_ARBEITSPREIS_AUFSCHLAG = "arbeitspreis_aufschlag"
+
+ENERGIE_SPARTEN = ("electricity", "gas", SPARTE_ELECTRICITY_HT_NT)
+GAS_SPARTE = "gas"
+WASSER_SPARTE = "water"
+ENERGIE_SPARTEN_MIT_WASSER = ("strom", "gas", "wasser")
+
+# Kündigungs-Erinnerung
+CONF_ERINNERUNG_MONATE = "erinnerung_monate"
+# Optional, in Monaten: Kuendigungsfrist (die Erinnerung bezieht sich dann auf den letzten
+# Kuendigungstag statt auf das Vertragsende) und Mindestvertragslaufzeit (nur Anzeige).
+CONF_KUENDIGUNGSFRIST = "kuendigungsfrist"
+CONF_MINDESTLAUFZEIT = "mindestlaufzeit"
+CONF_NOTIFY_TARGET = "notify_target"
+ERINNERUNG_OPTIONS = ["0", "1", "2", "3", "4"]
+
+# Interne Statusflags
+CONF_KUENDIGUNG_BESTAETIGT = "_kuendigung_bestaetigt"
+CONF_NOTIFY_GESENDET = "_notify_gesendet"
+
+NOTIFY_ID_PREFIX = "tariffy_kuendigung_"
+
+# Sparten, die nach Verbrauch abgerechnet werden (wie im Panel); alles andere ist eine Pauschale.
+METERED_SPARTEN = frozenset({"electricity", "electricity_ht_nt", "gas", "water"})
+
+# Zahlweise bei Pauschalvertraegen (Versicherung usw.): der Betrag pro Zahlung wird in einen
+# Monatsbetrag umgerechnet; `abschlag` bleibt immer der Betrag pro Monat.
+CONF_ZAHLWEISE = "zahlweise"
+ZAHLWEISE_MONATE = {"monthly": 1, "quarterly": 3, "halfyearly": 6, "yearly": 12}
+DEFAULT_ZAHLWEISE = "monthly"
+# Datum der ersten Abbuchung bei nicht monatlicher Zahlweise (leer = am Vertragsbeginn)
+CONF_ERSTE_ZAHLUNG = "erste_zahlung"
+
+# Vertragshistorie: beim Tarifwechsel wird die alte Laufzeit als Eintrag in
+# `_historie` gesichert (die Vertragsdaten werden dabei ueberschrieben); ein
+# abgelaufener Vertrag ohne Folgevertrag kann archiviert werden (`_archiviert`
+# = Datum). Beides sind interne Schluessel: kein neuer Sensor, keine neue
+# Entitaet, und beim Bearbeiten (Neu konfigurieren) bleiben sie erhalten.
+CONF_HISTORIE = "_historie"
+CONF_ARCHIVIERT = "_archiviert"
+HISTORIE_MAX = 50
+
+# Einmalposten pro Vertrag (interner Schluessel, kein neuer Sensor): Liste aus
+# {bezeichnung, betrag, datum}; positiv = Gutschrift/Bonus, negativ = Rechnung/Honorar.
+CONF_EINMALPOSTEN = "_einmalposten"
+EINMALPOSTEN_MAX = 50
+
+# Aussenzaehler eines Wasservertrags (interner Schluessel, nur Wasser): Liste aus
+# {name, sensor, start_wert, preis}. Ihr Verbrauch ist im Hauptzaehler enthalten und ist nicht
+# abwasserpflichtig (Garten, Pool, Bewaesserung).
+CONF_AUSSENZAEHLER = "_aussenzaehler"
+AUSSENZAEHLER_MAX = 10
+
+# Abschlag-Warnung (optional, pro Vertrag): warnt, wenn die Prognose zum
+# Vertragsende eine Nachzahlung ueber der Schwelle erwarten laesst.
+CONF_ABSCHLAG_WARNUNG = "abschlag_warnung"
+CONF_ABSCHLAG_WARNUNG_SCHWELLE = "abschlag_warnung_schwelle"
+DEFAULT_ABSCHLAG_WARNUNG_SCHWELLE = 50.0
+CONF_ABSCHLAG_WARNUNG_BESTAETIGT = "_abschlag_warnung_bestaetigt"
+CONF_ABSCHLAG_WARNUNG_NOTIFY_GESENDET = "_abschlag_warnung_notify_gesendet"
+NOTIFY_ID_ABSCHLAG_PREFIX = "tariffy_abschlag_warnung_"
+
+# Abschlags-Historie: wird beim Bearbeiten eines Vertrags automatisch
+# nachgefuehrt (siehe config_flow.py::_stamp_abschlag_change), damit
+# "Guthaben/Nachzahlung (Bisher)" und "Abschlag (Anpassung empfohlen)"
+# nicht rueckwirkend mit dem NEUEN Abschlag rechnen, wenn er erst kuerzlich
+# geaendert wurde.
+CONF_ABSCHLAG_AB_DATUM = "_abschlag_ab_datum"
+CONF_ABSCHLAG_VORHERIGER_WERT = "_abschlag_vorheriger_wert"
+
+# Zukünftiger Vertrag
+NEXT_PREFIX = "next_"
+
+# Felder die beim Wechsel übernommen werden
+BASIS_FELDER = [
+    CONF_ANBIETER,
+    CONF_KUNDENNUMMER,
+    CONF_TARIF,
+    CONF_ARBEITSPREIS,
+    CONF_GRUNDPREIS,
+    CONF_ABSCHLAG,
+    CONF_JAHRESVERBRAUCH,
+    CONF_GAS_EINHEIT,
+    CONF_BRENNWERT,
+    CONF_ZUSTANDSZAHL,
+    CONF_ZAEHLERNUMMER,
+    CONF_MARKTLOKATION,
+    CONF_PREISGARANTIE,
+    CONF_BONUS,
+    CONF_OEKOSTROM,
+    CONF_BEGINN,
+    CONF_ENDE,
+    CONF_VERBRAUCH_SENSOR,
+    CONF_ARBEITSPREIS_ABWASSER,
+    CONF_ABWASSER_TYP,
+    CONF_WASSER_EINHEIT,
+    CONF_TIERED,
+    CONF_TIER_LIMITS,
+    CONF_TIER_PRICES,
+    CONF_ARBEITSPREIS_NACHT,
+    CONF_JAHRESVERBRAUCH_NACHT,
+    CONF_JAHRESVERBRAUCH_TAG,
+    CONF_EINSPEISEVERGUETUNG,
+    CONF_ARBEITSPREIS_SENSOR,
+    CONF_ARBEITSPREIS_AUFSCHLAG,
+    CONF_ARBEITSPREIS_NT,
+    CONF_VERBRAUCH_SENSOR_NT,
+    CONF_ZAEHLERNUMMER_NT,
+    CONF_VERSICHERUNGSART,
+    CONF_KENNZEICHEN,
+    CONF_KM_PRO_JAHR,
+]
+
+# Kredit / Finanzierung (Sparte "loan"): getrennt von den Vertraegen, zaehlt nicht in deren Summen.
+SPARTE_LOAN = "loan"
+CONF_KREDIT_SUMME = "kredit_summe"
+CONF_SOLLZINS = "sollzins"
+CONF_EFFEKTIVZINS = "effektivzins"
+CONF_LAUFZEIT_MONATE = "laufzeit_monate"
+CONF_KREDIT_RATE = "kredit_rate"
+CONF_SCHLUSSRATE = "schlussrate"
+
+SPARTEN = [
+    "electricity",
+    SPARTE_ELECTRICITY_HT_NT,
+    "gas",
+    "water",
+    "internet",
+    "mobile",
+    "streaming",
+    SPARTE_LOAN,
+    SPARTE_INSURANCE,
+    "other",
+]
+
+# Rueckwaertskompatibilitaet: alte Sparten-Werte -> neue
+SPARTEN_MIGRATION = {
+    "strom": "electricity",
+    "wasser": "water",
+    "mobilfunk": "mobile",
+    "versicherung": "insurance",
+    "sonstiges": "other",
+    # gas, internet bleiben gleich
+}
+
+# Wassereinheiten
+WASSER_EINHEITEN = ["m³", "L", "gal", "ft³", "CCF"]
+
+# Gas-Verbrauchseinheiten mit Umrechnungsfaktoren zu kWh
+# Brennwert wird separat angegeben (nur für m³, CCF, ft³)
+GAS_EINHEITEN = ["m³", "CCF", "therm", "ft³", "MBtu", "kWh"]
+
+# Einheiten — dynamisch aus HA-Währung gebaut
+# Feste Nicht-Währungs-Einheiten
+GRUNDPREIS_SUFFIX = "/month"
+ABSCHLAG_SUFFIX = "/month"
+JAHRESKOSTEN_SUFFIX = "/year"
+VERBRAUCH_KWH_EINHEIT = "kWh"
+VERBRAUCH_EINHEIT = "kWh"
+VERBRAUCH_M3_EINHEIT = "m³"
+BRENNWERT_SUFFIX_M3 = "kWh/m³"
+BRENNWERT_SUFFIX_CCF = "kWh/CCF"
+BRENNWERT_SUFFIX_FT3 = "kWh/ft³"
