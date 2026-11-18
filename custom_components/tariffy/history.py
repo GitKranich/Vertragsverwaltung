@@ -31,6 +31,8 @@ from .const import (
     CONF_ABSCHLAG_VORHERIGER_WERT,
     CONF_PREISAENDERUNGEN,
     PREISAENDERUNG_SPARTEN,
+    PREISAENDERUNG_PAUSCHAL_SPARTEN,
+    DEFAULT_ZAHLWEISE,
     PREISAENDERUNGEN_MAX,
     AUSSENZAEHLER_MAX,
     CONF_ARCHIVIERT,
@@ -490,6 +492,17 @@ def delete_aussenzaehler(hass: HomeAssistant, entry: ConfigEntry, index: int) ->
 
 # ------------------------------------------- Preisaenderungen im Vertrag (Strom/Gas)
 def _preisaenderung(values: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
+    """Eine Preisaenderung pruefen. Bei Pauschalvertraegen (Versicherung, Internet, ...) kommt der
+    neue Betrag pro Zahlung als `betrag` und wird wie im Vertrag als Monatsbetrag `abschlag`
+    gespeichert; einen Arbeitspreis gibt es dort nicht."""
+    if data.get(CONF_SPARTE) in PREISAENDERUNG_PAUSCHAL_SPARTEN:
+        values = {key: val for key, val in values.items() if key not in ("arbeitspreis", "abschlag")}
+        betrag = _number(values.pop("betrag", None), "betrag")
+        if betrag is not None:
+            zahlweise = data.get(CONF_ZAHLWEISE)
+            monate = ZAHLWEISE_MONATE.get(zahlweise, ZAHLWEISE_MONATE[DEFAULT_ZAHLWEISE])
+            values["abschlag"] = round(betrag / monate, 6)
+        values.pop("zaehlerstand", None)
     try:
         datum = date.fromisoformat(str(values.get("datum")))
     except ValueError as err:
@@ -517,7 +530,10 @@ def save_preisaenderung(
     """Legt eine Preisaenderung (neue Preise ab einem Datum, der Vertrag laeuft weiter) an oder
     ersetzt die mit `index`. Nur Strom und Gas mit festem Arbeitspreis."""
     data = entry.data
-    if data.get(CONF_SPARTE) not in PREISAENDERUNG_SPARTEN or data.get(CONF_ARBEITSPREIS_SENSOR):
+    if (
+        data.get(CONF_SPARTE) not in (*PREISAENDERUNG_SPARTEN, *PREISAENDERUNG_PAUSCHAL_SPARTEN)
+        or data.get(CONF_ARBEITSPREIS_SENSOR)
+    ):
         raise HistoryError("not_available")
     eintrag = _preisaenderung(values, data)
     liste = [item for item in data.get(CONF_PREISAENDERUNGEN) or [] if isinstance(item, dict)]

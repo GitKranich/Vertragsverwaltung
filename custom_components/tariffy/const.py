@@ -219,6 +219,9 @@ CONF_ABSCHLAG_VORHERIGER_WERT = "_abschlag_vorheriger_wert"
 CONF_PREISAENDERUNGEN = "_preisaenderungen"
 PREISAENDERUNGEN_MAX = 50
 PREISAENDERUNG_SPARTEN = ("electricity", "gas")
+# Pauschalvertraege mit Beitrags-/Preiserhoehung im laufenden Vertrag: neuer Betrag pro Zahlung ab
+# einem Datum (gespeichert als Monatsbetrag `abschlag`, wie der Vertrag selbst). Kein Kredit.
+PREISAENDERUNG_PAUSCHAL_SPARTEN = ("insurance", "internet", "mobile", "streaming", "other")
 
 # Zukünftiger Vertrag
 NEXT_PREFIX = "next_"

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.35.0] - 2026-11-18
+
+### Added
+
+- **Price changes also for flat-rate contracts** (insurance, internet, mobile, streaming, other; not loans): in the panel block "Price changes in this contract" a new amount per payment applies from a date, the contract keeps running. Payments made, the next payment amount, the total over the term and the total cost use the amount valid on each payment date.
+
 ## [1.34.1] - 2026-11-18
 
 ### Fixed

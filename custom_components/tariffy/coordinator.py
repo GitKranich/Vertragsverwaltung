@@ -57,6 +57,7 @@ from .const import (
     CONF_EINMALPOSTEN,
     CONF_PREISAENDERUNGEN,
     PREISAENDERUNG_SPARTEN,
+    PREISAENDERUNG_PAUSCHAL_SPARTEN,
     CONF_HISTORIE,
     CONF_JAHRESVERBRAUCH,
     CONF_KUENDIGUNG_BESTAETIGT,
@@ -279,6 +280,7 @@ def _abschlag_nach_zahlungen(
     ende: date | None,
     heute: date,
     data: dict[str, Any],
+    segmente: list[dict[str, Any]] | None = None,
 ) -> tuple[float, date | None]:
     """Bis heute tatsaechlich abgebuchte Betraege bei nicht monatlicher Zahlweise (zum Beispiel eine
     Versicherung, die jaehrlich im Voraus bezahlt wird): gezaehlt wird jede Zahlung ab der ersten
@@ -304,7 +306,12 @@ def _abschlag_nach_zahlungen(
             intervall != 1 and termin > heute
         ):
             break
-        monatlich = vorher if (ab_datum is not None and vorher and termin < ab_datum) else abschlag
+        if segmente:
+            # Preis-/Beitragsaenderungen: der am Zahltag gueltige Betrag (die gemerkte
+            # Abschlagsaenderung steckt schon in den Abschnitten, siehe _abschlag_segmente)
+            monatlich = _segment_am(segmente, termin)["abschlag"] or 0.0
+        else:
+            monatlich = vorher if (ab_datum is not None and vorher and termin < ab_datum) else abschlag
         summe += round(monatlich * intervall, 2)
         zahlung += 1
     if naechste is None:  # die naechste Abbuchung nach heute, falls der Vertrag dann noch laeuft
@@ -1783,7 +1790,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # "Preisaenderungen: Summen je Abschnitt" je Abschnitt mit dessen Preisen.
         preis_segmente: list[dict[str, Any]] = []
         if (
-            data.get(CONF_SPARTE) in PREISAENDERUNG_SPARTEN
+            data.get(CONF_SPARTE) in (*PREISAENDERUNG_SPARTEN, *PREISAENDERUNG_PAUSCHAL_SPARTEN)
             and data.get(CONF_PREISAENDERUNGEN)
             and beginn is not None
             and not arbeitspreis_sensor
@@ -1885,9 +1892,20 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             if sparte not in METERED_SPARTEN:
                 # Pauschalvertrag: gezaehlt werden die Abbuchungen (jede Rate am Tag der Zahlung, bei
                 # monatlicher Zahlung also am Monatstag des Beginns), nicht ein tagesgenauer Anteil
-                abschlag_bisher_gezahlt_wert, naechste_zahlung = _abschlag_nach_zahlungen(
-                    abschlag, ZAHLWEISE_MONATE[zahlweise], beginn, ende, heute, data
+                pauschal_segmente = (
+                    _abschlag_segmente(preis_segmente, beginn, data) if preis_segmente else None
                 )
+                abschlag_bisher_gezahlt_wert, naechste_zahlung = _abschlag_nach_zahlungen(
+                    abschlag, ZAHLWEISE_MONATE[zahlweise], beginn, ende, heute, data,
+                    pauschal_segmente,
+                )
+                if pauschal_segmente:
+                    # Beitragserhoehung: Summe ueber die Laufzeit je Abschnitt mit dessen Betrag
+                    summe_laufzeit = _integral_monate(
+                        pauschal_segmente, "abschlag", beginn, 0, laufzeit_monate
+                    )
+                    if summe_laufzeit is not None:
+                        abschlagssumme = round(summe_laufzeit, 2)
                 if zahlweise == DEFAULT_ZAHLWEISE:
                     naechste_zahlung = None  # bei monatlicher Zahlung gibt es dazu keine Anzeige
             else:
@@ -2156,7 +2174,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Mit Preisaenderungen im Vertrag rechnen Abschlaege, Grundpreis und Arbeitspreis je
         # Abschnitt mit dessen Werten; die einfachen Formeln oben (ein Preis fuer die ganze
         # Laufzeit) werden hier ersetzt. Ohne Preisaenderung bleibt alles wie oben.
-        if preis_segmente:
+        if preis_segmente and sparte in PREISAENDERUNG_SPARTEN:
             ab_segmente = _abschlag_segmente(preis_segmente, beginn, data)
             m_heute = max(0, (heute - beginn).days) / _MONAT_TAGE
             if abschlag is not None:
@@ -2444,7 +2462,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "prognose": data.get(CONF_PROGNOSE) or (PROGNOSE_DURCHSCHNITT if sparte in ENERGIE_SPARTEN else None),
             "prognose_methode": prognose_methode,
             "preisaenderung_moeglich": bool(
-                sparte in PREISAENDERUNG_SPARTEN
+                (sparte in PREISAENDERUNG_SPARTEN or sparte in PREISAENDERUNG_PAUSCHAL_SPARTEN)
                 and not arbeitspreis_sensor
                 and beginn is not None
                 and not archiviert

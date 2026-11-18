@@ -117,6 +117,7 @@ const I18N = {
     bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
     secPriceChanges: "Price changes in this contract", priceAdd: "Add price change", priceEdit: "Edit price change",
     priceTitleAdd: "Add a price change", priceTitleEdit: "Edit price change",
+    priceHintFlat: "A new amount from a date, for example after a premium increase. The contract keeps running (same start and end); from this date the payments, cost and total use the new amount.",
     priceHint: "New prices from a date, for example after a price increase by the provider. The contract keeps running (same start, end and meter); from this date costs, balance and forecast use the new values. Leave a field empty to keep its previous value.",
     priceDate: "Valid from", priceUnit: "Unit price (per kWh)", priceBase: "Standing charge (per month)", priceInstalment: "Instalment (per month)",
     priceMeter: "Meter reading on that date (optional, only if the statistics do not reach back that far)",
@@ -287,6 +288,7 @@ const I18N = {
     bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
     secPriceChanges: "Preisänderungen im Vertrag", priceAdd: "Preisänderung hinzufügen", priceEdit: "Preisänderung bearbeiten",
     priceTitleAdd: "Preisänderung hinzufügen", priceTitleEdit: "Preisänderung bearbeiten",
+    priceHintFlat: "Ein neuer Betrag ab einem Datum, zum Beispiel nach einer Beitragserhöhung. Der Vertrag läuft weiter (gleicher Beginn, gleiches Ende); ab dem Datum rechnen Zahlungen, Kosten und Summe mit dem neuen Betrag.",
     priceHint: "Neue Preise ab einem Datum, zum Beispiel nach einer Preiserhöhung des Anbieters. Der Vertrag läuft weiter (gleicher Beginn, gleiches Ende, gleicher Zähler); ab dem Datum rechnen Kosten, Saldo und Prognose mit den neuen Werten. Ein leeres Feld behält den bisherigen Wert.",
     priceDate: "Gültig ab", priceUnit: "Arbeitspreis (pro kWh)", priceBase: "Grundpreis (pro Monat)", priceInstalment: "Abschlag (pro Monat)",
     priceMeter: "Zählerstand am Stichtag (optional, nur nötig, wenn die Statistik nicht so weit zurückreicht)",
@@ -2324,16 +2326,25 @@ class TariffyPanel extends HTMLElement {
     });
     const item = index === null ? {} : (c.preisaenderungen || []).find((p) => p.index === index) || {};
     const str = (v) => (isNum(v) ? String(v) : "");
+    // Versicherung, Internet, ...: neuer Betrag pro Zahlung statt Arbeitspreis/Grundpreis/Abschlag
+    const flat = !METERED.has(c.sparte);
+    const months = INTERVAL_MONTHS[c.zahlweise] || 1;
     this._dlg = {
       mode: "preis", stage: "form", id: c.entry_id, name: c.title, index, flowId: null, localize: () => "", asking: null,
-      fields: [
+      flat,
+      fields: flat ? [
+        spec("datum", "date", this._t("priceDate"), { required: true }),
+        spec("betrag", "number", `${this._t("rf_abschlag")} · ${this._t("interval")[c.zahlweise] || this._t("interval").monthly}`, { min: 0, required: true }),
+      ] : [
         spec("datum", "date", this._t("priceDate"), { required: true }),
         spec("arbeitspreis", "number", this._t("priceUnit"), { min: 0 }),
         spec("grundpreis", "number", this._t("priceBase"), { min: 0 }),
         spec("abschlag", "number", this._t("priceInstalment"), { min: 0 }),
         spec("zaehlerstand", "number", this._t("priceMeter"), { min: 0 }),
       ],
-      values: {
+      values: flat ? {
+        datum: item.datum || "", betrag: isNum(item.abschlag) ? String(Math.round(item.abschlag * months * 100) / 100) : "",
+      } : {
         datum: item.datum || "", arbeitspreis: str(item.arbeitspreis), grundpreis: str(item.grundpreis),
         abschlag: str(item.abschlag), zaehlerstand: str(item.zaehlerstand),
       },
@@ -2348,7 +2359,7 @@ class TariffyPanel extends HTMLElement {
     dlg.fieldErrors = errors;
     dlg.message = null;
     if (Object.keys(errors).length) { this._renderPreisDialog(); return; }
-    if (!["arbeitspreis", "grundpreis", "abschlag"].some((k) => k in values)) {
+    if (!["arbeitspreis", "grundpreis", "abschlag", "betrag"].some((k) => k in values)) {
       dlg.message = this._t("termErr_invalid_preis_leer");
       this._renderPreisDialog();
       return;
@@ -2385,7 +2396,7 @@ class TariffyPanel extends HTMLElement {
     const body = [
       h("h2", { id: "dlg-title", text: this._t(dlg.index === null ? "priceTitleAdd" : "priceTitleEdit") }),
       h("p", { class: "hint", text: dlg.name }),
-      h("p", { class: "hint", text: this._t("priceHint") }),
+      h("p", { class: "hint", text: this._t(dlg.flat ? "priceHintFlat" : "priceHint") }),
       h("div", { class: "fields" }, dlg.fields.map((f) => {
         const error = dlg.fieldErrors[f.name];
         return h("label", { class: `fld${error ? " bad" : ""}`, for: `f-${f.name}` },
@@ -2425,7 +2436,10 @@ class TariffyPanel extends HTMLElement {
     if (!items.length && !change && !(this._isAdmin && c.preisaenderung_moeglich)) return null;
     const pu = this._priceUnit(c);
     const money = (v) => this._money(v, c.currency, { digits: 2 });
-    const describe = (p) => [
+    const flat = !METERED.has(c.sparte);
+    const months = INTERVAL_MONTHS[c.zahlweise] || 1;
+    const describe = (p) => flat ? (isNum(p.abschlag)
+      ? `${money(p.abschlag * months)} ${this._t("interval")[c.zahlweise] || this._t("interval").monthly}` : "") : [
       isNum(p.arbeitspreis) ? this._price(p.arbeitspreis, c.currency, pu) : null,
       isNum(p.grundpreis) ? `${money(p.grundpreis)} ${this._t("perMonth")}` : null,
       isNum(p.abschlag) ? `${this._t("instalment")} ${money(p.abschlag)}` : null,

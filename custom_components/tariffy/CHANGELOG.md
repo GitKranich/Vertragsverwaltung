@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.35.0] - 2026-11-18
+
+### Hinzugefügt
+
+- **Preisänderungen auch bei Pauschalverträgen** (Versicherung, Internet, Mobilfunk, Streaming, Sonstiges; nicht bei Krediten): Im Panel-Block "Preisänderungen im Vertrag" gilt ab einem Datum ein neuer Betrag pro Zahlung, der Vertrag läuft weiter. Bisherige Zahlungen, der Betrag pro Zahlung, die Summe über die Laufzeit und die Gesamtkosten rechnen mit dem am jeweiligen Zahltag gültigen Betrag.
+
 ## [1.34.1] - 2026-11-18
 
 ### Behoben

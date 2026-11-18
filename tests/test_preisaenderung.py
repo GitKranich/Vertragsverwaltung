@@ -171,9 +171,9 @@ async def test_edit_delete_and_validation(frontend_env, contract, hass, hass_ws_
     assert entry.runtime_data.data["kosten_bisher"] == base["kosten_bisher"]
 
 
-async def test_only_for_electricity_and_gas(frontend_env, contract, hass, hass_ws_client):  # noqa: F811
+async def test_not_for_loans(frontend_env, contract, hass, hass_ws_client):  # noqa: F811
     client = await hass_ws_client()
-    entry, _ = await contract.setup({**STROM, "sparte": "internet"}, **GOLDEN)
+    entry, _ = await contract.setup({**STROM, "sparte": "loan"}, **GOLDEN)
     reply = await _call(client, "preis_save", entry_id=entry.entry_id,
                         values={"datum": "2026-04-01", "abschlag": 30})
     assert reply["success"] is False and reply["error"]["code"] == "not_available"

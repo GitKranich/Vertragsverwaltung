@@ -29,6 +29,7 @@ Erhöht der Anbieter die Preise, ohne dass ein neuer Vertrag beginnt (gleicher B
 - "Vertrag bearbeiten" ändert weiterhin die Werte **ab Vertragsbeginn**; die Preisänderungen bleiben dabei erhalten. Beim Tarifwechsel beginnt der Folgevertrag ohne Preisänderungen.
 - **Erste Abschlagszahlung** (Feld im Vertragsformular): War der erste Abschlag erst später fällig (z. B. im Monat nach Vertragsbeginn), zählt Tariffy die monatlich gebuchten Abschläge ab diesem Tag statt tagesgenau ab Vertragsbeginn.
 - Wurde der Abschlag beim Bearbeiten geändert, merkt sich Tariffy den alten Betrag bis zum Änderungstag. War das nur eine Korrektur, lässt sich das im Block "Preisänderungen im Vertrag" mit **"Als Korrektur werten"** aufheben.
+- **Versicherung, Internet, Mobilfunk, Streaming, Sonstiges:** Hier trägst du bei einer Beitragserhöhung nur **Gültig ab** und den neuen **Betrag pro Zahlung** (in der Zahlweise des Vertrags) ein. Jede Zahlung ab dem Datum rechnet mit dem neuen Betrag. Bei Krediten gibt es keine Preisänderung.
 - Nicht verfügbar bei dynamischem Tarif (Börsenpreis-Sensor) und beim Zweizählertarif (HT/NT).
 
 ## Verbrauchsprognose (Strom und Gas)

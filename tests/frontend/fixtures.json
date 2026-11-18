@@ -553,7 +553,7 @@
       "naechste_zahlung": null,
       "next": null,
       "preis_basis": null,
-      "preisaenderung_moeglich": false,
+      "preisaenderung_moeglich": true,
       "preisaenderungen": [],
       "prognose": null,
       "prognose_methode": null,
@@ -665,7 +665,7 @@
         "tarif": "Flat 20 GB"
       },
       "preis_basis": null,
-      "preisaenderung_moeglich": false,
+      "preisaenderung_moeglich": true,
       "preisaenderungen": [],
       "prognose": null,
       "prognose_methode": null,
