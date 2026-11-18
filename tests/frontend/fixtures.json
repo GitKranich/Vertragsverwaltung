@@ -148,6 +148,7 @@
       "verlaengerbar": false,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -256,6 +257,7 @@
       "verlaengerbar": false,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -373,6 +375,7 @@
       "verlaengerbar": false,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -481,6 +484,7 @@
       "verlaengerbar": false,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -589,6 +593,7 @@
       "verlaengerbar": true,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -704,6 +709,7 @@
       "verlaengerbar": true,
       "versicherungsart": null,
       "wechsel": "2027-01-01",
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -844,6 +850,7 @@
       "verlaengerbar": false,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     },
     {
@@ -952,6 +959,7 @@
       "verlaengerbar": true,
       "versicherungsart": null,
       "wechsel": null,
+      "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
     }
   ],
@@ -1223,6 +1231,20 @@
             }
           },
           {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
+              }
+            }
+          },
+          {
             "default": false,
             "name": "abschlag_warnung",
             "optional": true,
@@ -1467,6 +1489,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },
@@ -1735,6 +1771,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },
@@ -2130,6 +2180,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },
@@ -3418,6 +3482,20 @@
             }
           },
           {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
+              }
+            }
+          },
+          {
             "default": true,
             "name": "abschlag_warnung",
             "optional": true,
@@ -3823,6 +3901,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },
@@ -4302,6 +4394,20 @@
             }
           },
           {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
+              }
+            }
+          },
+          {
             "default": false,
             "name": "abschlag_warnung",
             "optional": true,
@@ -4634,6 +4740,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },
@@ -5569,6 +5689,20 @@
                 "min": 0.0,
                 "mode": "box",
                 "step": "any"
+              }
+            }
+          },
+          {
+            "name": "zaehlerstand_eingabe",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "entity": {
+                "domain": [
+                  "input_number"
+                ],
+                "multiple": false,
+                "reorder": false
               }
             }
           },

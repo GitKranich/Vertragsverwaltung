@@ -32,6 +32,9 @@ CONF_BONUS = "bonus"
 CONF_SOFORTBONUS = "sofortbonus"
 # Wasser: Niederschlagswassergebuehr = versiegelte Flaeche (m²) x Gebuehr je m² und Jahr. Zaehlt
 # wie ein Grundpreis (fester Betrag pro Monat) in Kosten, Prognose und Abschlag-Empfehlung.
+# Zaehlerstand von Hand erfassen: input_number-Helfer, den das Panel mit "Zaehlerstand erfassen"
+# setzt (der Verbrauchssensor ist dann ein Template-Sensor mit total_increasing darauf)
+CONF_ZAEHLERSTAND_EINGABE = "zaehlerstand_eingabe"
 CONF_NIEDERSCHLAG_FLAECHE = "niederschlag_flaeche"
 CONF_NIEDERSCHLAG_GEBUEHR = "niederschlag_gebuehr"
 

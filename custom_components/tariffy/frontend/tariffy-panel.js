@@ -113,6 +113,12 @@ const I18N = {
     abschlagFix: "Treat as a correction", abschlagFixAsk: "Use the current instalment from the contract start?", abschlagFixYes: "Yes",
     abschlagFixHint: "Saved when the instalment was changed while editing. If the old amount was a typo, treat it as a correction: the current instalment then applies from the contract start.",
     stormwater: "Stormwater fee",
+    secMeter: "Meter reading", meterRecord: "Record meter reading", meterLast: "Last reading", meterNone: "none yet",
+    meterMissing: "Helper {e} not found", meterValue: "Meter reading", meterSwap: "New meter (meter replaced)",
+    meterHintLast: "Last reading: {v}. Enter the current reading of the meter.", meterHintFirst: "Enter the current reading of the meter.",
+    meterSwapHint: "Meter replaced? First record the final reading of the old meter, then the reading of the new one with \"New meter\" ticked.",
+    meterInvalid: "Enter a reading above zero.", meterTooBig: "The helper allows at most {v}.",
+    meterLower: "Lower than the last reading ({v}). Typo? For a replaced meter tick \"New meter\".",
     forecastMethod: "Forecast", forecast_saisonal: "seasonal (meter's monthly values)", forecast_standardprofil: "seasonal (standard profile)",
     forecast_letzte_30_tage: "last 30 days", forecast_durchschnitt: "average since start",
     bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
@@ -285,6 +291,12 @@ const I18N = {
     abschlagFix: "Als Korrektur werten", abschlagFixAsk: "Aktuellen Abschlag ab Vertragsbeginn verwenden?", abschlagFixYes: "Ja",
     abschlagFixHint: "Gemerkt, als der Abschlag beim Bearbeiten geändert wurde. War der alte Betrag ein Tippfehler, als Korrektur werten: dann gilt der aktuelle Abschlag ab Vertragsbeginn.",
     stormwater: "Niederschlagsgebühr",
+    secMeter: "Zählerstand", meterRecord: "Zählerstand erfassen", meterLast: "Letzte Ablesung", meterNone: "noch keine",
+    meterMissing: "Helfer {e} nicht gefunden", meterValue: "Zählerstand", meterSwap: "Neuer Zähler (Zählerwechsel)",
+    meterHintLast: "Letzte Ablesung: {v}. Trag den aktuellen Stand des Zählers ein.", meterHintFirst: "Trag den aktuellen Stand des Zählers ein.",
+    meterSwapHint: "Zähler gewechselt? Erst den Endstand des alten Zählers erfassen, dann den Stand des neuen mit Haken bei \"Neuer Zähler\".",
+    meterInvalid: "Trag einen Stand über null ein.", meterTooBig: "Der Helfer erlaubt höchstens {v}.",
+    meterLower: "Kleiner als die letzte Ablesung ({v}). Tippfehler? Bei einem Zählerwechsel \"Neuer Zähler\" ankreuzen.",
     forecastMethod: "Prognose", forecast_saisonal: "saisonal (Monatswerte des Zählers)", forecast_standardprofil: "saisonal (Standardprofil)",
     forecast_letzte_30_tage: "letzte 30 Tage", forecast_durchschnitt: "Durchschnitt seit Beginn",
     bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
@@ -396,6 +408,7 @@ const ICONS = {
     ["path", { d: "M16 2v4M8 2v4M3 10h18M12 13.500v5M9.500 16h5" }],
   ],
   plus: [["path", { d: "M12 5v14M5 12h14" }]],
+  meter: [["rect", { x: "3", y: "6", width: "18", height: "12", rx: "2" }], ["path", { d: "M7 10v4M10.500 10v4M14 10v4M17.500 10v4" }]],
   chevron: [["path", { d: "M9 6l6 6-6 6" }]],
   renew: [["path", { d: "M20 11a8 8 0 0 0-14.500-3.500M4 5v4h4" }], ["path", { d: "M4 13a8 8 0 0 0 14.500 3.500M20 19v-4h-4" }]],
   other: [
@@ -1831,6 +1844,7 @@ class TariffyPanel extends HTMLElement {
     if (dlg.mode === "renew") { this._renderRenewDialog(); return; }
     if (dlg.mode === "once") { this._renderOnceDialog(); return; }
     if (dlg.mode === "preis") { this._renderPreisDialog(); return; }
+    if (dlg.mode === "meter") { this._renderMeterDialog(); return; }
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
     const busy = dlg.stage === "saving";
     const body = [h("h2", { id: "dlg-title", text: this._t({ edit: "dlgTitleEdit", create: "dlgTitleCreate", next: "dlgTitle" }[dlg.mode], { name: dlg.name }) })];
@@ -2427,6 +2441,106 @@ class TariffyPanel extends HTMLElement {
     if (!dlg.focused) {
       dlg.focused = true;
       const first = this._dlgEl.querySelector("input, select");
+      if (first) first.focus();
+    }
+  }
+
+  /* ----- meter reading entered by hand (number helper behind a template sensor) ----- */
+  _meterState(c) {
+    const st = c.zaehlerstand_eingabe && this._hass && this._hass.states[c.zaehlerstand_eingabe];
+    if (!st) return null;
+    const value = Number(st.state);
+    return {
+      value: Number.isFinite(value) && value > 0 ? value : null,
+      when: st.last_changed || st.last_updated,
+      unit: (st.attributes && st.attributes.unit_of_measurement) || this._unit(c),
+      max: st.attributes && isNum(st.attributes.max) ? st.attributes.max : null,
+      step: st.attributes && st.attributes.step,
+    };
+  }
+
+  _meterSection(c) {
+    if (!c.zaehlerstand_eingabe) return null;
+    const m = this._meterState(c);
+    const text = !m ? this._t("meterMissing", { e: c.zaehlerstand_eingabe })
+      : m.value === null ? this._t("meterNone")
+        : `${this._num(m.value, 3)} ${m.unit} · ${this._date(String(m.when).slice(0, 10))}`;
+    return h("div", { class: "sec" }, h("h4", { text: this._t("secMeter") }),
+      h("div", { class: "row once-row" },
+        h("span", {}, this._t("meterLast"), h("span", { class: "t2", text })),
+        h("span", {}),
+        m ? h("button", { class: "btn", type: "button", onclick: () => this._openMeter(c) }, icon("meter"), this._t("meterRecord")) : null));
+  }
+
+  _openMeter(c) {
+    this._closeFlow();
+    const m = this._meterState(c) || {};
+    this._dlg = {
+      mode: "meter", stage: "form", id: c.entry_id, name: c.title, entity: c.zaehlerstand_eingabe, last: m.value, unit: m.unit || "",
+      max: m.max, flowId: null, localize: () => "", asking: null,
+      fields: [
+        { name: "wert", kind: "number", label: `${this._t("meterValue")} (${m.unit || ""})`, required: true, min: 0, domains: [], custom: false, options: [], initial: "" },
+        { name: "wechsel", kind: "boolean", label: this._t("meterSwap"), required: false, min: null, domains: [], custom: false, options: [], initial: "" },
+      ],
+      values: { wert: "", wechsel: false }, fieldErrors: {}, message: null,
+    };
+    this._renderMeterDialog();
+  }
+
+  async _saveMeter() {
+    const dlg = this._dlg;
+    const { values, errors } = this._collectFlow(dlg);
+    dlg.fieldErrors = errors;
+    dlg.message = null;
+    const wert = values.wert;
+    if (!Object.keys(errors).length) {
+      if (!isNum(wert) || wert <= 0) dlg.fieldErrors.wert = this._t("meterInvalid");
+      else if (isNum(dlg.max) && wert > dlg.max) dlg.fieldErrors.wert = this._t("meterTooBig", { v: this._num(dlg.max, 0) });
+      else if (isNum(dlg.last) && wert < dlg.last && !dlg.values.wechsel) {
+        dlg.fieldErrors.wert = this._t("meterLower", { v: `${this._num(dlg.last, 3)} ${dlg.unit}` });
+      }
+    }
+    if (Object.keys(dlg.fieldErrors).length) { this._renderMeterDialog(); return; }
+    dlg.stage = "saving";
+    this._renderMeterDialog();
+    try {
+      await this._hass.callService("input_number", "set_value", { value: wert }, { entity_id: dlg.entity });
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.message = (err && err.message) || String(err);
+      this._renderMeterDialog();
+      return;
+    }
+    if (this._dlg === dlg) this._closeFlow();
+    this._render();
+  }
+
+  _renderMeterDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving";
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t("meterRecord") }),
+      h("p", { class: "hint", text: dlg.name }),
+      h("p", { class: "hint", text: isNum(dlg.last)
+        ? this._t("meterHintLast", { v: `${this._num(dlg.last, 3)} ${dlg.unit}` }) : this._t("meterHintFirst") }),
+      h("div", { class: "fields" }, dlg.fields.map((f) => {
+        const error = dlg.fieldErrors[f.name];
+        return h("label", { class: `fld${error ? " bad" : ""}`, for: `f-${f.name}` },
+          h("span", { class: "lbl", text: f.label }), this._fieldInput(dlg, f),
+          error ? h("div", { class: "ferr", text: error }) : null);
+      })),
+      h("p", { class: "hint", text: this._t("meterSwapHint") }),
+    ];
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    body.push(h("div", { class: "actions" },
+      h("button", { class: "btn go", type: "button", disabled: busy ? "" : null, text: this._t(busy ? "dlgSaving" : "dlgSave"), onclick: () => this._saveMeter() }),
+      h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() })));
+    this._mountDialog(dlg, body, busy);
+    if (!dlg.focused) {
+      dlg.focused = true;
+      const first = this._dlgEl.querySelector("input");
       if (first) first.focus();
     }
   }
@@ -3065,6 +3179,10 @@ class TariffyPanel extends HTMLElement {
         class: "icon-btn", type: "button", title: this._t("actRenew"), "aria-label": this._t("actRenew"),
         onclick: (ev) => { ev.preventDefault(); ev.stopPropagation(); this._openRenew(c); },
       }, icon("renew")) : null,
+      c.zaehlerstand_eingabe ? h("button", {
+        class: "icon-btn", type: "button", title: this._t("meterRecord"), "aria-label": this._t("meterRecord"),
+        onclick: (ev) => { ev.preventDefault(); ev.stopPropagation(); this._openMeter(c); },
+      }, icon("meter")) : null,
       c.sparte === "loan" ? null : button("next", this._t(c.next && c.next.beginn ? "actNextEdit" : "actNextPlan"), "plan"),
       button("edit", this._t("actEdit"), "edit"));
   }
@@ -3126,6 +3244,7 @@ class TariffyPanel extends HTMLElement {
         row(this._t("costSoFar"), !METERED.has(c.sparte) && isNum(this._costSoFar(c)) ? money(this._costSoFar(c)) : null),
         row(this._t("totalCost"), this._total(c) ? `${this._total(c).value} · ${this._total(c).since}` : null),
       ]),
+      this._meterSection(c),
       this._preisSection(c),
       this._onceSection(c),
       d.measured || d.hasMetering || isNum(c.verbrauch_letzte_laufzeit) ? section(this._t("secConsumption"), [

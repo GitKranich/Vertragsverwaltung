@@ -129,6 +129,7 @@ CONTRACT_FIELDS = (
     "niederschlag_flaeche",
     "niederschlag_gebuehr",
     "niederschlag_jahr",
+    "zaehlerstand_eingabe",
     "preisaenderungen",
     "naechste_preisaenderung",
     "preis_basis",

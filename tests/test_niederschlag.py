@@ -40,3 +40,11 @@ async def test_stormwater_fee_counts_like_a_standing_charge(contract):
 async def test_stormwater_fee_only_with_area_and_fee(contract):
     entry, base = await contract.setup({**WASSER, "niederschlag_flaeche": 150.0}, **GOLDEN)
     assert entry.runtime_data.data["niederschlag_jahr"] is None
+
+
+async def test_meter_reading_helper_is_passed_to_the_panel(contract):
+    entry, _ = await contract.setup({**WASSER, "zaehlerstand_eingabe": "input_number.wasser_stand"}, **GOLDEN)
+    assert entry.runtime_data.data["zaehlerstand_eingabe"] == "input_number.wasser_stand"
+    entry, _ = await contract.setup({"sparte": "insurance", "anbieter": "X", "abschlag": 1.0,
+                                     "zaehlerstand_eingabe": "input_number.x", "erinnerung_monate": "0"}, **GOLDEN)
+    assert entry.runtime_data.data["zaehlerstand_eingabe"] is None

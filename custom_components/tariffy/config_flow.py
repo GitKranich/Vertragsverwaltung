@@ -42,6 +42,7 @@ from .const import (
     CONF_BONUS,
     CONF_SOFORTBONUS,
     CONF_NIEDERSCHLAG_FLAECHE,
+    CONF_ZAEHLERSTAND_EINGABE,
     CONF_NIEDERSCHLAG_GEBUEHR,
     CONF_PROGNOSE,
     PROGNOSE_SAISONAL,
@@ -512,6 +513,9 @@ def _energie_schema(d: dict[str, Any], features: dict | None = None) -> vol.Sche
                 selector.EntitySelectorConfig(domain="sensor")
             ),
             **_verbrauch_start_wert_field(d),
+            _opt(CONF_ZAEHLERSTAND_EINGABE, d.get(CONF_ZAEHLERSTAND_EINGABE)): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="input_number")
+            ),
             **_abschlag_warnung_fields(d),
             **_einspeisung_fields(d),
             _opt(CONF_BONUS, d.get(CONF_BONUS)): _preis(0.01),
@@ -567,6 +571,9 @@ def _energie_ht_nt_schema(d: dict[str, Any], features: dict | None = None) -> vo
                 selector.EntitySelectorConfig(domain="sensor")
             ),
             **_verbrauch_start_wert_field(d),
+            _opt(CONF_ZAEHLERSTAND_EINGABE, d.get(CONF_ZAEHLERSTAND_EINGABE)): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="input_number")
+            ),
             _opt(CONF_VERBRAUCH_SENSOR_NT, d.get(CONF_VERBRAUCH_SENSOR_NT)): selector.EntitySelector(
                 selector.EntitySelectorConfig(domain="sensor")
             ),
@@ -625,6 +632,9 @@ def _gas_schema(d: dict[str, Any], features: dict | None = None) -> vol.Schema:
                 selector.EntitySelectorConfig(domain="sensor")
             ),
             **_verbrauch_start_wert_field(d),
+            _opt(CONF_ZAEHLERSTAND_EINGABE, d.get(CONF_ZAEHLERSTAND_EINGABE)): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="input_number")
+            ),
             vol.Required(
                 CONF_BRENNWERT, default=_dezimal_default(d.get(CONF_BRENNWERT, 11.0))
             ): _dezimal_feld(),
@@ -825,6 +835,9 @@ def _wasser_schema(d: dict[str, Any], features: dict | None = None) -> vol.Schem
                 selector.EntitySelectorConfig(domain="sensor")
             ),
             **_verbrauch_start_wert_field(d),
+            _opt(CONF_ZAEHLERSTAND_EINGABE, d.get(CONF_ZAEHLERSTAND_EINGABE)): selector.EntitySelector(
+                selector.EntitySelectorConfig(domain="input_number")
+            ),
             **_abschlag_warnung_fields(d),
             _opt(CONF_ZAEHLERNUMMER, d.get(CONF_ZAEHLERNUMMER)): selector.TextSelector(),
             **_tiered_fields(d, enabled=f.get("hat_tiered", True)),

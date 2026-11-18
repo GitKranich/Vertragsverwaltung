@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.37.0] - 2026-11-18
+
+### Hinzugefügt
+
+- **Zählerstände von Hand erfassen** für Zähler ohne digitale Anbindung: neues freiwilliges Feld "Zählerstand-Eingabe" (ein Zahl-Helfer) in den Formularen für Wasser, Strom und Gas. Das Panel zeigt dann den Block "Zählerstand" mit der letzten Ablesung und ihrem Datum und "Zählerstand erfassen" (auch als Knopf in der Vertragszeile). Ein Stand unter der letzten Ablesung wird nur mit Haken bei "Neuer Zähler" angenommen, damit ein Tippfehler nicht als Zählerwechsel zählt. Als Verbrauchssensor dient ein Template-Sensor mit Zustandsklasse "Gesamt steigend" auf diesem Helfer.
+
 ## [1.36.0] - 2026-11-18
 
 ### Hinzugefügt

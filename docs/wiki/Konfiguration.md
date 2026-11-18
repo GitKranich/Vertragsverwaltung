@@ -63,6 +63,7 @@ Wie Strom, zusätzlich:
 | Abwassergebühr | – | Betrag je nach gewähltem Typ |
 | Versiegelte Fläche | – | m² für die Niederschlagswassergebühr (laut Gebührenbescheid) |
 | Niederschlagsgebühr | – | € je m² und Jahr; Fläche × Gebühr zählt wie ein Grundpreis |
+| Zählerstand-Eingabe | – | Zahl-Helfer für Zähler ohne digitale Anbindung; das Panel bekommt "Zählerstand erfassen" |
 | Zählernummer | – | Für Dokumentation |
 
 ### Außenzähler (Garten, Pool, Bewässerung)
@@ -114,3 +115,12 @@ Die Sparte **Kredit / Finanzierung** ist für Annuitätendarlehen (Baufinanzieru
 **Angezeigt** werden die **Restschuld**, **Gezahlt bisher** (Zinsen und Tilgung), die **Restsumme** (noch zu zahlen bis zum Ende), Zinsen bisher und über die Laufzeit, die gezahlten Raten, die nächste Rate mit der Aufteilung in Zins und Tilgung und der Fortschritt der Tilgung. Für jeden Kredit gibt es vier Sensoren: **Restschuld**, **Gezahlt bisher**, **Restsumme** und **Zinsen bisher**.
 
 **Anschlussfinanzierung:** Im Tab **Verträge** hat der Kredit das Symbol **Vertrag verlängern**. Der Dialog schlägt die Restschuld als neue Summe vor, dazu Zins und Laufzeit; die bisherige Laufzeit kommt in die Historie. Ein Kredit hat kein Symbol für einen Folgevertrag.
+
+
+### Zähler ohne digitale Anbindung (Stand von Hand erfassen)
+
+1. Helfer **Zahl** (input_number) anlegen, Darstellung "Eingabefeld", Einheit wie am Zähler (z. B. m³), Schrittweite 0,001.
+2. Helfer **Template → Sensor** anlegen: Zustand `{{ states('input_number.<helfer>') | float(0) }}`, Geräteklasse passend (Wasser, Energie, Gas), Zustandsklasse **Gesamt steigend**, gleiche Einheit; unter "Weitere Optionen" als Verfügbarkeit `{{ states('input_number.<helfer>') | float(0) > 0 }}`, damit vor der ersten Ablesung kein Sprung von 0 gezählt wird.
+3. Im Vertrag den Template-Sensor als **Verbrauchssensor** und den Zahl-Helfer als **Zählerstand-Eingabe** eintragen.
+
+**Zählerwechsel:** erst den Endstand des alten Zählers erfassen, dann den Stand des neuen mit Haken bei "Neuer Zähler". Home Assistant zählt die Statistik nahtlos weiter. Einen manuellen "Zählerstand bei Vertragsbeginn" im Vertrag danach leeren.

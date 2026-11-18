@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.37.0] - 2026-11-18
+
+### Added
+
+- **Record meter readings by hand** for meters without a digital connection: new optional field "Meter reading input" (a number helper) in the water, electricity and gas forms. The panel then shows a block "Meter reading" with the last reading and its date, plus "Record meter reading" (also as a button in the contract row). A reading lower than the last one is refused unless "New meter" is ticked, so a typo does not count as a meter change. The consumption sensor is a template sensor with state class total increasing on that helper.
+
 ## [1.36.0] - 2026-11-18
 
 ### Added
