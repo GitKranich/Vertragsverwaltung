@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.38.0] - 2026-11-18
+
+### Hinzugefügt
+
+- **Historische Zählerstände importieren** in die Langzeitstatistik des Verbrauchssensors ("Verlauf importieren" im Block "Zählerstand", Administratoren; WebSocket `tariffy/zaehler_import`): Zeilen "Datum;Stand" einfügen oder eine CSV-Datei wählen, Vorschau prüfen, importieren. Importiert werden nur Stände vor der vorhandenen Statistik des Sensors, mit Summen, die den Verbrauch nahtlos fortsetzen; ein kleinerer Stand gilt als Zählerwechsel. Verlauf, Energie-Dashboard und Tariffy (Verbrauch, Stichtage, saisonale Prognose) nutzen die Stände danach.
+
 ## [1.37.0] - 2026-11-18
 
 ### Hinzugefügt

@@ -113,6 +113,15 @@ const I18N = {
     abschlagFix: "Treat as a correction", abschlagFixAsk: "Use the current instalment from the contract start?", abschlagFixYes: "Yes",
     abschlagFixHint: "Saved when the instalment was changed while editing. If the old amount was a typo, treat it as a correction: the current instalment then applies from the contract start.",
     stormwater: "Stormwater fee",
+    impOpen: "Import history", impTitle: "Import meter readings",
+    impHint: "One reading per line: date and reading, separated by ; or a tab (e.g. 01.03.2026;512,3). Only readings before the sensor's existing statistics are imported; consumption then continues seamlessly. A lower reading counts as a meter change.",
+    impText: "Readings", impFile: "…or choose a CSV file", impCheck: "Check", impRun: "Import", impClose: "Close",
+    impPreview: "{n} readings ready to import", impDone: "{n} readings imported", impRange: "From {a} to {b}",
+    impUse: "Consumption {v} (reading {a} → {b})", impSwaps: "{n} meter change(s) detected", impSkipped: "{n} reading(s) skipped: on or after the existing statistics",
+    impUnread: "{n} line(s) not readable (lines {l})",
+    impErr_keine_werte: "No readable readings found.", impErr_sensor_fehlt: "The consumption sensor of this contract was not found.",
+    impErr_sensor_ohne_summe: "The consumption sensor needs the state class total increasing.", impErr_kein_sensor: "This contract has no consumption sensor.",
+    impErr_nur_ueberschneidung: "All readings are on or after the sensor's existing statistics; nothing to import.", impErr_zu_viele_zeilen: "At most 5000 readings at once.",
     secMeter: "Meter reading", meterRecord: "Record meter reading", meterLast: "Last reading", meterNone: "none yet",
     meterMissing: "Helper {e} not found", meterValue: "Meter reading", meterSwap: "New meter (meter replaced)",
     meterHintLast: "Last reading: {v}. Enter the current reading of the meter.", meterHintFirst: "Enter the current reading of the meter.",
@@ -291,6 +300,15 @@ const I18N = {
     abschlagFix: "Als Korrektur werten", abschlagFixAsk: "Aktuellen Abschlag ab Vertragsbeginn verwenden?", abschlagFixYes: "Ja",
     abschlagFixHint: "Gemerkt, als der Abschlag beim Bearbeiten geändert wurde. War der alte Betrag ein Tippfehler, als Korrektur werten: dann gilt der aktuelle Abschlag ab Vertragsbeginn.",
     stormwater: "Niederschlagsgebühr",
+    impOpen: "Verlauf importieren", impTitle: "Zählerstände importieren",
+    impHint: "Ein Stand pro Zeile: Datum und Stand, getrennt durch ; oder Tab (z. B. 01.03.2026;512,3). Importiert werden nur Stände vor der vorhandenen Statistik des Sensors; der Verbrauch läuft danach nahtlos weiter. Ein kleinerer Stand gilt als Zählerwechsel.",
+    impText: "Zählerstände", impFile: "…oder CSV-Datei wählen", impCheck: "Prüfen", impRun: "Importieren", impClose: "Schließen",
+    impPreview: "{n} Stände bereit zum Import", impDone: "{n} Stände importiert", impRange: "Vom {a} bis {b}",
+    impUse: "Verbrauch {v} (Stand {a} → {b})", impSwaps: "{n} Zählerwechsel erkannt", impSkipped: "{n} Stand/Stände übersprungen: am oder nach Beginn der vorhandenen Statistik",
+    impUnread: "{n} Zeile(n) nicht lesbar (Zeilen {l})",
+    impErr_keine_werte: "Keine lesbaren Zählerstände gefunden.", impErr_sensor_fehlt: "Der Verbrauchssensor dieses Vertrags wurde nicht gefunden.",
+    impErr_sensor_ohne_summe: "Der Verbrauchssensor braucht die Zustandsklasse \"Gesamt steigend\".", impErr_kein_sensor: "Dieser Vertrag hat keinen Verbrauchssensor.",
+    impErr_nur_ueberschneidung: "Alle Stände liegen am oder nach Beginn der vorhandenen Statistik, es gibt nichts zu importieren.", impErr_zu_viele_zeilen: "Höchstens 5000 Stände auf einmal.",
     secMeter: "Zählerstand", meterRecord: "Zählerstand erfassen", meterLast: "Letzte Ablesung", meterNone: "noch keine",
     meterMissing: "Helfer {e} nicht gefunden", meterValue: "Zählerstand", meterSwap: "Neuer Zähler (Zählerwechsel)",
     meterHintLast: "Letzte Ablesung: {v}. Trag den aktuellen Stand des Zählers ein.", meterHintFirst: "Trag den aktuellen Stand des Zählers ein.",
@@ -545,7 +563,7 @@ section.card .foot { padding-top: 12px; }
 .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .fld { display: block; margin: 8px 0; min-width: 0; }
 .fld .lbl { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-.fld input, .fld select { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; color: var(--text); background: var(--tile); border: 1px solid var(--tile-line); border-radius: 8px; padding: 8px 10px; color-scheme: dark; }
+.fld input, .fld select, .fld textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; color: var(--text); background: var(--tile); border: 1px solid var(--tile-line); border-radius: 8px; padding: 8px 10px; color-scheme: dark; }
 /* the list of a drop-down is drawn by the browser: some ignore color-scheme, so it gets its colours explicitly
    (otherwise light text on a white list) */
 /* iOS draws a date field with its own intrinsic width and no height while empty: it stuck out of the dialog */
@@ -1845,6 +1863,7 @@ class TariffyPanel extends HTMLElement {
     if (dlg.mode === "once") { this._renderOnceDialog(); return; }
     if (dlg.mode === "preis") { this._renderPreisDialog(); return; }
     if (dlg.mode === "meter") { this._renderMeterDialog(); return; }
+    if (dlg.mode === "import") { this._renderImportDialog(); return; }
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
     const busy = dlg.stage === "saving";
     const body = [h("h2", { id: "dlg-title", text: this._t({ edit: "dlgTitleEdit", create: "dlgTitleCreate", next: "dlgTitle" }[dlg.mode], { name: dlg.name }) })];
@@ -2469,7 +2488,88 @@ class TariffyPanel extends HTMLElement {
       h("div", { class: "row once-row" },
         h("span", {}, this._t("meterLast"), h("span", { class: "t2", text })),
         h("span", {}),
-        m ? h("button", { class: "btn", type: "button", onclick: () => this._openMeter(c) }, icon("meter"), this._t("meterRecord")) : null));
+        m ? h("button", { class: "btn", type: "button", onclick: () => this._openMeter(c) }, icon("meter"), this._t("meterRecord")) : null),
+      this._isAdmin ? h("div", { class: "once-add" }, h("button", {
+        class: "btn", type: "button", onclick: () => this._openImport(c),
+      }, icon("plus"), this._t("impOpen"))) : null);
+  }
+
+  /* ----- import historical meter readings into the sensor's long-term statistics ----- */
+  _openImport(c) {
+    this._closeFlow();
+    this._dlg = { mode: "import", stage: "form", id: c.entry_id, name: c.title, text: "", report: null, message: null, asking: null,
+      fields: [], values: {}, fieldErrors: {} };
+    this._renderImportDialog();
+  }
+
+  async _runImport(pruefen) {
+    const dlg = this._dlg;
+    dlg.message = null;
+    if (!dlg.text.trim()) { dlg.message = this._t("impErr_keine_werte"); this._renderImportDialog(); return; }
+    dlg.stage = "saving";
+    this._renderImportDialog();
+    try {
+      const report = await this._hass.callWS({ type: "tariffy/zaehler_import", entry_id: dlg.id, text: dlg.text, pruefen });
+      if (this._dlg !== dlg) return;
+      dlg.report = report;
+      dlg.stage = report.importiert ? "done" : "form";
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.report = null;
+      const code = err && err.code;
+      dlg.message = code && this._t(`impErr_${code}`) !== `impErr_${code}` ? this._t(`impErr_${code}`) : this._errorText(err);
+    }
+    this._renderImportDialog();
+  }
+
+  _renderImportDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving";
+    const r = dlg.report;
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t("impTitle") }),
+      h("p", { class: "hint", text: dlg.name }),
+      h("p", { class: "hint", text: this._t("impHint") }),
+    ];
+    if (dlg.stage !== "done") {
+      const area = h("textarea", { id: "f-import", rows: "8", spellcheck: "false", placeholder: "01.01.2026;72,0\n01.02.2026;80,5",
+        style: "font-family:monospace",
+        oninput: (ev) => { dlg.text = ev.target.value; dlg.report = null; } });
+      area.value = dlg.text;
+      const file = h("input", { type: "file", accept: ".csv,.txt,text/csv,text/plain", onchange: async (ev) => {
+        const f = ev.target.files && ev.target.files[0];
+        if (!f) return;
+        dlg.text = await f.text();
+        dlg.report = null;
+        this._renderImportDialog();
+      } });
+      body.push(h("label", { class: "fld", for: "f-import" }, h("span", { class: "lbl", text: this._t("impText") }), area));
+      body.push(h("label", { class: "fld" }, h("span", { class: "lbl", text: this._t("impFile") }), file));
+    }
+    if (r) {
+      const unit = r.einheit || "";
+      const lines = [
+        this._t(r.importiert ? "impDone" : "impPreview", { n: String(r.anzahl) }),
+        this._t("impRange", { a: this._date(r.von.slice(0, 10)), b: this._date(r.bis.slice(0, 10)) }),
+        this._t("impUse", { v: `${this._num(r.verbrauch, 3)} ${unit}`, a: this._num(r.erster_stand, 3), b: this._num(r.letzter_stand, 3) }),
+        r.zaehlerwechsel ? this._t("impSwaps", { n: String(r.zaehlerwechsel) }) : null,
+        r.uebersprungen ? this._t("impSkipped", { n: String(r.uebersprungen) }) : null,
+        r.nicht_gelesen_anzahl ? this._t("impUnread", { n: String(r.nicht_gelesen_anzahl), l: r.nicht_gelesen.join(", ") }) : null,
+      ].filter(Boolean);
+      body.push(h("div", { class: "hint" }, lines.map((t) => h("div", { text: t }))));
+    }
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    const buttons = dlg.stage === "done"
+      ? [h("button", { class: "btn go", type: "button", text: this._t("impClose"), onclick: () => this._closeFlow() })]
+      : [
+        h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("impCheck"), onclick: () => this._runImport(true) }),
+        r && r.anzahl ? h("button", { class: "btn go", type: "button", disabled: busy ? "" : null, text: this._t("impRun"), onclick: () => this._runImport(false) }) : null,
+        h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() }),
+      ];
+    body.push(h("div", { class: "actions" }, buttons));
+    this._mountDialog(dlg, body, busy);
   }
 
   _openMeter(c) {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.38.0] - 2026-11-18
+
+### Added
+
+- **Import historical meter readings** into the long-term statistics of the consumption sensor ("Import history" in the "Meter reading" block, administrators; WebSocket `tariffy/zaehler_import`): paste lines "date;reading" or choose a CSV file, check the preview, import. Only readings before the sensor's existing statistics are imported, with sums set so that consumption continues seamlessly; a lower reading counts as a meter change. History, energy dashboard and Tariffy (consumption, key dates, seasonal forecast) then use the readings.
+
 ## [1.37.0] - 2026-11-18
 
 ### Added

@@ -26,7 +26,7 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.loader import async_get_integration
 
-from . import backup, history
+from . import backup, history, meter_import
 from .const import (
     CONF_VERBRAUCH_SENSOR,
     DOMAIN,
@@ -474,6 +474,36 @@ async def ws_einmal_delete(hass: HomeAssistant, connection, msg: dict[str, Any])
 @websocket_api.require_admin
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): "tariffy/zaehler_import",
+        vol.Required("entry_id"): str,
+        vol.Required("text"): vol.All(str, vol.Length(max=400_000)),
+        vol.Optional("pruefen", default=True): bool,
+    }
+)
+@websocket_api.async_response
+async def ws_zaehler_import(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Prueft oder importiert historische Zaehlerstaende in die Statistik des Verbrauchssensors."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    sensor = entry.data.get(CONF_VERBRAUCH_SENSOR)
+    if not sensor:
+        connection.send_error(msg["id"], "kein_sensor", "kein_sensor")
+        return
+    try:
+        ergebnis = await meter_import.zaehlerstaende_importieren(
+            hass, sensor, msg["text"], nur_pruefen=msg["pruefen"]
+        )
+    except meter_import.ImportFehler as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    connection.send_result(msg["id"], ergebnis)
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): "tariffy/abschlag_korrektur",
         vol.Required("entry_id"): str,
     }
@@ -695,6 +725,7 @@ async def async_setup_panel(hass: HomeAssistant) -> None:
             websocket_api.async_register_command(hass, ws_einmal_save)
             websocket_api.async_register_command(hass, ws_einmal_delete)
             websocket_api.async_register_command(hass, ws_abschlag_korrektur)
+            websocket_api.async_register_command(hass, ws_zaehler_import)
             websocket_api.async_register_command(hass, ws_preis_save)
             websocket_api.async_register_command(hass, ws_preis_delete)
             websocket_api.async_register_command(hass, ws_aussen_save)

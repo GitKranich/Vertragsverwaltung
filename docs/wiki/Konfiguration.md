@@ -124,3 +124,5 @@ Die Sparte **Kredit / Finanzierung** ist für Annuitätendarlehen (Baufinanzieru
 3. Im Vertrag den Template-Sensor als **Verbrauchssensor** und den Zahl-Helfer als **Zählerstand-Eingabe** eintragen.
 
 **Zählerwechsel:** erst den Endstand des alten Zählers erfassen, dann den Stand des neuen mit Haken bei "Neuer Zähler". Home Assistant zählt die Statistik nahtlos weiter. Einen manuellen "Zählerstand bei Vertragsbeginn" im Vertrag danach leeren.
+
+**Historische Stände importieren:** Im Block "Zählerstand" mit **"Verlauf importieren"** (Administratoren) Zeilen im Format `Datum;Stand` einfügen (z. B. `01.03.2026;512,3`, auch `2026-03-01` oder mit Uhrzeit) oder eine CSV-Datei wählen, mit **"Prüfen"** die Vorschau ansehen und dann **"Importieren"**. Übernommen werden nur Stände vor der vorhandenen Statistik des Sensors; der Verbrauch läuft danach nahtlos weiter. Ein kleinerer Stand gilt als Zählerwechsel.
