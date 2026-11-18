@@ -755,6 +755,18 @@ async def _get_latest_sum(hass: HomeAssistant, entity_id: str) -> tuple[float | 
             sum_val, state_val = _entry_sum_state(entry)
             if sum_val is not None:
                 return sum_val, state_val
+        # Nichts in den letzten drei Tagen (z. B. ein von Hand erfasster Zaehler, dessen Sensor
+        # zwischen den Ablesungen nicht verfuegbar war, oder importierte Staende): die letzte
+        # vorhandene Statistikzeile, egal wie alt
+        from homeassistant.components.recorder.statistics import get_last_statistics
+
+        last = await instance.async_add_executor_job(
+            lambda: get_last_statistics(hass, 1, entity_id, True, {"sum", "state"})
+        )
+        for entry in last.get(entity_id, []) or []:
+            sum_val, state_val = _entry_sum_state(entry)
+            if sum_val is not None:
+                return sum_val, state_val
     except Exception as err:  # noqa: BLE001
         _LOGGER.warning("Tariffy: aktueller Sum-Wert für %s fehlgeschlagen: %s", entity_id, err)
     return None, None

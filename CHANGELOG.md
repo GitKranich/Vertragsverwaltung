@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.38.1] - 2026-11-18
+
+### Fixed
+
+- Consumption so far is also found when the meter's last statistics row is older than three days (a meter read by hand whose sensor was unavailable in between, or imported readings): the last existing row is used.
+- The meter-reading import also reads timestamps with seconds and fractions and a trailing separator (for example the EHW+ export `2026-11-09T17:55:55.043936;33,000;`).
+
 ## [1.38.0] - 2026-11-18
 
 ### Added

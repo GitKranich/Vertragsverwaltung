@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.38.1] - 2026-11-18
+
+### Behoben
+
+- Der bisherige Verbrauch wird auch gefunden, wenn die letzte Statistikzeile des Zählers älter als drei Tage ist (ein von Hand abgelesener Zähler, dessen Sensor zwischendurch nicht verfügbar war, oder importierte Stände): Dann zählt die letzte vorhandene Zeile.
+- Der Import von Zählerständen liest auch Zeitstempel mit Sekunden und Sekundenbruchteilen und ein Trennzeichen am Zeilenende (zum Beispiel den EHW+-Export `2026-11-09T17:55:55.043936;33,000;`).
+
 ## [1.38.0] - 2026-11-18
 
 ### Hinzugefügt

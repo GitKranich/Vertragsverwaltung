@@ -47,3 +47,18 @@ async def test_import_writes_the_long_term_statistics(hass):
     rows = stats["sensor.wasser"]
     assert [r["state"] for r in rows] == [72.0, 80.5, 89.25, 95.0]
     assert [r["sum"] for r in rows] == [0.0, 8.5, 17.25, 23.0]
+
+
+async def test_latest_sum_falls_back_to_the_last_row_when_older_than_three_days(hass):
+    from pytest_homeassistant_custom_component.components.recorder.common import (
+        async_wait_recording_done,
+    )
+
+    from custom_components.tariffy import coordinator as coord
+
+    hass.states.async_set(
+        "sensor.wasser", "unavailable", {"state_class": "total_increasing", "unit_of_measurement": "m³"}
+    )
+    await mi.zaehlerstaende_importieren(hass, "sensor.wasser", TEXT, nur_pruefen=False)
+    await async_wait_recording_done(hass)
+    assert await coord._get_latest_sum(hass, "sensor.wasser") == (23.0, 95.0)

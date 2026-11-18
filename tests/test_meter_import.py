@@ -99,3 +99,10 @@ async def test_only_rows_before_the_existing_statistics_are_imported(hass):
         mi._aelteste_zeile = mi_old
     assert grenze - timedelta(days=1) < grenze
 
+
+
+def test_reads_the_ehw_plus_export_with_seconds_and_trailing_separator():
+    werte, fehler = mi.zeilen_lesen("2026-11-09T17:55:55.043936;33,000;\n2026-07-16T12:00:00.000;0,000;\n")
+    assert fehler == []
+    assert [w for _, w in werte] == [33.0, 0.0]
+    assert (werte[0][0].hour, werte[0][0].minute) == (17, 55)
