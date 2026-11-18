@@ -30,6 +30,10 @@ CONF_PREISGARANTIE = "preisgarantie"
 # Abschlag-Empfehlung). Sofortbonus: schon ausgezahlt, senkt nur die Gesamtkosten.
 CONF_BONUS = "bonus"
 CONF_SOFORTBONUS = "sofortbonus"
+# Wasser: Niederschlagswassergebuehr = versiegelte Flaeche (m²) x Gebuehr je m² und Jahr. Zaehlt
+# wie ein Grundpreis (fester Betrag pro Monat) in Kosten, Prognose und Abschlag-Empfehlung.
+CONF_NIEDERSCHLAG_FLAECHE = "niederschlag_flaeche"
+CONF_NIEDERSCHLAG_GEBUEHR = "niederschlag_gebuehr"
 
 # Verbrauchsprognose bis Vertragsende (nur Strom und Gas):
 #   saisonal       - Monatsprofil aus der Langzeitstatistik des Zaehlers (Durchschnitt je

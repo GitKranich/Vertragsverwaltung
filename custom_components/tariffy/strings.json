@@ -381,6 +381,8 @@
           "abschlag_warnung_schwelle": "Warning threshold (€ balance due)",
           "abwasser_typ": "Wastewater billing type",
           "arbeitspreis_abwasser": "Wastewater charge",
+          "niederschlag_flaeche": "Sealed area (m²)",
+          "niederschlag_gebuehr": "Stormwater fee (€ per m² and year)",
           "zaehlernummer": "Meter number",
           "tiered": "Enable tiered/block pricing",
           "tier_limit_0": "Block 1 limit",
@@ -404,6 +406,8 @@
           "verbrauch_start_wert": "Manual override/fallback: enter the exact meter reading on the contract start date if you know it (e.g. from your bill). Takes priority over automatic detection — useful if Home Assistant's statistics history for the consumption sensor doesn't reach back that far (e.g. after renaming or recreating the sensor).",
           "abwasser_typ": "How wastewater is billed: fixed price per unit, % of fresh water, or flat monthly rate",
           "arbeitspreis_abwasser": "Price per unit / percentage / flat monthly rate depending on billing type above",
+          "niederschlag_flaeche": "For the stormwater fee: sealed area connected to the sewer (roof, yard, driveway) as stated in the fee notice",
+          "niederschlag_gebuehr": "Fee per m² of sealed area and year from the fee notice. Area × fee counts like a standing charge in cost, forecast and recommended instalment",
           "zaehlernummer": "Meter number from your water bill"
         }
       },
@@ -421,6 +425,8 @@
           "abschlag_warnung_schwelle": "Warning threshold (€ balance due)",
           "abwasser_typ": "Wastewater billing type",
           "arbeitspreis_abwasser": "Wastewater charge",
+          "niederschlag_flaeche": "Sealed area (m²)",
+          "niederschlag_gebuehr": "Stormwater fee (€ per m² and year)",
           "zaehlernummer": "Meter number",
           "tiered": "Enable tiered/block pricing",
           "tier_limit_0": "Block 1 limit",
@@ -444,6 +450,8 @@
           "verbrauch_start_wert": "Manual override/fallback: enter the exact meter reading on the contract start date if you know it (e.g. from your bill). Takes priority over automatic detection — useful if Home Assistant's statistics history for the consumption sensor doesn't reach back that far (e.g. after renaming or recreating the sensor).",
           "abwasser_typ": "How wastewater is billed: fixed price per unit, % of fresh water, or flat monthly rate",
           "arbeitspreis_abwasser": "Price per unit / percentage / flat monthly rate depending on billing type above",
+          "niederschlag_flaeche": "For the stormwater fee: sealed area connected to the sewer (roof, yard, driveway) as stated in the fee notice",
+          "niederschlag_gebuehr": "Fee per m² of sealed area and year from the fee notice. Area × fee counts like a standing charge in cost, forecast and recommended instalment",
           "zaehlernummer": "Meter number from your water bill"
         }
       },

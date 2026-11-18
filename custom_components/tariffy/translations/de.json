@@ -381,6 +381,8 @@
           "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
           "abwasser_typ": "Abwasser-Abrechnungstyp",
           "arbeitspreis_abwasser": "Abwassergebühr",
+          "niederschlag_flaeche": "Versiegelte Fläche (m²)",
+          "niederschlag_gebuehr": "Niederschlagsgebühr (€ je m² und Jahr)",
           "zaehlernummer": "Zählernummer",
           "tiered": "Staffelpreise aktivieren",
           "tier_limit_0": "Block 1 Obergrenze",
@@ -404,6 +406,8 @@
           "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
           "abwasser_typ": "Art der Abwasserberechnung: Festpreis pro Einheit, % des Frischwasserpreises oder Monatspauschale",
           "arbeitspreis_abwasser": "Betrag pro Einheit / Prozentsatz / Monatspauschale — je nach gewähltem Typ",
+          "niederschlag_flaeche": "Für die Niederschlagswassergebühr: an die Kanalisation angeschlossene, versiegelte Fläche (Dach, Hof, Einfahrt) laut Gebührenbescheid",
+          "niederschlag_gebuehr": "Gebühr je m² versiegelter Fläche und Jahr laut Gebührenbescheid. Fläche × Gebühr zählt wie ein Grundpreis in Kosten, Prognose und Abschlag-Empfehlung",
           "zaehlernummer": "Zählernummer auf deiner Wasserrechnung"
         }
       },
@@ -421,6 +425,8 @@
           "abschlag_warnung_schwelle": "Warnschwelle (€ Nachzahlung)",
           "abwasser_typ": "Abwasser-Abrechnungstyp",
           "arbeitspreis_abwasser": "Abwassergebühr",
+          "niederschlag_flaeche": "Versiegelte Fläche (m²)",
+          "niederschlag_gebuehr": "Niederschlagsgebühr (€ je m² und Jahr)",
           "zaehlernummer": "Zählernummer",
           "tiered": "Staffelpreise aktivieren",
           "tier_limit_0": "Block 1 Obergrenze",
@@ -444,6 +450,8 @@
           "verbrauch_start_wert": "Manueller Override/Fallback: trag den genauen Zählerstand am Vertragsbeginn ein, falls du ihn kennst (z.B. von der Abrechnung). Hat Vorrang vor der automatischen Erkennung — hilfreich, wenn Home Assistants Statistik-Historie für den Verbrauchssensor nicht so weit zurückreicht (z.B. nach einem Umbenennen/Neuanlegen des Sensors).",
           "abwasser_typ": "Art der Abwasserberechnung: Festpreis pro Einheit, % des Frischwasserpreises oder Monatspauschale",
           "arbeitspreis_abwasser": "Betrag pro Einheit / Prozentsatz / Monatspauschale — je nach gewähltem Typ",
+          "niederschlag_flaeche": "Für die Niederschlagswassergebühr: an die Kanalisation angeschlossene, versiegelte Fläche (Dach, Hof, Einfahrt) laut Gebührenbescheid",
+          "niederschlag_gebuehr": "Gebühr je m² versiegelter Fläche und Jahr laut Gebührenbescheid. Fläche × Gebühr zählt wie ein Grundpreis in Kosten, Prognose und Abschlag-Empfehlung",
           "zaehlernummer": "Zählernummer auf deiner Wasserrechnung"
         }
       },

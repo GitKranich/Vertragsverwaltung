@@ -41,6 +41,8 @@ from .const import (
     CONF_BEGINN,
     CONF_BONUS,
     CONF_SOFORTBONUS,
+    CONF_NIEDERSCHLAG_FLAECHE,
+    CONF_NIEDERSCHLAG_GEBUEHR,
     CONF_PROGNOSE,
     PROGNOSE_SAISONAL,
     PROGNOSE_DURCHSCHNITT,
@@ -807,6 +809,13 @@ def _wasser_schema(d: dict[str, Any], features: dict | None = None) -> vol.Schem
             # Abwasser-Wert: Bedeutung abhängig vom Typ
             # price_per_unit: Preis/Einheit | percentage: % | flat_rate: €/Monat
             _opt(CONF_ARBEITSPREIS_ABWASSER, d.get(CONF_ARBEITSPREIS_ABWASSER)): _preis(None),
+            # Niederschlagswassergebuehr: versiegelte Flaeche x Gebuehr je m² und Jahr
+            _opt(CONF_NIEDERSCHLAG_FLAECHE, d.get(CONF_NIEDERSCHLAG_FLAECHE)): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0, step="any", unit_of_measurement="m²", mode=selector.NumberSelectorMode.BOX
+                )
+            ),
+            _opt(CONF_NIEDERSCHLAG_GEBUEHR, d.get(CONF_NIEDERSCHLAG_GEBUEHR)): _preis(None),
             _opt(CONF_JAHRESVERBRAUCH, d.get(CONF_JAHRESVERBRAUCH)): selector.NumberSelector(
                 selector.NumberSelectorConfig(
                     min=0, step="any", mode=selector.NumberSelectorMode.BOX

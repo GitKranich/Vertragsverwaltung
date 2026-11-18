@@ -112,6 +112,7 @@ const I18N = {
     firstInstalment: "First instalment", abschlagBefore: "Instalment before", abschlagUntil: "until {d}",
     abschlagFix: "Treat as a correction", abschlagFixAsk: "Use the current instalment from the contract start?", abschlagFixYes: "Yes",
     abschlagFixHint: "Saved when the instalment was changed while editing. If the old amount was a typo, treat it as a correction: the current instalment then applies from the contract start.",
+    stormwater: "Stormwater fee",
     forecastMethod: "Forecast", forecast_saisonal: "seasonal (meter's monthly values)", forecast_standardprofil: "seasonal (standard profile)",
     forecast_letzte_30_tage: "last 30 days", forecast_durchschnitt: "average since start",
     bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
@@ -283,6 +284,7 @@ const I18N = {
     firstInstalment: "Erster Abschlag", abschlagBefore: "Abschlag vorher", abschlagUntil: "bis {d}",
     abschlagFix: "Als Korrektur werten", abschlagFixAsk: "Aktuellen Abschlag ab Vertragsbeginn verwenden?", abschlagFixYes: "Ja",
     abschlagFixHint: "Gemerkt, als der Abschlag beim Bearbeiten geändert wurde. War der alte Betrag ein Tippfehler, als Korrektur werten: dann gilt der aktuelle Abschlag ab Vertragsbeginn.",
+    stormwater: "Niederschlagsgebühr",
     forecastMethod: "Prognose", forecast_saisonal: "saisonal (Monatswerte des Zählers)", forecast_standardprofil: "saisonal (Standardprofil)",
     forecast_letzte_30_tage: "letzte 30 Tage", forecast_durchschnitt: "Durchschnitt seit Beginn",
     bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
@@ -3111,6 +3113,8 @@ class TariffyPanel extends HTMLElement {
         row(this._t("instalmentYear"), isNum(c.abschlag_jahr) ? money(c.abschlag_jahr) : null),
         row(this._t("priceNext"), c.naechste_preisaenderung ? this._date(c.naechste_preisaenderung) : null),
         row(this._t("firstInstalment"), METERED.has(c.sparte) && c.erste_zahlung ? this._date(c.erste_zahlung) : null),
+        row(this._t("stormwater"), isNum(c.niederschlag_jahr)
+          ? `${this._t("perYearShort", { v: money(c.niederschlag_jahr) })} · ${this._num(c.niederschlag_flaeche, 1)} m² × ${this._money(c.niederschlag_gebuehr, c.currency, { digits: 2 })}` : null),
         row(this._t("bonusSignup"), isNum(c.bonus) && c.bonus ? `${money(c.bonus)} · ${this._t("bonusSignupHint")}` : null),
         row(this._t("bonusInstant"), isNum(c.sofortbonus) && c.sofortbonus ? `${money(c.sofortbonus)} · ${this._t("bonusInstantHint")}` : null),
         // flat-rate contracts: what the contract costs a year, and how it is paid when not monthly

@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.36.0] - 2026-11-18
+
+### Hinzugefügt
+
+- **Niederschlagswassergebühr bei Wasserverträgen**: zwei freiwillige Felder im Wasser-Formular, versiegelte Fläche (m²) und Gebühr je m² und Jahr. Fläche × Gebühr zählt als fester Monatsbetrag wie der Grundpreis in Kosten bisher, Saldo, Prognose, Kosten pro Jahr und Abschlag-Empfehlung. Das Panel zeigt sie unter "Preise".
+
 ## [1.35.0] - 2026-11-18
 
 ### Hinzugefügt

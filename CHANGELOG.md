@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.36.0] - 2026-11-18
+
+### Added
+
+- **Stormwater fee for water contracts**: two optional fields in the water form, sealed area (m²) and fee per m² and year. Area × fee counts as a fixed monthly amount like the standing charge in cost so far, balance, forecast, cost per year and the recommended instalment. The panel shows it under "Prices".
+
 ## [1.35.0] - 2026-11-18
 
 ### Added

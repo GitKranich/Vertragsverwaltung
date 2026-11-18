@@ -61,6 +61,8 @@ Wie Strom, zusätzlich:
 | Verbrauchssensor | – | HA-Sensor des Wasserzählers |
 | Abwasser-Typ | ✅ | Festpreis/Einheit, % des Frischwassers oder Monatspauschale |
 | Abwassergebühr | – | Betrag je nach gewähltem Typ |
+| Versiegelte Fläche | – | m² für die Niederschlagswassergebühr (laut Gebührenbescheid) |
+| Niederschlagsgebühr | – | € je m² und Jahr; Fläche × Gebühr zählt wie ein Grundpreis |
 | Zählernummer | – | Für Dokumentation |
 
 ### Außenzähler (Garten, Pool, Bewässerung)

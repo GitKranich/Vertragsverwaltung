@@ -39,6 +39,8 @@ from .const import (
     CONF_BEGINN,
     CONF_BONUS,
     CONF_SOFORTBONUS,
+    CONF_NIEDERSCHLAG_FLAECHE,
+    CONF_NIEDERSCHLAG_GEBUEHR,
     CONF_PROGNOSE,
     PROGNOSE_SAISONAL,
     PROGNOSE_LETZTE_30,
@@ -1870,6 +1872,17 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         abschlagssumme = round(abschlag * laufzeit_monate, 2) if abschlag is not None else None
 
+        # Niederschlagswassergebuehr (Wasser): versiegelte Flaeche x Gebuehr je m² und Jahr, als
+        # fester Monatsbetrag zusaetzlich zum Grundpreis in allen Kostenrechnungen
+        niederschlag_jahr: float | None = None
+        niederschlag_monat = 0.0
+        if sparte == WASSER_SPARTE:
+            flaeche = _f(data.get(CONF_NIEDERSCHLAG_FLAECHE))
+            gebuehr = _f(data.get(CONF_NIEDERSCHLAG_GEBUEHR))
+            if flaeche and gebuehr:
+                niederschlag_jahr = round(flaeche * gebuehr, 2)
+                niederschlag_monat = flaeche * gebuehr / 12
+
         # Jahreswerte und Zahlweise (nur Anzeige im Panel, keine neuen Sensoren): `abschlag` ist
         # immer der Betrag pro Monat, die Zahlweise sagt nur, wie er bezahlt wird.
         zahlweise = data.get(CONF_ZAHLWEISE)
@@ -1880,7 +1893,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             round(abschlag * ZAHLWEISE_MONATE[zahlweise], 2) if abschlag is not None else None
         )
         kosten_jahr = (
-            round((abschlag + (grundpreis or 0)) * 12, 2) if abschlag is not None else None
+            round((abschlag + (grundpreis or 0) + niederschlag_monat) * 12, 2) if abschlag is not None else None
         )
 
         # Bis heute faellige Abschlaege. Bei Pauschalvertraegen (Internet, Mobilfunk, ...)
@@ -2095,7 +2108,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     # hier keinen weiteren laufzeit_faktor mehr.
                     geschaetzte_kosten_real = round(
                         verbrauch_kwh_real * ap_real
-                        + (grundpreis or 0) * laufzeit_monate,
+                        + ((grundpreis or 0) + niederschlag_monat) * laufzeit_monate,
                         2,
                     )
                     geschaetzt_gesamt = geschaetzte_kosten_real
@@ -2154,7 +2167,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 )
                 if _ap_kb is not None:
                     kosten_bisher = round(
-                        _vb_abr * _ap_kb + (grundpreis or 0) * _vergangene_monate_kb,
+                        _vb_abr * _ap_kb + ((grundpreis or 0) + niederschlag_monat) * _vergangene_monate_kb,
                         2,
                     )
                     # Guthaben/Nachzahlung bisher: Abschlag, der bis heute
@@ -2344,7 +2357,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
             if _ap is not None:
                 empfohlener_abschlag = round(
-                    (_vll_kwh * _ap + (grundpreis or 0) * _monate_alt) / _monate_alt, 2
+                    (_vll_kwh * _ap + ((grundpreis or 0) + niederschlag_monat) * _monate_alt) / _monate_alt, 2
                 )
 
         monate = int(data.get(CONF_ERINNERUNG_MONATE) or 0)
@@ -2396,6 +2409,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_ABWASSER_TYP: abwasser_typ,
             "arbeitspreis_gesamt_wasser": arbeitspreis_gesamt_wasser,
             "abwasser_pauschal_monat": abwasser_pauschal_monat,
+            "niederschlag_flaeche": _f(data.get(CONF_NIEDERSCHLAG_FLAECHE)),
+            "niederschlag_gebuehr": _f(data.get(CONF_NIEDERSCHLAG_GEBUEHR)),
+            "niederschlag_jahr": niederschlag_jahr,
             "aussenzaehler": aussen.get("liste") or [],
             "garten_verbrauch": aussen.get("garten_verbrauch"),
             "garten_kosten": aussen.get("garten_kosten"),
