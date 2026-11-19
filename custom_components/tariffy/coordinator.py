@@ -828,6 +828,70 @@ def _pick_verbrauch_delta(
     return None
 
 
+def _verbrauch_aus_zeilen(
+    zeilen: list[dict], live_state: float | None = None
+) -> tuple[float | None, int]:
+    """Verbrauch aus aufeinanderfolgenden Statistikzeilen (je 'sum' und 'state'), robust gegen
+    Brueche in der Summenreihe. Gibt (verbrauch, anzahl_brueche) zurueck.
+
+    Normalfall: der Zuwachs von 'sum' zwischen zwei Zeilen. Faellt 'sum' dagegen (die Reihe ist
+    neu bei einem kleineren Wert angefangen, z. B. weil der Sensor neu angelegt oder die Statistik
+    beschaedigt wurde), zaehlt fuer diesen Schritt der Zuwachs des rohen Zaehlerstands; ist auch
+    der gefallen, gilt das als Zaehlerwechsel und der neue Stand zaehlt ab 0 -- wie bei
+    total_increasing. Ein Live-Zustand ueber dem letzten Statistikstand wird noch addiert."""
+    verbrauch = 0.0
+    brueche = 0
+    vorher: tuple[float | None, float | None] | None = None
+    for zeile in zeilen:
+        s, st = _entry_sum_state(zeile)
+        if s is None and st is None:
+            continue
+        if vorher is not None:
+            ps, pst = vorher
+            if s is not None and ps is not None and s >= ps:
+                verbrauch += s - ps
+            elif st is not None and pst is not None:
+                if s is not None and ps is not None:
+                    brueche += 1
+                verbrauch += st - pst if st >= pst else st
+        vorher = (s, st)
+    if vorher is None:
+        return None, 0
+    letzter_state = vorher[1]
+    if live_state is not None and letzter_state is not None and live_state > letzter_state:
+        verbrauch += live_state - letzter_state
+    return verbrauch, brueche
+
+
+async def _get_verbrauch_gestueckelt(
+    hass: HomeAssistant, entity_id: str, beginn: date, live_state: float | None = None
+) -> tuple[float | None, int]:
+    """Verbrauch seit Vertragsbeginn, Zeile fuer Zeile aus der Langzeitstatistik zusammengesetzt
+    (siehe _verbrauch_aus_zeilen). Nur fuer den Fall gedacht, dass die einfache Differenz
+    unplausibel (negativ) ist: liest alle Stundenzeilen seit Beginn. Wirft nie."""
+    try:
+        from homeassistant.components.recorder import get_instance
+        from homeassistant.components.recorder.statistics import statistics_during_period
+
+        tz = dt_util.get_default_time_zone()
+        start_dt = datetime.combine(beginn, datetime.min.time()).replace(tzinfo=tz)
+        stats = await get_instance(hass).async_add_executor_job(
+            lambda: statistics_during_period(
+                hass,
+                start_dt,
+                None,
+                statistic_ids={entity_id},
+                period="hour",
+                units={},
+                types={"sum", "state"},
+            )
+        )
+        return _verbrauch_aus_zeilen(stats.get(entity_id, []), live_state)
+    except Exception as err:  # noqa: BLE001
+        _LOGGER.warning("Tariffy: Statistikzeilen für %s nicht lesbar: %s", entity_id, err)
+    return None, 0
+
+
 async def _get_average_price(
     hass: HomeAssistant, entity_id: str, start: datetime, end: datetime
 ) -> float | None:
@@ -894,6 +958,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # Verbrauch beim letzten Update ermittelt wurde (siehe diagnostics.py).
         self.verbrauch_diag: dict[str, Any] = {}
         self._verbrauch_war_unbekannt = False
+        # Brueche in der Summenreihe der Statistik beim letzten Update (siehe _verbrauch_delta)
+        self._statistik_brueche = 0
+        self._bruch_gemeldet = False
 
         async def _startup_refresh(_event: Any = None) -> None:
             """Refresh nach HA-Start, damit LTS-Daten verfügbar sind."""
@@ -1447,6 +1514,50 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         return ergebnis
 
+    async def _verbrauch_delta(
+        self,
+        sensor_id: str,
+        beginn: date | None,
+        aktuell_sum: float | None,
+        offset_sum: float | None,
+        aktuell_state: float | None,
+        offset_state: float | None,
+    ) -> float | None:
+        """_pick_verbrauch_delta() mit Schutz gegen Brueche in der Summenreihe: Ein negativer
+        Verbrauch ist bei einem Zaehler nicht moeglich und heisst, dass die 'sum'-Statistik
+        zwischendurch neu (kleiner) angefangen hat -- z. B. weil der Sensor neu angelegt wurde.
+        Dann wird der Verbrauch Zeile fuer Zeile aus der Statistik zusammengesetzt und der Bruch
+        ueberbrueckt. Die Zahl der Brueche landet in den Daten (Attribut am Sensor
+        "Verbrauch (Bisher)") und einmal als Warnung im Log."""
+        faktor = await _einheit_faktor(self.hass, sensor_id)
+        delta = _pick_verbrauch_delta(aktuell_sum, offset_sum, aktuell_state, offset_state, faktor)
+        if delta is None or delta >= 0 or beginn is None:
+            return delta
+        live = self.hass.states.get(sensor_id)
+        verbrauch, brueche = await _get_verbrauch_gestueckelt(
+            self.hass, sensor_id, beginn, _f(live.state) if live else None
+        )
+        if verbrauch is None:
+            # Ohne lesbare Zeilen lieber unbekannt als ein negativer Verbrauch
+            return None
+        brueche = max(brueche, 1)
+        if not self._bruch_gemeldet:
+            self._bruch_gemeldet = True
+            _LOGGER.warning(
+                "Tariffy '%s': Die Statistik von %s hat %d Bruch/Brueche (die Summe faellt). "
+                "Verbrauch wird Zeile fuer Zeile berechnet: %.3f statt %.3f. Dauerhaft beheben: "
+                "Entwicklerwerkzeuge > Statistik > Summe anpassen.",
+                self.entry.title, sensor_id, brueche, verbrauch * faktor, delta,
+            )
+        self._statistik_brueche += brueche
+        return round(verbrauch * faktor, 2)
+
+    def _statistik_brueche_melden(self) -> int:
+        """Zahl der Brueche dieses Updates; ohne Bruch darf ein spaeterer wieder ins Log."""
+        if not self._statistik_brueche:
+            self._bruch_gemeldet = False
+        return self._statistik_brueche
+
     async def _verbrauch_bisher_fuer_sensor(
         self,
         sensor_id: str | None,
@@ -1480,8 +1591,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if aktuell_sum is None:
             return None
         offset_sum, offset_state = await offset_getter(sensor_id, beginn)
-        return _pick_verbrauch_delta(
-            aktuell_sum, offset_sum, aktuell_state, offset_state, await _einheit_faktor(self.hass, sensor_id)
+        return await self._verbrauch_delta(
+            sensor_id, beginn, aktuell_sum, offset_sum, aktuell_state, offset_state
         )
 
     async def _monatswerte(
@@ -1700,9 +1811,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             aktuell_state = aktuell_sum
         if aktuell_sum is None:
             return None
-        verbrauch_ht = _pick_verbrauch_delta(
-            aktuell_sum, self._verbrauch_offset, aktuell_state, self._verbrauch_offset_state,
-            await _einheit_faktor(self.hass, sensor_id),
+        verbrauch_ht = await self._verbrauch_delta(
+            sensor_id, beginn, aktuell_sum, self._verbrauch_offset, aktuell_state,
+            self._verbrauch_offset_state,
         )
         if self.entry.data.get(CONF_SPARTE) != SPARTE_ELECTRICITY_HT_NT:
             return verbrauch_ht
@@ -1724,9 +1835,9 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             aktuell_state_nt = aktuell_sum_nt
         if aktuell_sum_nt is None:
             return verbrauch_ht
-        verbrauch_nt = _pick_verbrauch_delta(
-            aktuell_sum_nt, self._verbrauch_offset_nt, aktuell_state_nt, self._verbrauch_offset_state_nt,
-            await _einheit_faktor(self.hass, sensor_id_nt),
+        verbrauch_nt = await self._verbrauch_delta(
+            sensor_id_nt, beginn, aktuell_sum_nt, self._verbrauch_offset_nt, aktuell_state_nt,
+            self._verbrauch_offset_state_nt,
         )
         if verbrauch_ht is None and verbrauch_nt is None:
             return None
@@ -1734,6 +1845,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         heute = dt_util.now().date()
+        self._statistik_brueche = 0
 
         nxt = dict(self.entry.options)
         wechsel = _parse_date(nxt.get(NEXT_PREFIX + CONF_BEGINN)) if nxt else None
@@ -2008,10 +2120,11 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     offset_sum, offset_state = await self._get_verbrauch_offset(verbrauch_sensor, beginn)
                     diag["offset_sum"] = offset_sum
                     diag["offset_state"] = offset_state
-                    verbrauch_bisher = _pick_verbrauch_delta(
-                        aktuell_sum, offset_sum, aktuell_state, offset_state,
-                        await _einheit_faktor(self.hass, verbrauch_sensor),
+                    verbrauch_bisher = await self._verbrauch_delta(
+                        verbrauch_sensor, beginn, aktuell_sum, offset_sum, aktuell_state, offset_state,
                     )
+                    if self._statistik_brueche:
+                        diag["statistik_brueche"] = self._statistik_brueche
 
                 if verbrauch_bisher is None:
                     # LTS für Vertragsbeginn nicht verfügbar — Sensor bleibt unbekannt.
@@ -2507,6 +2620,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 else None
             ),
             "verbrauch_bisher": verbrauch_bisher,
+            "statistik_brueche": self._statistik_brueche_melden(),
             "verbrauch_hochgerechnet": verbrauch_hochgerechnet,
             "prognose_real": prognose_real,
             "abschlag_anpassung_empfohlen": abschlag_anpassung_empfohlen,

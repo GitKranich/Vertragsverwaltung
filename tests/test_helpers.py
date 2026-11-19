@@ -14,6 +14,7 @@ from custom_components.tariffy.coordinator import (
     _parse_date,
     _pick_verbrauch_delta,
     _tiered_cost,
+    _verbrauch_aus_zeilen,
 )
 
 
@@ -140,6 +141,33 @@ class TestPickVerbrauchDelta:
 
     def test_rounds_to_two_decimals(self):
         assert _pick_verbrauch_delta(None, None, 10.123456, 0.0) == 10.12
+
+
+def _z(s, st):
+    return {"sum": s, "state": st}
+
+
+class TestVerbrauchAusZeilen:
+    def test_normal_series_uses_sum(self):
+        assert _verbrauch_aus_zeilen([_z(442, 514), _z(472, 544), _z(517, 589)]) == (75.0, 0)
+
+    def test_meter_swap_inside_sum_is_no_break(self):
+        # Zaehlerwechsel 589 -> 0, die Summe laeuft korrekt weiter
+        assert _verbrauch_aus_zeilen([_z(442, 514), _z(517, 589), _z(517, 0), _z(550, 33)]) == (108.0, 0)
+
+    def test_sum_restart_is_bridged_with_the_state(self):
+        # Sensor neu angelegt: Summe faengt bei 0 an, Stand steigt 33 -> 53
+        zeilen = [_z(442, 514), _z(517, 589), _z(517, 0), _z(550, 33), _z(0, 53), _z(0, 53)]
+        assert _verbrauch_aus_zeilen(zeilen) == (128.0, 1)
+
+    def test_sum_restart_with_falling_state_counts_new_meter(self):
+        assert _verbrauch_aus_zeilen([_z(100, 500), _z(0, 4)]) == (4.0, 1)
+
+    def test_live_state_above_last_row_is_added(self):
+        assert _verbrauch_aus_zeilen([_z(0, 10), _z(5, 15)], live_state=17.5) == (7.5, 0)
+
+    def test_empty(self):
+        assert _verbrauch_aus_zeilen([]) == (None, 0)
 
 
 class TestAbschlagBisherGezahlt:

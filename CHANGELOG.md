@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.38.2] - 2026-11-19
+
+### Fixed
+
+- No more negative consumption when the meter's statistics sum starts over at a smaller value mid-contract (for example after the consumption sensor was recreated): Tariffy then rebuilds the consumption row by row from the statistics and bridges the break with the meter reading. The new attribute `statistik_brueche` on "Verbrauch (Bisher)" counts the bridged breaks, and the log says once how to fix the statistics for good.
+
 ## [1.38.1] - 2026-11-18
 
 ### Fixed

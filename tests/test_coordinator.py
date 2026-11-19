@@ -1114,3 +1114,40 @@ class TestInstalmentEnteredAfterwards:
                 "_abschlag_ab_datum": "2026-07-12", "_abschlag_vorheriger_wert": 0.0}
         _, d = await setup_contract(data, today="2026-07-12")
         assert d["abschlag_bisher_gezahlt"] == 350.0  # seven rates, not 0
+
+
+class TestStatistikBruch:
+    """Die Summenreihe der Statistik faengt mitten im Vertrag neu an: kein negativer Verbrauch."""
+
+    async def test_negative_delta_is_rebuilt_row_by_row(self, setup_contract):
+        from unittest.mock import AsyncMock, patch
+
+        gestueckelt = AsyncMock(return_value=(128.0, 1))
+        with patch(
+            "custom_components.tariffy.coordinator._get_verbrauch_gestueckelt", gestueckelt
+        ):
+            _, d = await setup_contract(
+                STROM,
+                latest=(0.0, 53.0),
+                offset=(442.0, 514.0),
+                sensor_states={SENSOR: "53"},
+            )
+        assert d["verbrauch_bisher"] == 128.0
+        assert d["statistik_brueche"] == 1
+        gestueckelt.assert_awaited()
+
+    async def test_unreadable_rows_give_unknown_not_negative(self, setup_contract):
+        from unittest.mock import AsyncMock, patch
+
+        with patch(
+            "custom_components.tariffy.coordinator._get_verbrauch_gestueckelt",
+            AsyncMock(return_value=(None, 0)),
+        ):
+            _, d = await setup_contract(
+                STROM, latest=(0.0, 53.0), offset=(442.0, 514.0), sensor_states={SENSOR: "53"}
+            )
+        assert d["verbrauch_bisher"] is None
+
+    async def test_normal_contract_has_no_break(self, setup_contract):
+        _, d = await setup_contract(STROM, **GOLDEN_KW)
+        assert d["statistik_brueche"] == 0

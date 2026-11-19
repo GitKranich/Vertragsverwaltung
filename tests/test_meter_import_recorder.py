@@ -62,3 +62,48 @@ async def test_latest_sum_falls_back_to_the_last_row_when_older_than_three_days(
     await mi.zaehlerstaende_importieren(hass, "sensor.wasser", TEXT, nur_pruefen=False)
     await async_wait_recording_done(hass)
     assert await coord._get_latest_sum(hass, "sensor.wasser") == (23.0, 95.0)
+
+
+async def test_sum_restart_is_bridged_row_by_row(hass):
+    """Die Summenreihe faengt mitten im Vertrag neu bei 0 an (Sensor neu angelegt): Der Verbrauch
+    wird Zeile fuer Zeile zusammengesetzt statt negativ zu werden."""
+    from homeassistant.components.recorder.models import StatisticMeanType
+    from homeassistant.components.recorder.statistics import async_import_statistics
+    from pytest_homeassistant_custom_component.components.recorder.common import (
+        async_wait_recording_done,
+    )
+
+    from custom_components.tariffy import coordinator as coord
+
+    hass.states.async_set(
+        "sensor.wasser", "53", {"state_class": "total_increasing", "unit_of_measurement": "m³"}
+    )
+    metadata = {
+        "mean_type": StatisticMeanType.NONE,
+        "has_sum": True,
+        "name": None,
+        "source": "recorder",
+        "statistic_id": "sensor.wasser",
+        "unit_class": "volume",
+        "unit_of_measurement": "m³",
+    }
+    zeilen = [
+        (datetime(2026, 1, 1, 0), 442.0, 514.0),
+        (datetime(2026, 7, 15, 0), 517.0, 589.0),
+        (datetime(2026, 7, 16, 0), 517.0, 0.0),
+        (datetime(2026, 11, 7, 0), 550.0, 33.0),
+        (datetime(2026, 11, 18, 12), 0.0, 53.0),
+        (datetime(2026, 11, 18, 13), 0.0, 53.0),
+    ]
+    async_import_statistics(
+        hass,
+        metadata,
+        [
+            {"start": t.replace(tzinfo=dt_util.get_default_time_zone()), "sum": s, "state": st}
+            for t, s, st in zeilen
+        ],
+    )
+    await async_wait_recording_done(hass)
+    from datetime import date
+
+    assert await coord._get_verbrauch_gestueckelt(hass, "sensor.wasser", date(2026, 1, 1), 53.0) == (128.0, 1)

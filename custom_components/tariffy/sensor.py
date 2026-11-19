@@ -493,6 +493,7 @@ SENSOREN: tuple[VertragSensorDescription, ...] = (
             "verbrauch_hochgerechnet": d.get("verbrauch_hochgerechnet"),
             "verbrauch_bisher_ht": d.get("verbrauch_bisher_ht"),
             "verbrauch_bisher_nt": d.get("verbrauch_bisher_nt"),
+            "statistik_brueche": d.get("statistik_brueche") or 0,
         },
     ),
     VertragSensorDescription(

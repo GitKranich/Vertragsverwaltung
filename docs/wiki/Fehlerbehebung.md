@@ -6,6 +6,9 @@ Kosten, Guthaben und Prognose brauchen einen konfigurierten Arbeitspreis; `Koste
 ## Statistik reicht nicht bis zum Vertragsbeginn
 Wurde der Sensor umbenannt oder neu angelegt, trage unter den Vertragsdaten einen manuellen **„Zählerstand bei Vertragsbeginn"** ein. Er hat Vorrang vor den automatischen Methoden.
 
+## Verbrauch war negativ / Attribut `statistik_brueche` größer 0
+Die Summe in der Statistik des Verbrauchssensors hat mitten im Vertrag neu (kleiner) angefangen, meist weil der Sensor neu angelegt wurde. Tariffy überbrückt das und rechnet den Verbrauch Zeile für Zeile aus der Statistik. Dauerhaft reparieren (auch für Energie-Dashboard und Verlauf): **Entwicklerwerkzeuge → Statistik**, beim Sensor die erste Zeile nach dem Bruch wählen und die Summe um den fehlenden Betrag anpassen (letzte Summe vor dem Bruch + Verbrauch bis dahin).
+
 ## Verbrauch in m³, Kosten in kWh
 Die Sensoren „Verbrauch (Bisher)" und „Verbrauch (Vertragslaufzeit hochgerechnet)" zeigen die rohe Zählerdifferenz in der Einheit deines Sensors (meist m³). Nur für die Kostenberechnung wird intern über Brennwert × Zustandszahl in kWh umgerechnet.
 

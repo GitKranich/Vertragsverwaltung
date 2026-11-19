@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.38.2] - 2026-11-19
+
+### Behoben
+
+- Kein negativer Verbrauch mehr, wenn die Summe in der Statistik des Zählers mitten im Vertrag bei einem kleineren Wert neu anfängt (zum Beispiel nachdem der Verbrauchssensor neu angelegt wurde): Tariffy setzt den Verbrauch dann Zeile für Zeile aus der Statistik zusammen und überbrückt den Bruch mit dem Zählerstand. Das neue Attribut `statistik_brueche` an „Verbrauch (Bisher)" zählt die überbrückten Brüche, und das Log sagt einmal, wie man die Statistik dauerhaft repariert.
+
 ## [1.38.1] - 2026-11-18
 
 ### Behoben

@@ -19,7 +19,7 @@
 | Guthaben/Nachzahlung (Bisher) | € | Energie | Abschlag bisher gezahlt − Kosten (Bisher), Stand von heute (keine Hochrechnung). Icon zeigt 👍/👎 je nach Vorzeichen |
 | Einspeisevergütung | €/kWh | Strom | Eingetragene Vergütung pro kWh |
 | Jahresverbrauch (kWh) | kWh | Gas | m³ umgerechnet via Brennwert & Zustandszahl |
-| Verbrauch (Bisher) | Einheit des Verbrauchssensors (meist m³) | Energie+Wasser | Gemessener Verbrauch seit Vertragsbeginn — roher Zählerstand-Delta, **nicht** automatisch in kWh umgerechnet |
+| Verbrauch (Bisher) | Einheit des Verbrauchssensors (meist m³) | Energie+Wasser | Gemessener Verbrauch seit Vertragsbeginn — roher Zählerstand-Delta, **nicht** automatisch in kWh umgerechnet; Attribut `statistik_brueche` zählt überbrückte Brüche in der Statistik |
 | Verbrauch (Vertragslaufzeit hochgerechnet) | Einheit des Verbrauchssensors | Energie+Wasser | Aktueller Verbrauch auf die tatsächliche Vertragslaufzeit hochgerechnet (kein festes Kalenderjahr) |
 | Verbrauch (Letzte Laufzeit) | Einheit des Verbrauchssensors | Energie | Eingefroren beim Tarifwechsel |
 | Verbrauch Hochtarif/Niedertarif (Bisher) | kWh | Strom (Zweizählertarif) | Gemessener Verbrauch je Register seit Vertragsbeginn |
