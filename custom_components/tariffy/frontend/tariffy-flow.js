@@ -36,6 +36,7 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
       min: kind === "number" && isNum(raw.selector.number.min) ? raw.selector.number.min : null,
       domains: kind === "entity" ? [].concat(raw.selector.entity.domain || []) : [],
       custom: Boolean(sel.custom_value),
+      labelled: Boolean(sel.translation_key), // the options have texts of their own (the stored value is the key)
       options: (sel.options || []).map((o) => {
         const value = typeof o === "string" ? o : o.value;
         return { value, label: optionLabel(value, typeof o === "string" ? o : o.label || o.value) };
@@ -134,6 +135,19 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
     }
   }
 
+  /* a free-text select with listed options (house costs): show the text of a listed option, store its key;
+   * what the user typed himself is kept as typed */
+  _optionKey(f, text) {
+    const t = String(text).trim().toLowerCase();
+    const hit = f.options.find((o) => o.value.toLowerCase() === t || String(o.label).toLowerCase() === t);
+    return hit ? hit.value : String(text).trim();
+  }
+
+  _optionLabel(f, value) {
+    const hit = f.options.find((o) => o.value === value);
+    return hit ? hit.label : value;
+  }
+
   _collectFlow(dlg) {
     const values = {};
     const errors = {};
@@ -152,7 +166,7 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
         if (!Number.isFinite(n) || (f.min !== null && n < f.min)) errors[f.name] = this._t("dlgInvalidNumber");
         else values[f.name] = n;
       } else {
-        values[f.name] = raw;
+        values[f.name] = f.kind === "select" && f.custom && f.labelled ? this._optionKey(f, raw) : raw;
       }
     }
     return { values, errors };
@@ -275,7 +289,7 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
     }
     if (f.kind === "entity" || f.kind === "select") { // free text with suggestions
       const list = `dl-${f.name}`;
-      const ids = f.kind === "select" ? f.options.map((o) => o.value)
+      const ids = f.kind === "select" ? f.options.map((o) => (f.labelled ? o.label : o.value))
         : Object.keys((this._hass && this._hass.states) || {})
           .filter((id) => !f.domains.length || f.domains.includes(id.split(".")[0])).sort();
       return [
@@ -398,7 +412,7 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
       const input = el.querySelector(`[name="${f.name}"]`);
       if (!input) continue;
       if (f.kind === "boolean") input.checked = Boolean(dlg.values[f.name]);
-      else input.value = dlg.values[f.name] ?? "";
+      else input.value = f.kind === "select" && f.custom && f.labelled ? this._optionLabel(f, dlg.values[f.name] ?? "") : (dlg.values[f.name] ?? "");
     }
     const confirmName = el.querySelector(".confirm-name");
     if (confirmName) confirmName.focus();

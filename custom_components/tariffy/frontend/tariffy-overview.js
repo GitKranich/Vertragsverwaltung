@@ -140,6 +140,18 @@ export default ({ h, svg, icon, isNum, METERED, GRID }) => class {
   }
 
   /* Contracts that are not archived (loans are kept apart): the overview, the costs and the list only show these. */
+  /* house costs (waste fees, street cleaning, ...): flat-rate contracts that count in the totals, in a group of their own */
+  get _house() {
+    return this._live.filter((c) => c.sparte === "hauskosten");
+  }
+
+  /* the type of house costs under the name, unless the name already says it ("Abfallgebühren 2026") */
+  _houseCostMeta(c) {
+    if (c.sparte !== "hauskosten" || !c.hauskostenart) return null;
+    const type = this._houseCostType(c.hauskostenart);
+    return String(c.title).toLowerCase().includes(type.toLowerCase()) ? null : type;
+  }
+
   get _live() {
     return (this._contracts || []).filter((c) => !c.archiviert && c.sparte !== "loan");
   }
@@ -233,7 +245,7 @@ export default ({ h, svg, icon, isNum, METERED, GRID }) => class {
     return h(
       "div", { class: "who" },
       h("div", { class: "title", text: c.title }),
-      h("div", { class: "meta", text: [c.anbieter, c.tarif].filter(Boolean).join(" · ") })
+      h("div", { class: "meta", text: [this._houseCostMeta(c), c.anbieter, c.tarif].filter(Boolean).join(" · ") })
     );
   }
 

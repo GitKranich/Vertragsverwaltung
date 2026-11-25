@@ -14,7 +14,8 @@ export default ({ h, icon, isNum, METERED }) => class {
       list.map((c) => this._detail(c))) : null);
     return h("div", {}, head,
       group("groupMetered", this._live.filter((c) => METERED.has(c.sparte))),
-      group("groupFlat", this._live.filter((c) => !METERED.has(c.sparte))),
+      group("groupFlat", this._live.filter((c) => !METERED.has(c.sparte) && c.sparte !== "hauskosten")),
+      group("groupHouse", this._house),
       group("groupLoans", this._loans));
   }
 
@@ -58,6 +59,7 @@ export default ({ h, icon, isNum, METERED }) => class {
       section(this._t("secContract"), [
         row(this._t("provider"), c.anbieter), row(this._t("tariff"), c.tarif),
         row(this._t("insuranceType"), c.versicherungsart ? this._insuranceType(c.versicherungsart) : null),
+        row(this._t("houseCostType"), c.hauskostenart ? this._houseCostType(c.hauskostenart) : null),
         row(this._t("kmStart"), isNum(c.km_start) ? `${this._num(c.km_start, 0)} km` : null),
         row(this._t("kmPerYear"), isNum(c.km_pro_jahr) ? `${this._num(c.km_pro_jahr, 0)} km` : null),
         row(this._t("start"), c.beginn ? this._date(c.beginn) : null),

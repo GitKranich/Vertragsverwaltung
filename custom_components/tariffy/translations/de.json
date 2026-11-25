@@ -646,6 +646,26 @@
           "schlussrate": "Freiwillig: ein Betrag, der am Ende noch offen ist und mit der letzten Rate gezahlt wird (Autofinanzierung, Restwert)",
           "erste_zahlung": "Leer = ein Zahlungsintervall nach dem Beginn (bei monatlicher Zahlung: Ende des ersten Monats). Die weiteren Raten folgen im Abstand der Zahlweise."
         }
+      },
+      "hauskosten": {
+        "title": "Hauskosten",
+        "description": "Um welche Hauskosten geht es? Wähle aus der Liste oder tippe eigene Kosten ein. Alles danach läuft wie bei einem Pauschalvertrag.",
+        "data": {
+          "hauskostenart": "Art der Hauskosten"
+        },
+        "data_description": {
+          "hauskostenart": "Optional: zum Beispiel Abfallgebühren; Du kannst auch eigene eintippen"
+        }
+      },
+      "reconfigure_hauskosten": {
+        "title": "Hauskosten",
+        "description": "Um welche Hauskosten geht es? Wähle aus der Liste oder tippe eigene Kosten ein. Alles danach läuft wie bei einem Pauschalvertrag.",
+        "data": {
+          "hauskostenart": "Art der Hauskosten"
+        },
+        "data_description": {
+          "hauskostenart": "Optional: zum Beispiel Abfallgebühren; Du kannst auch eigene eintippen"
+        }
       }
     },
     "abort": {
@@ -700,7 +720,8 @@
         "insurance": "Versicherung",
         "other": "Sonstiges",
         "electricity_ht_nt": "Strom (Zweizählertarif, Hoch-/Niedertarif)",
-        "loan": "Kredit / Finanzierung"
+        "loan": "Kredit / Finanzierung",
+        "hauskosten": "Hauskosten"
       }
     },
     "erinnerung": {
@@ -745,6 +766,17 @@
         "saisonal": "Saisonal (Monatswerte der Vorjahre)",
         "letzte_30_tage": "Letzte 30 Tage",
         "durchschnitt": "Durchschnitt seit Vertragsbeginn"
+      }
+    },
+    "hauskostenart": {
+      "options": {
+        "waste": "Abfallgebühren",
+        "street_cleaning": "Straßenreinigung",
+        "rainwater": "Niederschlagswasser (Regenwassergebühr)",
+        "property_tax": "Grundsteuer",
+        "chimney_sweep": "Schornsteinfeger",
+        "winter_service": "Winterdienst",
+        "caretaker": "Hausmeister / Gebäudeservice"
       }
     }
   },

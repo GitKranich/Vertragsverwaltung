@@ -52,6 +52,7 @@ CONTRACT_FIELDS = (
     "anbieter",
     "tarif",
     "versicherungsart",
+    "hauskostenart",
     "km_start",
     "km_pro_jahr",
     "currency",

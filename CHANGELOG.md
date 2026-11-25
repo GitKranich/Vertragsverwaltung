@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0-beta.3] - 2026-11-25
+
+### Added
+
+- **New category "House costs"** (taken over from the original, weskona/tariffy 1.33.0) for the running costs around the house that have no meter: waste fees, street cleaning, rainwater (stormwater fee), property tax, chimney sweep, winter service and the like. It is a normal **flat-rate contract** (payment interval, amount per payment, start, end, reminder, one-time items, renew, plan next contract) with an additional, optional **type**: choose it from the list **or type your own** (for example "Garden waste"). In this version house costs also take **price changes** (for example the new waste fees from 1 January). House costs **count in the totals** and have a group of their own in the overview and in the contracts list, with a house icon; the type is shown under the name and in the details. A water contract that already has the rainwater fee does not need a separate house-cost contract for it (it would count twice).
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.42.0-beta.2] - 2026-11-25
 
 ### Changed

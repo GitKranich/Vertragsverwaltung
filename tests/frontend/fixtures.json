@@ -68,6 +68,7 @@
       "garten_verbrauch": null,
       "grundpreis": 11.51,
       "guthaben_bisher": -206.24,
+      "hauskostenart": null,
       "historie": [
         {
           "abgeschlossen": "2025-01-01",
@@ -210,6 +211,7 @@
       "garten_verbrauch": null,
       "grundpreis": 9.5,
       "guthaben_bisher": 452.39,
+      "hauskostenart": null,
       "historie": [],
       "icon": null,
       "jahreskosten": 1674.11,
@@ -330,6 +332,7 @@
       "garten_verbrauch": 12.0,
       "grundpreis": 6.0,
       "guthaben_bisher": 7.92,
+      "hauskostenart": null,
       "historie": [],
       "icon": null,
       "jahreskosten": 334.82,
@@ -441,6 +444,7 @@
       "garten_verbrauch": null,
       "grundpreis": 12.0,
       "guthaben_bisher": -186.57,
+      "hauskostenart": null,
       "historie": [],
       "icon": null,
       "jahreskosten": 657.69,
@@ -552,6 +556,7 @@
       "garten_verbrauch": null,
       "grundpreis": null,
       "guthaben_bisher": null,
+      "hauskostenart": null,
       "historie": [],
       "icon": "mdi:router-wireless",
       "jahreskosten": 478.2,
@@ -663,6 +668,7 @@
       "garten_verbrauch": null,
       "grundpreis": null,
       "guthaben_bisher": null,
+      "hauskostenart": null,
       "historie": [],
       "icon": null,
       "jahreskosten": 339.51,
@@ -781,6 +787,7 @@
       "garten_verbrauch": null,
       "grundpreis": 10.0,
       "guthaben_bisher": null,
+      "hauskostenart": null,
       "historie": [
         {
           "abgeschlossen": "2024-01-01",
@@ -924,6 +931,7 @@
       "garten_verbrauch": null,
       "grundpreis": null,
       "guthaben_bisher": null,
+      "hauskostenart": null,
       "historie": [],
       "icon": null,
       "jahreskosten": null,
@@ -994,6 +1002,118 @@
       "wechsel": null,
       "zaehlerstand_eingabe": null,
       "zahlweise": "monthly"
+    },
+    {
+      "abschlag": 31.0,
+      "abschlag_aenderung": null,
+      "abschlag_anpassung_empfohlen": null,
+      "abschlag_bisher_gezahlt": 279.0,
+      "abschlag_jahr": 372.0,
+      "abschlag_je_zahlung": 93.0,
+      "abschlag_warnung_aktiv": false,
+      "abschlag_warnung_zu_bestaetigen": false,
+      "abwasser_kosten": null,
+      "abwasserpflichtiger_verbrauch": null,
+      "anbieter": "Stadt Musterstadt",
+      "arbeitspreis": null,
+      "arbeitspreis_gesamt_wasser": null,
+      "arbeitspreis_ht": null,
+      "arbeitspreis_nacht": null,
+      "arbeitspreis_nt": null,
+      "archivierbar": false,
+      "archiviert": false,
+      "archiviert_am": null,
+      "aussenzaehler": [],
+      "beginn": "2026-01-01",
+      "bonus": null,
+      "currency": "EUR",
+      "dokumente": [],
+      "effektiver_arbeitspreis": null,
+      "einmal_summe": 0.0,
+      "einmalposten": [],
+      "empfohlener_abschlag": null,
+      "ende": null,
+      "entry_id": "contract-9",
+      "erinnerung_aktiv": false,
+      "erinnerung_bestaetigt": false,
+      "erinnerung_datum": null,
+      "erinnerung_monate": 0,
+      "erste_zahlung": null,
+      "garten_kosten": null,
+      "garten_verbrauch": null,
+      "grundpreis": null,
+      "guthaben_bisher": null,
+      "hauskostenart": "waste",
+      "historie": [],
+      "icon": null,
+      "jahreskosten": 372.0,
+      "km_pro_jahr": null,
+      "km_start": null,
+      "kosten_bisher": null,
+      "kosten_gesamt": 279.0,
+      "kosten_gesamt_vollstaendig": true,
+      "kosten_ht_bisher": null,
+      "kosten_jahr": 372.0,
+      "kosten_nt_bisher": null,
+      "kredit_effektivzins": null,
+      "kredit_erste_zahlung": null,
+      "kredit_gesamtkosten": null,
+      "kredit_gezahlt": null,
+      "kredit_naechste_betrag": null,
+      "kredit_naechste_zahlung": null,
+      "kredit_rate": null,
+      "kredit_rate_abweichung": null,
+      "kredit_rate_berechnet": null,
+      "kredit_rate_passt": null,
+      "kredit_restschuld": null,
+      "kredit_restsumme": null,
+      "kredit_schlussrate": null,
+      "kredit_sollzins": null,
+      "kredit_summe": null,
+      "kredit_tilgung_anteil": null,
+      "kredit_tilgung_bisher": null,
+      "kredit_tilgung_prozent": null,
+      "kredit_zahlungen_geleistet": null,
+      "kredit_zahlungen_gesamt": null,
+      "kredit_zins_anteil": null,
+      "kredit_zinsen_bisher": null,
+      "kredit_zinsen_gesamt": null,
+      "kuendigung_bis": null,
+      "kuendigungsfrist": null,
+      "laufzeit_monate": null,
+      "laufzeiten_anzahl": 1,
+      "mindestlaufzeit": null,
+      "mindestlaufzeit_bis": null,
+      "naechste_preisaenderung": null,
+      "naechste_zahlung": "2026-10-01",
+      "next": null,
+      "niederschlag_flaeche": null,
+      "niederschlag_gebuehr": null,
+      "niederschlag_jahr": null,
+      "preis_basis": null,
+      "preisaenderung_moeglich": true,
+      "preisaenderungen": [],
+      "prognose": null,
+      "prognose_methode": null,
+      "prognose_real": null,
+      "restlaufzeit": null,
+      "seit": "2026-01-01",
+      "sofortbonus": null,
+      "sparte": "hauskosten",
+      "tarif": "Restmüll und Biotonne",
+      "title": "Abfallgebühren",
+      "verbrauch_bisher": null,
+      "verbrauch_bisher_ht": null,
+      "verbrauch_bisher_nt": null,
+      "verbrauch_einheit": null,
+      "verbrauch_hochgerechnet": null,
+      "verbrauch_letzte_laufzeit": null,
+      "verbrauch_letzte_laufzeit_monate": null,
+      "verlaengerbar": false,
+      "versicherungsart": null,
+      "wechsel": null,
+      "zaehlerstand_eingabe": null,
+      "zahlweise": "quarterly"
     }
   ],
   "create": {
@@ -1028,6 +1148,7 @@
                 "streaming",
                 "loan",
                 "insurance",
+                "hauskosten",
                 "other"
               ],
               "sort": false,
@@ -3239,6 +3360,91 @@
       "preview": null,
       "step_id": "init",
       "type": "form"
+    },
+    "contract-9": {
+      "data_schema": [
+        {
+          "name": "next_beginn",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "date": {}
+          }
+        },
+        {
+          "name": "next_anbieter",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "text": {
+              "multiline": false,
+              "multiple": false
+            }
+          }
+        },
+        {
+          "name": "next_kundennummer",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "text": {
+              "multiline": false,
+              "multiple": false
+            }
+          }
+        },
+        {
+          "name": "next_tarif",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "text": {
+              "multiline": false,
+              "multiple": false
+            }
+          }
+        },
+        {
+          "name": "next_abschlag",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "number": {
+              "min": 0.0,
+              "mode": "box",
+              "step": 0.01
+            }
+          }
+        },
+        {
+          "name": "next_grundpreis",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "number": {
+              "min": 0.0,
+              "mode": "box",
+              "step": 0.01
+            }
+          }
+        },
+        {
+          "name": "next_ende",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "date": {}
+          }
+        }
+      ],
+      "description_placeholders": null,
+      "errors": {},
+      "flow_id": "flow-9",
+      "handler": "contract-9",
+      "last_step": null,
+      "preview": null,
+      "step_id": "init",
+      "type": "form"
     }
   },
   "reconfigure": {
@@ -3275,6 +3481,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -3711,6 +3918,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -4152,6 +4360,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -4549,6 +4758,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -5037,6 +5247,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -5293,6 +5504,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -5540,6 +5752,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -5973,6 +6186,7 @@
                   "streaming",
                   "loan",
                   "insurance",
+                  "hauskosten",
                   "other"
                 ],
                 "sort": false,
@@ -6238,6 +6452,225 @@
         "last_step": null,
         "preview": null,
         "step_id": "reconfigure_kredit",
+        "type": "form"
+      }
+    },
+    "contract-9": {
+      "first": {
+        "data_schema": [
+          {
+            "default": "Abfallgebühren",
+            "name": "name",
+            "required": true,
+            "selector": {
+              "text": {
+                "multiline": false,
+                "multiple": false
+              }
+            }
+          },
+          {
+            "default": "hauskosten",
+            "name": "sparte",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "electricity",
+                  "electricity_ht_nt",
+                  "gas",
+                  "water",
+                  "internet",
+                  "mobile",
+                  "streaming",
+                  "loan",
+                  "insurance",
+                  "hauskosten",
+                  "other"
+                ],
+                "sort": false,
+                "translation_key": "sparte"
+              }
+            }
+          },
+          {
+            "default": "Stadt Musterstadt",
+            "name": "anbieter",
+            "required": true,
+            "selector": {
+              "text": {
+                "multiline": false,
+                "multiple": false
+              }
+            }
+          },
+          {
+            "name": "kundennummer",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "text": {
+                "multiline": false,
+                "multiple": false
+              }
+            }
+          },
+          {
+            "description": {
+              "suggested_value": "Restmüll und Biotonne"
+            },
+            "name": "tarif",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "text": {
+                "multiline": false,
+                "multiple": false
+              }
+            }
+          },
+          {
+            "description": {
+              "suggested_value": "2026-01-01"
+            },
+            "name": "beginn",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
+            }
+          },
+          {
+            "name": "ende",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "date": {}
+            }
+          },
+          {
+            "name": "mindestlaufzeit",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "max": 120.0,
+                "min": 0.0,
+                "mode": "box",
+                "step": 1.0
+              }
+            }
+          },
+          {
+            "name": "kuendigungsfrist",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "number": {
+                "max": 120.0,
+                "min": 0.0,
+                "mode": "box",
+                "step": 1.0
+              }
+            }
+          },
+          {
+            "default": "0",
+            "name": "erinnerung_monate",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "0",
+                  "1",
+                  "2",
+                  "3",
+                  "4"
+                ],
+                "sort": false,
+                "translation_key": "erinnerung"
+              }
+            }
+          },
+          {
+            "name": "notify_target",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "select": {
+                "custom_value": true,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "notify.mobile_app_pixel",
+                    "value": "mobile_app_pixel"
+                  }
+                ],
+                "sort": false
+              }
+            }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
+            }
+          }
+        ],
+        "description_placeholders": null,
+        "errors": null,
+        "flow_id": "rflow-9",
+        "handler": "tariffy",
+        "last_step": null,
+        "preview": null,
+        "step_id": "reconfigure",
+        "type": "form"
+      },
+      "second": {
+        "data_schema": [
+          {
+            "description": {
+              "suggested_value": "waste"
+            },
+            "name": "hauskostenart",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "select": {
+                "custom_value": true,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  "waste",
+                  "street_cleaning",
+                  "rainwater",
+                  "property_tax",
+                  "chimney_sweep",
+                  "winter_service",
+                  "caretaker"
+                ],
+                "sort": false,
+                "translation_key": "hauskostenart"
+              }
+            }
+          }
+        ],
+        "description_placeholders": null,
+        "errors": null,
+        "flow_id": "rflow-9",
+        "handler": "tariffy",
+        "last_step": false,
+        "preview": null,
+        "step_id": "reconfigure_hauskosten",
         "type": "form"
       }
     }

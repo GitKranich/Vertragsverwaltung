@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.42.0-beta.3] - 2026-11-25
+
+### Hinzugefügt
+
+- **Neue Sparte „Hauskosten“** (übernommen aus dem Original, weskona/tariffy 1.33.0) für die laufenden Kosten rund ums Haus ohne Zähler: Abfallgebühren, Straßenreinigung, Niederschlagswasser (Regenwassergebühr), Grundsteuer, Schornsteinfeger, Winterdienst und Ähnliches. Ein normaler **Pauschalvertrag** (Zahlweise, Betrag je Zahlung, Beginn, Ende, Erinnerung, Einmalposten, Verlängern, Folgevertrag) mit einer zusätzlichen, freiwilligen **Art**: aus der Liste wählen **oder selbst eintippen** (z. B. „Gartenabfall“). In dieser Version gehen bei Hauskosten auch **Preisänderungen** (z. B. die neuen Abfallgebühren ab 1. Januar). Hauskosten **zählen in den Summen** und haben in der Übersicht und in der Vertragsliste eine eigene Gruppe mit Haus-Icon; die Art steht unter dem Namen und in den Details. Hat ein Wasservertrag schon die Niederschlagswassergebühr, braucht es dafür keinen eigenen Hauskosten-Vertrag (sie würde doppelt zählen).
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.42.0-beta.2] - 2026-11-25
 
 ### Geändert

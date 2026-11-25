@@ -9,15 +9,15 @@ damit der nächste Vergleich dort weitermacht.
 
 | | Version | Commit | Datum |
 |---|---|---|---|
-| Zuletzt verglichen (stabil) | 1.32.0 | `1f9c3cb` (main bis `6bbd25e`) | 2026-11-19 |
-| Zuletzt verglichen (beta) | 1.33.0-beta.1 | `c82176b` | 2026-11-20 |
+| Zuletzt verglichen (stabil) | 1.33.0 | `ba4a28c` (main bis `aa8ad9b`) | 2026-11-25 |
+| Zuletzt verglichen (beta) | 1.33.0 | `ba4a28c` (beta bis `38d2c09`) | 2026-11-25 |
 
-Nächster Vergleich: alles im Original nach `6bbd25e` (main) bzw. `c82176b` (beta).
+Nächster Vergleich: alles im Original nach `aa8ad9b` (main) bzw. `38d2c09` (beta).
 
 ```bash
 git remote add upstream https://github.com/weskona/tariffy.git   # einmalig
 git fetch upstream --tags
-git log --oneline --no-merges 6bbd25e..upstream/main -- custom_components
+git log --oneline --no-merges aa8ad9b..upstream/main -- custom_components
 ```
 
 ## Übernommen
@@ -29,6 +29,7 @@ git log --oneline --no-merges 6bbd25e..upstream/main -- custom_components
 | 1.32.0 | Helles Design (folgt Home Assistant), erweitert auf Dokumente, Diagramme, Preisänderungen | 1.40.0-beta.1 / 1.41.0 |
 | 1.32.0 (#93) | Eigenes Icon pro Vertrag | 1.40.0-beta.1 / 1.41.0 |
 | 1.32.0 | Panel aufgeteilt in Code, Texte, Icons, Styles; Laden mit `?v=`, kein top-level await | 1.42.0-beta.1 |
+| 1.33.0 (#122) | Sparte Hauskosten mit Art aus Liste oder frei getippt; hier zusätzlich mit Preisänderungen | 1.42.0-beta.3 |
 
 ## Offen (noch nicht übernommen)
 
@@ -43,8 +44,10 @@ git log --oneline --no-merges 6bbd25e..upstream/main -- custom_components
 | 1.32.0 | Kurzes Folgevertrag-Formular für Streaming, "Preis" statt "Abschlag" | klein, Formular und Texte |
 | 1.32.0 | Pauschal-Formular nur noch mit einem Betrag | prüfen gegen Preisänderungen bei Pauschalverträgen (1.35.0 hier) |
 | 1.32.0 | Panel stand schwarz beim Öffnen | mit 1.42.0-beta.1 enthalten (Ladeverfahren) |
-| 1.33.0-beta.1 (#122) | Sparte Hauskosten mit Art aus Liste oder frei | erst nach stabiler Version im Original |
-| unreleased | Neues Logo und Icon | bewusst offen: eigene Version, eigenes Erscheinungsbild |
+| 1.32.0 (#103) / Hauskosten | Verlängern ohne Enddatum (Hauskosten ohne Ende sind hier wie alle Pauschalverträge erst mit Ende verlängerbar) | klein |
+| 1.33.0 (#123) | Ausgefallene Zahlung im Abschlagsverlauf als 0 € | nur zusammen mit „Abschläge je Zahlung korrigieren“ |
+| 1.33.0 | Hauskosten: „Betrag“ statt „Abschlag“ in den Texten (`_tc`, Varianten `_hauskosten`) | hängt am Abschlagsverlauf je Zahlung, der hier fehlt |
+| 1.33.0 | Neues Logo und Icon | bewusst offen: eigene Version, eigenes Erscheinungsbild |
 
 ## Bewusst nicht übernommen
 

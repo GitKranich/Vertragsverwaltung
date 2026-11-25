@@ -311,6 +311,11 @@ class TariffyPanel extends HTMLElement {
     return d ? Math.round((d - this._today()) / 86400000) : null;
   }
 
+  _houseCostType(key) {
+    const labels = (I18N[this._lang] && I18N[this._lang].hauskostenart) || I18N.en.hauskostenart;
+    return labels[key] || key; // a type the user typed is shown as it is
+  }
+
   _insuranceType(key) {
     const labels = (I18N[this._lang] && I18N[this._lang].versicherungsart) || I18N.en.versicherungsart;
     return labels[key] || key;
@@ -387,7 +392,8 @@ class TariffyPanel extends HTMLElement {
       // and leaves the whole panel empty for anyone who has only metered or only flat-rate contracts)
       for (const section of [
         group("groupMetered", this._live.filter((c) => METERED.has(c.sparte)), "metered"),
-        group("groupFlat", this._live.filter((c) => !METERED.has(c.sparte)), "flat"),
+        group("groupFlat", this._live.filter((c) => !METERED.has(c.sparte) && c.sparte !== "hauskosten"), "flat"),
+        group("groupHouse", this._house, "flat"),
         group("groupLoans", this._loans, "flat"),
       ]) {
         if (section) wrap.appendChild(section);

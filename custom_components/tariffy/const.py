@@ -101,6 +101,21 @@ CONF_VERBRAUCH_LETZTE_LAUFZEIT_MONATE = "verbrauch_letzte_laufzeit_monate"
 # das die automatische Erkennung normalerweise funktioniert.
 CONF_VERBRAUCH_START_WERT = "verbrauch_start_wert"
 
+# Hauskosten (aus weskona/tariffy 1.33.0, Issue 121 dort): Abfallgebuehren, Strassenreinigung, Niederschlagswasser,
+# Grundsteuer usw. Ein Pauschalvertrag wie jeder andere (zaehlt in den Summen mit, Preisaenderungen moeglich); dazu die
+# freiwillige "Art" aus einer festen Liste oder frei getippt.
+SPARTE_HAUSKOSTEN = "hauskosten"
+CONF_HAUSKOSTENART = "hauskostenart"
+HAUSKOSTENARTEN = [
+    "waste",
+    "street_cleaning",
+    "rainwater",
+    "property_tax",
+    "chimney_sweep",
+    "winter_service",
+    "caretaker",
+]
+
 # Versicherung (nur Sparte "insurance"): Art der Versicherung und, fuer eine
 # Kfz-Versicherung, Kennzeichen, Kilometerstand bei Vertragsbeginn und die
 # vereinbarten Kilometer pro Jahr. Nur zur Dokumentation, es wird nichts
@@ -238,7 +253,7 @@ PREISAENDERUNGEN_MAX = 50
 PREISAENDERUNG_SPARTEN = ("electricity", "gas")
 # Pauschalvertraege mit Beitrags-/Preiserhoehung im laufenden Vertrag: neuer Betrag pro Zahlung ab
 # einem Datum (gespeichert als Monatsbetrag `abschlag`, wie der Vertrag selbst). Kein Kredit.
-PREISAENDERUNG_PAUSCHAL_SPARTEN = ("insurance", "internet", "mobile", "streaming", "other")
+PREISAENDERUNG_PAUSCHAL_SPARTEN = ("insurance", "internet", "mobile", "streaming", "hauskosten", "other")
 
 # Zukünftiger Vertrag
 NEXT_PREFIX = "next_"
@@ -281,6 +296,7 @@ BASIS_FELDER = [
     CONF_VERSICHERUNGSART,
     CONF_KENNZEICHEN,
     CONF_KM_PRO_JAHR,
+    CONF_HAUSKOSTENART,
     # die Zahlweise eines Pauschalvertrags gilt auch fuer den Folgevertrag (sonst fiel er auf monatlich zurueck)
     CONF_ZAHLWEISE,
 ]
@@ -304,6 +320,7 @@ SPARTEN = [
     "streaming",
     SPARTE_LOAN,
     SPARTE_INSURANCE,
+    SPARTE_HAUSKOSTEN,
     "other",
 ]
 

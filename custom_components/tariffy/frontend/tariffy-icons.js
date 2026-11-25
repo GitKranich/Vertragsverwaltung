@@ -40,6 +40,11 @@ export const ICONS = {
   download: [["path", { d: "M12 4v11M7 10l5 5 5-5M5 20h14" }]],
   external: [["path", { d: "M14 4h6v6M20 4l-9 9" }], ["path", { d: "M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" }]],
   renew: [["path", { d: "M20 11a8 8 0 0 0-14.500-3.500M4 5v4h4" }], ["path", { d: "M4 13a8 8 0 0 0 14.500 3.500M20 19v-4h-4" }]],
+  hauskosten: [
+    ["path", { d: "M4 11l8-6.500 8 6.500" }],
+    ["path", { d: "M6 10v9.500h12V10" }],
+    ["path", { d: "M10 19.500v-5h4v5" }],
+  ],
   other: [
     ["circle", { cx: "6", cy: "12", r: "1.600", fill: "currentColor" }],
     ["circle", { cx: "12", cy: "12", r: "1.600", fill: "currentColor" }],

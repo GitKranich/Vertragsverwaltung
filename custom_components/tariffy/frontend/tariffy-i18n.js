@@ -36,7 +36,7 @@ export const I18N = {
     costsHint: "Positive = credit, negative = balance due. “At contract end” is projected from the consumption so far. For flat-rate contracts the cost so far is the instalments due until today.",
     secContract: "Contract", secPrices: "Prices", secConsumption: "Consumption",
     secAdvice: "Recommendations", secNext: "Next contract",
-    provider: "Provider", tariff: "Tariff", insuranceType: "Type of insurance", kmStart: "Odometer at start", kmPerYear: "Allowed per year", start: "Start", end: "End",
+    provider: "Provider", tariff: "Tariff", insuranceType: "Type of insurance", houseCostType: "Type of house costs", kmStart: "Odometer at start", kmPerYear: "Allowed per year", start: "Start", end: "End",
     unitPrice: "Unit price", unitPriceLow: "Unit price low tariff", unitPriceNight: "Unit price night",
     unitPriceEff: "Unit price effective", unitPriceWater: "Water price incl. wastewater",
     basePrice: "Base price", perMonth: "/ month",
@@ -166,7 +166,7 @@ export const I18N = {
     docErr_duplicate: "This document is already linked to the contract.", docErr_too_many: "There are too many linked documents (30).",
     gardenUse: "Outdoor water", gardenCost: "Outdoor water cost", wwUse: "Wastewater-liable consumption", wwCost: "Wastewater cost",
     termErr_invalid_name: "Enter a name.", termErr_invalid_sensor: "Enter the entity id of a sensor (for example sensor.garden_water).", termErr_same_sensor: "This is the main meter of the contract.",
-    groupLoans: "Loans / financing", secLoan: "Loan", loanDebt: "Remaining debt", loanPaid: "Paid so far", loanRemainingSum: "Remaining payments",
+    groupLoans: "Loans / financing", groupHouse: "House costs", secLoan: "Loan", loanDebt: "Remaining debt", loanPaid: "Paid so far", loanRemainingSum: "Remaining payments",
     loanNext: "Next payment", loanSplit: "interest {z} · principal {t}", loanRepaid: "Repaid", loanPayments: "Payments made", loanEffective: "effective {v} %",
     loanInterestOf: "of which interest {v}", loanInterestTotalOf: "interest over the term {v}", loanAmount: "Loan amount", loanNominal: "Nominal interest rate",
     loanEffectiveRow: "Effective interest rate", loanTerm: "Term", loanRatePaid: "Rate", loanRateCalc: "Rate by the interest", loanFinal: "Final payment at the end",
@@ -203,11 +203,15 @@ export const I18N = {
     adviceNone: "No instalment needed: the credit covers the costs until the contract ends", adviceOk: "The instalment fits",
     sparte: {
       electricity: "Electricity", electricity_ht_nt: "Electricity HT/NT", gas: "Gas",
-      water: "Water", internet: "Internet", mobile: "Mobile", streaming: "Streaming", loan: "Loan", insurance: "Insurance", other: "Other",
+      water: "Water", internet: "Internet", mobile: "Mobile", streaming: "Streaming", loan: "Loan", insurance: "Insurance", hauskosten: "House costs", other: "Other",
     },
     versicherungsart: {
       car: "Car", house: "Building / house", household: "Household contents", liability: "Liability",
       health: "Health", life: "Life", legal: "Legal protection", accident: "Accident", other: "Other",
+    },
+    hauskostenart: {
+      waste: "Waste fees", street_cleaning: "Street cleaning", rainwater: "Rainwater (stormwater fee)", property_tax: "Property tax",
+      chimney_sweep: "Chimney sweep", winter_service: "Winter service", caretaker: "Caretaker / building services",
     },
   },
   de: {
@@ -245,7 +249,7 @@ export const I18N = {
     costsHint: "Positiv = Guthaben, negativ = Nachzahlung. „Zum Vertragsende“ ist aus dem bisherigen Verbrauch hochgerechnet. Bei Pauschalverträgen sind die Kosten bisher die bis heute fälligen Abschläge.",
     secContract: "Vertrag", secPrices: "Preise", secConsumption: "Verbrauch",
     secAdvice: "Empfehlungen", secNext: "Folgevertrag",
-    provider: "Anbieter", tariff: "Tarif", insuranceType: "Art der Versicherung", kmStart: "Kilometerstand bei Beginn", kmPerYear: "Erlaubt pro Jahr", start: "Beginn", end: "Ende",
+    provider: "Anbieter", tariff: "Tarif", insuranceType: "Art der Versicherung", houseCostType: "Art der Hauskosten", kmStart: "Kilometerstand bei Beginn", kmPerYear: "Erlaubt pro Jahr", start: "Beginn", end: "Ende",
     unitPrice: "Arbeitspreis", unitPriceLow: "Arbeitspreis Niedertarif", unitPriceNight: "Arbeitspreis Nacht",
     unitPriceEff: "Arbeitspreis effektiv", unitPriceWater: "Wasserpreis inkl. Abwasser",
     basePrice: "Grundpreis", perMonth: "/ Monat",
@@ -376,7 +380,7 @@ export const I18N = {
     docErr_duplicate: "Dieses Dokument ist bereits mit dem Vertrag verknüpft.", docErr_too_many: "Es sind zu viele Dokumente verknüpft (30).",
     gardenUse: "Gartenwasser", gardenCost: "Gartenwasser-Kosten", wwUse: "Abwasserpflichtiger Verbrauch", wwCost: "Abwasserkosten",
     termErr_invalid_name: "Trage einen Namen ein.", termErr_invalid_sensor: "Trage die Entity-ID eines Sensors ein (zum Beispiel sensor.garten_wasser).", termErr_same_sensor: "Das ist der Hauptzähler des Vertrags.",
-    groupLoans: "Kredite / Finanzierungen", secLoan: "Kredit", loanDebt: "Restschuld", loanPaid: "Gezahlt bisher", loanRemainingSum: "Restsumme",
+    groupLoans: "Kredite / Finanzierungen", groupHouse: "Hauskosten", secLoan: "Kredit", loanDebt: "Restschuld", loanPaid: "Gezahlt bisher", loanRemainingSum: "Restsumme",
     loanNext: "Nächste Rate", loanSplit: "Zinsen {z} · Tilgung {t}", loanRepaid: "Getilgt", loanPayments: "Raten gezahlt", loanEffective: "effektiv {v} %",
     loanInterestOf: "davon Zinsen {v}", loanInterestTotalOf: "Zinsen insgesamt {v}", loanAmount: "Kreditsumme", loanNominal: "Sollzins",
     loanEffectiveRow: "Effektiver Jahreszins", loanTerm: "Laufzeit", loanRatePaid: "Rate", loanRateCalc: "Rate laut Zins", loanFinal: "Schlussrate am Ende",
@@ -413,11 +417,15 @@ export const I18N = {
     adviceNone: "Kein Abschlag nötig: Das Guthaben deckt die Kosten bis Vertragsende", adviceOk: "Der Abschlag passt",
     sparte: {
       electricity: "Strom", electricity_ht_nt: "Strom HT/NT", gas: "Gas",
-      water: "Wasser", internet: "Internet", mobile: "Mobilfunk", streaming: "Streaming", loan: "Kredit", insurance: "Versicherung", other: "Sonstiges",
+      water: "Wasser", internet: "Internet", mobile: "Mobilfunk", streaming: "Streaming", loan: "Kredit", insurance: "Versicherung", hauskosten: "Hauskosten", other: "Sonstiges",
     },
     versicherungsart: {
       car: "Auto (Kfz)", house: "Gebäude / Haus", household: "Hausrat", liability: "Haftpflicht",
       health: "Kranken", life: "Leben", legal: "Rechtsschutz", accident: "Unfall", other: "Sonstige",
+    },
+    hauskostenart: {
+      waste: "Abfallgebühren", street_cleaning: "Straßenreinigung", rainwater: "Niederschlagswasser (Regenwassergebühr)", property_tax: "Grundsteuer",
+      chimney_sweep: "Schornsteinfeger", winter_service: "Winterdienst", caretaker: "Hausmeister / Gebäudeservice",
     },
   },
 };
