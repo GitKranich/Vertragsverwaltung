@@ -149,6 +149,15 @@ const I18N = {
     aussenHint: "Water that does not go into the sewer (garden, pool, irrigation). Its consumption is part of the main meter and is charged without wastewater.",
     aussenName: "Name", aussenSensor: "Consumption sensor", aussenStart: "Start value (optional)", aussenPrice: "Own price per unit (optional)",
     aussenDelete: "Delete meter", aussenDeleteAsk: "Delete this outdoor meter?", aussenTooMany: "There are too many outdoor meters (10).",
+    secDocs: "Documents", docLink: "Link document", docTitleLink: "Link a Paperless document", docTitleEdit: "Edit document link",
+    docHint: "Only a link is stored, the document stays in Paperless. Who may open it is decided by the integration Paperless-ngx Insights.",
+    docQuery: "Search in Paperless", docModeTitle: "Title", docModeText: "Full text", docSearch: "Search", docSearching: "Searching …", docConnection: "Paperless connection",
+    docNone: "No documents found.", docMore: "More results", docLinked: "already linked", docFound: "{n} documents found",
+    docLabel: "Label (optional, e.g. contract, price letter)", docOpen: "Open", docDownload: "Download", docInPaperless: "Open in Paperless", docEdit: "Edit link",
+    docRemove: "Remove link", docRemoveAsk: "Remove this link? The document stays in Paperless.", docRemoveYes: "Yes, remove",
+    docOffline: "Paperless-ngx Insights is not available, the documents cannot be opened right now.", docPickFirst: "Choose a document from the results.",
+    docOpenFailed: "The document could not be opened ({m}).", docTooLarge: "The document is too large for the preview. Use Download.", docSearchFailed: "Search failed: {m}",
+    docErr_duplicate: "This document is already linked to the contract.", docErr_too_many: "There are too many linked documents (30).",
     gardenUse: "Outdoor water", gardenCost: "Outdoor water cost", wwUse: "Wastewater-liable consumption", wwCost: "Wastewater cost",
     termErr_invalid_name: "Enter a name.", termErr_invalid_sensor: "Enter the entity id of a sensor (for example sensor.garden_water).", termErr_same_sensor: "This is the main meter of the contract.",
     groupLoans: "Loans / financing", secLoan: "Loan", loanDebt: "Remaining debt", loanPaid: "Paid so far", loanRemainingSum: "Remaining payments",
@@ -336,6 +345,15 @@ const I18N = {
     aussenHint: "Wasser, das nicht in die Kanalisation fließt (Garten, Pool, Bewässerung). Sein Verbrauch ist im Hauptzähler enthalten und wird ohne Abwasser berechnet.",
     aussenName: "Name", aussenSensor: "Verbrauchssensor", aussenStart: "Startwert (optional)", aussenPrice: "Eigener Preis je Einheit (optional)",
     aussenDelete: "Zähler löschen", aussenDeleteAsk: "Diesen Außenzähler löschen?", aussenTooMany: "Es gibt zu viele Außenzähler (10).",
+    secDocs: "Dokumente", docLink: "Dokument verknüpfen", docTitleLink: "Paperless-Dokument verknüpfen", docTitleEdit: "Verknüpfung bearbeiten",
+    docHint: "Gespeichert wird nur ein Verweis, das Dokument bleibt in Paperless. Wer es öffnen darf, entscheidet die Integration Paperless-ngx Insights.",
+    docQuery: "In Paperless suchen", docModeTitle: "Titel", docModeText: "Volltext", docSearch: "Suchen", docSearching: "Suche läuft …", docConnection: "Paperless-Verbindung",
+    docNone: "Keine Dokumente gefunden.", docMore: "Weitere Treffer", docLinked: "bereits verknüpft", docFound: "{n} Dokumente gefunden",
+    docLabel: "Bezeichnung (optional, z. B. Vertrag, Preisbrief)", docOpen: "Öffnen", docDownload: "Herunterladen", docInPaperless: "In Paperless öffnen", docEdit: "Verknüpfung bearbeiten",
+    docRemove: "Verknüpfung entfernen", docRemoveAsk: "Diese Verknüpfung entfernen? Das Dokument bleibt in Paperless.", docRemoveYes: "Ja, entfernen",
+    docOffline: "Paperless-ngx Insights ist nicht erreichbar, die Dokumente lassen sich gerade nicht öffnen.", docPickFirst: "Wähle ein Dokument aus den Treffern.",
+    docOpenFailed: "Das Dokument konnte nicht geöffnet werden ({m}).", docTooLarge: "Das Dokument ist zu groß für die Vorschau. Nutze Herunterladen.", docSearchFailed: "Suche fehlgeschlagen: {m}",
+    docErr_duplicate: "Dieses Dokument ist bereits mit dem Vertrag verknüpft.", docErr_too_many: "Es sind zu viele Dokumente verknüpft (30).",
     gardenUse: "Gartenwasser", gardenCost: "Gartenwasser-Kosten", wwUse: "Abwasserpflichtiger Verbrauch", wwCost: "Abwasserkosten",
     termErr_invalid_name: "Trage einen Namen ein.", termErr_invalid_sensor: "Trage die Entity-ID eines Sensors ein (zum Beispiel sensor.garten_wasser).", termErr_same_sensor: "Das ist der Hauptzähler des Vertrags.",
     groupLoans: "Kredite / Finanzierungen", secLoan: "Kredit", loanDebt: "Restschuld", loanPaid: "Gezahlt bisher", loanRemainingSum: "Restsumme",
@@ -428,6 +446,10 @@ const ICONS = {
   plus: [["path", { d: "M12 5v14M5 12h14" }]],
   meter: [["rect", { x: "3", y: "6", width: "18", height: "12", rx: "2" }], ["path", { d: "M7 10v4M10.500 10v4M14 10v4M17.500 10v4" }]],
   chevron: [["path", { d: "M9 6l6 6-6 6" }]],
+  doc: [["path", { d: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" }], ["path", { d: "M14 3v5h5M9 13h6M9 17h4" }]],
+  eye: [["path", { d: "M2 12s3.500-7 10-7 10 7 10 7-3.500 7-10 7S2 12 2 12z" }], ["circle", { cx: "12", cy: "12", r: "3" }]],
+  download: [["path", { d: "M12 4v11M7 10l5 5 5-5M5 20h14" }]],
+  external: [["path", { d: "M14 4h6v6M20 4l-9 9" }], ["path", { d: "M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" }]],
   renew: [["path", { d: "M20 11a8 8 0 0 0-14.500-3.500M4 5v4h4" }], ["path", { d: "M4 13a8 8 0 0 0 14.500 3.500M20 19v-4h-4" }]],
   other: [
     ["circle", { cx: "6", cy: "12", r: "1.600", fill: "currentColor" }],
@@ -629,6 +651,19 @@ tr.sub td:first-child { padding-left: 32px; }
 .aussen-sec { grid-column: 1 / -1; }
 .aussen-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); column-gap: 18px; }
 .once-add { margin-top: 8px; }
+.doc-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.doc-row .dn { min-width: 0; overflow-wrap: anywhere; }
+.doc-row .t2, .doc-hit .t2 { display: block; font-size: 12px; color: var(--muted); }
+.doc-row .da { display: flex; flex: none; }
+a.icon-btn { color: var(--muted); text-decoration: none; }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.doc-search { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.doc-search .fld { flex: 1 1 220px; margin: 0; }
+.doc-search .fld.mode { flex: 0 1 130px; }
+.doc-results { max-height: 42vh; overflow: auto; margin-top: 10px; }
+.doc-hit { appearance: none; width: 100%; display: block; text-align: left; font: inherit; font-size: 14px; color: var(--text); background: none; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; overflow-wrap: anywhere; }
+.doc-hit.on { border-color: var(--blue); background: rgba(96,165,250,.12); }
+.doc-hit:disabled { opacity: .5; cursor: default; }
 .chart { margin-bottom: 22px; }
 .chart-ctl { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 0 0 14px; }
 .yr-pick { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
@@ -1865,6 +1900,7 @@ class TariffyPanel extends HTMLElement {
     if (dlg.mode === "meter") { this._renderMeterDialog(); return; }
     if (dlg.mode === "import") { this._renderImportDialog(); return; }
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
+    if (dlg.mode === "doc") { this._renderDocDialog(); return; }
     const busy = dlg.stage === "saving";
     const body = [h("h2", { id: "dlg-title", text: this._t({ edit: "dlgTitleEdit", create: "dlgTitleCreate", next: "dlgTitle" }[dlg.mode], { name: dlg.name }) })];
     const buttons = [];
@@ -2815,6 +2851,256 @@ class TariffyPanel extends HTMLElement {
       }, icon("plus"), this._t("aussenAdd"))) : null);
   }
 
+  /* ----- documents from Paperless-ngx (integration "Paperless-ngx Insights"): only links are stored ----- */
+  _plLoad() {
+    if (this._pl || !this._hass) return;
+    this._pl = { state: "loading", entries: [] };
+    Promise.resolve(this._hass.callWS({ type: "paperless_ngx_insights/entries" }))
+      .then((list) => {
+        const entries = Array.isArray(list) ? list.filter((e) => e && typeof e.entry_id === "string") : [];
+        this._pl = { state: entries.length ? "ok" : "none", entries };
+      })
+      .catch(() => { this._pl = { state: "none", entries: [] }; }) // not installed, or no access for this user
+      .then(() => this._render());
+  }
+
+  _docSection(c) {
+    const items = c.dokumente || [];
+    this._plLoad();
+    const pl = this._pl || { state: "loading", entries: [] };
+    const canLink = this._isAdmin && pl.state === "ok";
+    if (!items.length && !canLink) return null;
+    const btn = (name, label, onclick, off) => h("button", {
+      class: "icon-btn", type: "button", title: label, "aria-label": label, disabled: off ? "" : null, onclick,
+    }, icon(name));
+    const rows = items.map((item) => {
+      const off = !pl.entries.some((e) => e.entry_id === item.paperless_entry);
+      const sub = [item.bezeichnung ? item.titel : null, item.erstellt ? this._date(item.erstellt) : null].filter(Boolean).join(" · ");
+      const web = typeof item.web_url === "string" && /^https?:\/\//.test(item.web_url)
+        ? `${item.web_url}/documents/${encodeURIComponent(item.id)}/details` : null;
+      return h("div", { class: "doc-row" },
+        h("span", { class: "dn" }, item.bezeichnung || item.titel, sub ? h("span", { class: "t2", text: sub }) : null),
+        h("span", { class: "da" },
+          btn("eye", this._t("docOpen"), () => this._docOpen(c, item), off),
+          btn("download", this._t("docDownload"), () => this._docDownload(c, item), off),
+          web ? h("a", { class: "icon-btn", href: web, target: "_blank", rel: "noopener noreferrer",
+            title: this._t("docInPaperless"), "aria-label": this._t("docInPaperless") }, icon("external")) : null,
+          this._isAdmin ? btn("edit", this._t("docEdit"), () => this._openDoc(c, item.index)) : null));
+    });
+    const msg = this._docMsg && this._docMsg.id === c.entry_id ? this._docMsg.text : null;
+    return h("div", { class: "sec" }, h("h4", { text: this._t("secDocs") }), rows,
+      items.length && pl.state === "none" ? h("p", { class: "hint", text: this._t("docOffline") }) : null,
+      msg ? h("div", { class: "err", role: "alert", text: msg }) : null,
+      canLink ? h("div", { class: "once-add" }, h("button", {
+        class: "btn", type: "button", onclick: () => this._openDoc(c, null),
+      }, icon("plus"), this._t("docLink"))) : null);
+  }
+
+  _docFail(c, text) {
+    this._docMsg = { id: c.entry_id, text };
+    this._render();
+  }
+
+  /* preview in a new tab: the PDF is fetched with the HA login (the URL needs it), then shown from memory */
+  async _docOpen(c, item) {
+    this._docMsg = null;
+    if (typeof this._hass.fetchWithAuth !== "function") { this._docDownload(c, item); return; }
+    const win = window.open("", "_blank"); // opened right away, a later one would be blocked as a pop-up
+    if (win) win.opener = null;
+    try {
+      const res = await this._hass.fetchWithAuth(
+        `/api/paperless_ngx_insights/${encodeURIComponent(item.paperless_entry)}/documents/${encodeURIComponent(item.id)}/preview`);
+      if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status });
+      const url = URL.createObjectURL(await res.blob());
+      setTimeout(() => URL.revokeObjectURL(url), 300000);
+      if (win) win.location.href = url;
+      else window.open(url, "_blank");
+    } catch (err) {
+      if (win) win.close();
+      this._docFail(c, err && (err.status === 413 || err.status === 415)
+        ? this._t("docTooLarge") : this._t("docOpenFailed", { m: this._errorText(err) }));
+    }
+  }
+
+  /* download: Paperless-ngx Insights hands out a path that is valid for 30 seconds and bound to this login */
+  async _docDownload(c, item) {
+    this._docMsg = null;
+    try {
+      const res = await this._hass.callWS({
+        type: "paperless_ngx_insights/download", entry_id: item.paperless_entry, document_id: item.id, kind: "pdf",
+      });
+      if (!res || typeof res.url !== "string" || !res.url.startsWith("/")) throw new Error("no url");
+      const a = h("a", { href: res.url, download: "" });
+      this.shadowRoot.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      this._docFail(c, this._t("docOpenFailed", { m: this._errorText(err) }));
+    }
+  }
+
+  _openDoc(c, index) {
+    this._closeFlow();
+    const pl = this._pl || { entries: [] };
+    const item = index === null ? null : (c.dokumente || []).find((d) => d.index === index) || null;
+    this._dlg = {
+      mode: "doc", stage: "form", id: c.entry_id, name: c.title, index, item, flowId: null, asking: null, fields: [], values: {},
+      linked: new Set((c.dokumente || []).map((d) => `${d.paperless_entry}/${d.id}`)),
+      entry: pl.entries.length ? pl.entries[0].entry_id : null,
+      text: index === null ? String(c.anbieter || "") : "", searchMode: "text",
+      results: null, count: 0, page: 1, searching: false, picked: null, webUrl: null,
+      label: item ? item.bezeichnung || "" : "", message: null,
+    };
+    this._renderDocDialog();
+    if (index === null && this._dlg.text.trim()) this._docSearch(false); // the provider is a good first guess
+  }
+
+  async _docSearch(more) {
+    const dlg = this._dlg;
+    if (!dlg || dlg.searching || !dlg.entry || !dlg.text.trim()) return;
+    dlg.searching = true;
+    dlg.message = null;
+    const page = more ? dlg.page + 1 : 1;
+    this._renderDocDialog();
+    try {
+      const res = await this._hass.callWS({
+        type: "paperless_ngx_insights/search", entry_id: dlg.entry, text: dlg.text.trim().slice(0, 500),
+        mode: dlg.searchMode, page, page_size: 20,
+      });
+      if (this._dlg !== dlg) return;
+      const docs = (Array.isArray(res && res.documents) ? res.documents : []).filter((d) => d && isNum(d.id));
+      dlg.results = more ? [...(dlg.results || []), ...docs] : docs;
+      dlg.count = isNum(res.count) ? res.count : dlg.results.length;
+      dlg.page = page;
+      dlg.webUrl = typeof res.web_url === "string" && /^https?:\/\//.test(res.web_url) ? res.web_url.slice(0, 300) : null;
+      if (!more) dlg.picked = null;
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.message = this._t("docSearchFailed", { m: this._errorText(err) });
+    }
+    dlg.searching = false;
+    this._renderDocDialog();
+  }
+
+  async _saveDoc() {
+    const dlg = this._dlg;
+    const label = dlg.label.trim().slice(0, 100) || null;
+    let values;
+    if (dlg.index === null) {
+      if (!dlg.picked) { dlg.message = this._t("docPickFirst"); this._renderDocDialog(); return; }
+      const d = dlg.picked;
+      values = {
+        paperless_entry: dlg.entry, id: d.id, titel: String(d.title || `#${d.id}`).slice(0, 300),
+        erstellt: typeof d.created === "string" ? d.created.slice(0, 10) : null, bezeichnung: label, web_url: dlg.webUrl,
+      };
+    } else {
+      const it = dlg.item || {};
+      values = {
+        paperless_entry: it.paperless_entry, id: it.id, titel: it.titel, erstellt: it.erstellt || null,
+        bezeichnung: label, web_url: it.web_url || null,
+      };
+    }
+    await this._callDoc(dlg, { type: "tariffy/dokument_save", entry_id: dlg.id, values, ...(dlg.index === null ? {} : { index: dlg.index }) });
+  }
+
+  async _callDoc(dlg, message) {
+    dlg.stage = "saving";
+    this._renderDocDialog();
+    try {
+      await this._hass.callWS(message);
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.asking = null;
+      const code = String((err && (err.code || (err.body && err.body.code))) || "");
+      const key = `docErr_${code}`;
+      dlg.message = I18N[this._lang][key] || I18N.en[key] ? this._t(key) : this._termError(err);
+      this._renderDocDialog();
+      return;
+    }
+    if (this._dlg === dlg) this._closeFlow();
+    this._render();
+  }
+
+  _renderDocDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving";
+    const pl = this._pl || { entries: [] };
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t(dlg.index === null ? "docTitleLink" : "docTitleEdit") }),
+      h("p", { class: "hint", text: dlg.name }),
+    ];
+    if (dlg.index === null) {
+      body.push(h("p", { class: "hint", text: this._t("docHint") }));
+      if (pl.entries.length > 1) {
+        body.push(h("label", { class: "fld" }, h("span", { class: "lbl", text: this._t("docConnection") }),
+          h("select", { name: "doc-entry", onchange: (ev) => { dlg.entry = ev.target.value; dlg.results = null; dlg.picked = null; this._renderDocDialog(); } },
+            pl.entries.map((e) => h("option", { value: e.entry_id, text: e.title || e.entry_id })))));
+      }
+      body.push(h("div", { class: "doc-search" },
+        h("label", { class: "fld" }, h("span", { class: "lbl", text: this._t("docQuery") }),
+          h("input", { name: "doc-q", type: "search", autocomplete: "off", maxlength: "500",
+            oninput: (ev) => { dlg.text = ev.target.value; },
+            onkeydown: (ev) => { if (ev.key === "Enter") { ev.preventDefault(); this._docSearch(false); } } })),
+        h("label", { class: "fld mode" }, h("span", { class: "lbl", text: " " }),
+          h("select", { name: "doc-mode", onchange: (ev) => { dlg.searchMode = ev.target.value; } },
+            h("option", { value: "text", text: this._t("docModeText") }), h("option", { value: "title", text: this._t("docModeTitle") }))),
+        h("button", { class: "btn", type: "button", disabled: dlg.searching ? "" : null,
+          text: this._t(dlg.searching ? "docSearching" : "docSearch"), onclick: () => this._docSearch(false) })));
+      if (dlg.results) {
+        const hits = dlg.results.map((d) => {
+          const done = dlg.linked.has(`${dlg.entry}/${d.id}`);
+          const on = dlg.picked && dlg.picked.id === d.id;
+          return h("button", {
+            class: `doc-hit${on ? " on" : ""}`, type: "button", disabled: done ? "" : null, "aria-pressed": on ? "true" : "false",
+            onclick: () => { dlg.picked = d; dlg.message = null; this._renderDocDialog(); },
+          }, String(d.title || `#${d.id}`),
+          h("span", { class: "t2", text: [d.created ? this._date(String(d.created).slice(0, 10)) : null, done ? this._t("docLinked") : null].filter(Boolean).join(" · ") }));
+        });
+        body.push(h("div", { class: "doc-results" },
+          h("p", { class: "hint", text: hits.length ? this._t("docFound", { n: dlg.count }) : this._t("docNone") }), hits,
+          dlg.results.length < dlg.count ? h("button", { class: "btn", type: "button", disabled: dlg.searching ? "" : null,
+            text: this._t("docMore"), onclick: () => this._docSearch(true) }) : null));
+      }
+    } else if (dlg.item) {
+      body.push(h("p", { class: "hint", text: [dlg.item.titel, dlg.item.erstellt ? this._date(dlg.item.erstellt) : null].filter(Boolean).join(" · ") }));
+    }
+    body.push(h("label", { class: "fld" }, h("span", { class: "lbl", text: this._t("docLabel") }),
+      h("input", { name: "doc-label", type: "text", autocomplete: "off", maxlength: "100", oninput: (ev) => { dlg.label = ev.target.value; } })));
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    const buttons = [];
+    if (dlg.asking === "delete") {
+      buttons.push(h("div", { class: "ask" },
+        h("span", { text: this._t("docRemoveAsk") }),
+        h("button", { class: "btn red", type: "button", disabled: busy ? "" : null, text: this._t("docRemoveYes"),
+          onclick: () => this._callDoc(dlg, { type: "tariffy/dokument_delete", entry_id: dlg.id, index: dlg.index }) }),
+        h("button", { class: "btn", type: "button", text: this._t("actCancel"), onclick: () => { dlg.asking = null; this._renderDocDialog(); } })));
+    } else {
+      buttons.push(h("button", { class: "btn go", type: "button", disabled: busy || (dlg.index === null && !dlg.picked) ? "" : null,
+        text: this._t(busy ? "dlgSaving" : "dlgSave"), onclick: () => this._saveDoc() }));
+      buttons.push(h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() }));
+      if (dlg.index !== null) {
+        buttons.push(h("button", { class: "btn red", type: "button", disabled: busy ? "" : null, text: this._t("docRemove"),
+          onclick: () => { dlg.asking = "delete"; this._renderDocDialog(); } }));
+      }
+    }
+    body.push(h("div", { class: "actions" }, buttons));
+    // keep what was typed and the place of the cursor: the dialog is drawn again after every search
+    const active = this._dlgEl && this.shadowRoot.activeElement;
+    const focusName = active && active.getAttribute ? active.getAttribute("name") : null;
+    this._mountDialog(dlg, body, busy);
+    const set = (name, value) => { const el = this._dlgEl.querySelector(`[name="${name}"]`); if (el) el.value = value; };
+    set("doc-q", dlg.text);
+    set("doc-mode", dlg.searchMode);
+    set("doc-entry", dlg.entry || "");
+    set("doc-label", dlg.label);
+    const target = !dlg.focused ? (dlg.index === null ? "doc-q" : "doc-label") : focusName;
+    dlg.focused = true;
+    const el = target && this._dlgEl.querySelector(`[name="${target}"]`);
+    if (el) el.focus();
+  }
+
   /* ----- old contracts: a term entered by hand (administrators only) ----- */
 
   _openTerm(c, index) {
@@ -3347,6 +3633,7 @@ class TariffyPanel extends HTMLElement {
       this._meterSection(c),
       this._preisSection(c),
       this._onceSection(c),
+      this._docSection(c),
       d.measured || d.hasMetering || isNum(c.verbrauch_letzte_laufzeit) ? section(this._t("secConsumption"), [
         row(this._t("soFar"), amount(c.verbrauch_bisher)),
         row(this._t("gardenUse"), amount1(c.garten_verbrauch)),

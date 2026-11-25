@@ -251,6 +251,10 @@ A **water contract** can have up to ten outdoor meters, entered in the **Contrac
 - A meter in litres is converted to the unit of the main meter.
 - A contract with an outdoor meter gets four more sensors: **Outdoor water (consumption)**, **Outdoor water (cost)**, **Wastewater-liable consumption**, **Wastewater cost**. The total cost is in the cost sensors as always. Without an outdoor meter nothing changes.
 
+### Documents from Paperless-ngx
+
+With the integration [Paperless-ngx Insights](https://github.com/VexMex/paperless-ngx-Insights) (HACS), documents from Paperless-ngx can be linked to a contract, for example the electricity contract or a price letter. The block **Documents** in the contract details lists them with **Open** (PDF in a new tab), **Download** and **Open in Paperless**. Administrators add one with **Link document**: the search is filled with the provider, search in the full text or the title, pick a hit, optionally give it a label, save. Only the link is stored (document id, title, date, label), never the document; search, preview and download go through Paperless-ngx Insights and its own access check. The links survive editing, renewing and a tariff switch, are part of the backup and are redacted in the diagnostics.
+
 ## Loan / financing
 
 The category **Loan / financing** is for annuity loans (mortgages), instalment loans and car financing. It is kept **apart from the contracts**: the loan has a group of its own in the panel and does not count in the totals of the contracts (instalments per month, cost so far, cost split). After the general step comes a step with the loan data:

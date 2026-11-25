@@ -26,7 +26,7 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.loader import async_get_integration
 
-from . import backup, history, meter_import
+from . import backup, dokumente, history, meter_import
 from .const import (
     CONF_VERBRAUCH_SENSOR,
     DOMAIN,
@@ -205,6 +205,8 @@ def contract_payload(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
     unit = state.attributes.get("unit_of_measurement") if state else None
     # a meter reporting Wh or MWh is calculated in kWh (see coordinator._einheit_faktor)
     payload["verbrauch_einheit"] = "kWh" if str(unit or "").strip().lower() in ("wh", "mwh") else unit
+    # verknuepfte Paperless-Dokumente: nur Verweise; Vorschau und Download prueft die Paperless-Integration
+    payload["dokumente"] = dokumente.payload(entry.data)
     return payload
 
 
@@ -629,6 +631,55 @@ async def ws_aussen_delete(hass: HomeAssistant, connection, msg: dict[str, Any])
 
 
 @websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/dokument_save",
+        vol.Required("entry_id"): str,
+        vol.Required("values"): HISTORY_VALUES,
+        vol.Optional("index"): vol.All(int, vol.Range(min=0)),
+    }
+)
+@websocket_api.async_response
+async def ws_dokument_save(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Verknuepft ein Paperless-Dokument mit dem Vertrag oder aendert den Verweis."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    try:
+        dokumente.save_dokument(hass, entry, msg["values"], msg.get("index"))
+    except dokumente.DokumentError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    await entry.runtime_data.async_refresh()
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/dokument_delete",
+        vol.Required("entry_id"): str,
+        vol.Required("index"): vol.All(int, vol.Range(min=0)),
+    }
+)
+@websocket_api.async_response
+async def ws_dokument_delete(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Entfernt den Verweis auf ein Dokument (in Paperless bleibt es erhalten)."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    try:
+        dokumente.delete_dokument(hass, entry, msg["index"])
+    except dokumente.DokumentError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    await entry.runtime_data.async_refresh()
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.require_admin
 @websocket_api.websocket_command({vol.Required("type"): "tariffy/backup_export"})
 @websocket_api.async_response
 async def ws_backup_export(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
@@ -730,6 +781,8 @@ async def async_setup_panel(hass: HomeAssistant) -> None:
             websocket_api.async_register_command(hass, ws_preis_delete)
             websocket_api.async_register_command(hass, ws_aussen_save)
             websocket_api.async_register_command(hass, ws_aussen_delete)
+            websocket_api.async_register_command(hass, ws_dokument_save)
+            websocket_api.async_register_command(hass, ws_dokument_delete)
             for command in (
                 ws_backup_export,
                 ws_backup_preview,

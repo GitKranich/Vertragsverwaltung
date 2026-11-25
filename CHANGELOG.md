@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.39.0-beta.1] - 2026-11-25
+
+### Added
+
+- **Link documents from Paperless-ngx to a contract** (with the integration [Paperless-ngx Insights](https://github.com/VexMex/paperless-ngx-Insights)): new block "Documents" in the contract details with **Open** (PDF preview in a new tab), **Download** and **Open in Paperless**. Administrators link a document with "Link document" (search in full text or title, prefilled with the provider; optional label such as "contract" or "price letter") and can change the label or remove the link (WebSocket `tariffy/dokument_save`, `tariffy/dokument_delete`). Only the link is stored in the contract data (`_dokumente`: document id, title, date, label, address of the Paperless web interface), never the document; search, preview and download go through Paperless-ngx Insights with its own access check per user. The links are kept when editing, renewing and on a tariff switch, are part of the backup and are redacted in the diagnostics. Without Paperless-ngx Insights nothing changes.
+
 ## [1.38.2] - 2026-11-19
 
 ### Fixed

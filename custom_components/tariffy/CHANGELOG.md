@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.39.0-beta.1] - 2026-11-25
+
+### Hinzugefügt
+
+- **Dokumente aus Paperless-ngx mit einem Vertrag verknüpfen** (mit der Integration [Paperless-ngx Insights](https://github.com/VexMex/paperless-ngx-Insights)): neuer Block "Dokumente" in den Vertragsdetails mit **Öffnen** (PDF-Vorschau in einem neuen Tab), **Herunterladen** und **In Paperless öffnen**. Administratoren verknüpfen ein Dokument über "Dokument verknüpfen" (Suche im Volltext oder Titel, mit dem Anbieter vorbelegt; optionale Bezeichnung wie "Vertrag" oder "Preisbrief") und können die Bezeichnung ändern oder die Verknüpfung entfernen (WebSocket `tariffy/dokument_save`, `tariffy/dokument_delete`). In den Vertragsdaten steht nur der Verweis (`_dokumente`: Dokument-ID, Titel, Datum, Bezeichnung, Adresse der Paperless-Oberfläche), nie das Dokument; Suche, Vorschau und Download laufen über Paperless-ngx Insights mit dessen eigener Rechteprüfung pro Benutzer. Die Verknüpfungen bleiben beim Bearbeiten, Verlängern und beim Tarifwechsel erhalten, stehen in der Sicherung und sind im Diagnose-Download geschwärzt. Ohne Paperless-ngx Insights ändert sich nichts.
+
 ## [1.38.2] - 2026-11-19
 
 ### Behoben

@@ -1,7 +1,7 @@
 """Diagnose-Download fuer einen Vertrag (Einstellungen > Geraete > Diagnose).
 
 Persoenliche Daten (Kundennummer, Zaehlernummer, Marktlokation,
-Benachrichtigungsziel) werden geschwaerzt.
+Benachrichtigungsziel, verknuepfte Dokumente) werden geschwaerzt.
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 
 from . import TariffyConfigEntry
 from .const import (
+    CONF_DOKUMENTE,
     CONF_KENNZEICHEN,
     CONF_KUNDENNUMMER,
     CONF_MARKTLOKATION,
@@ -25,6 +26,7 @@ from .const import (
 )
 
 TO_REDACT = {
+    CONF_DOKUMENTE,  # Dokumenttitel koennen persoenliche Angaben enthalten
     CONF_KENNZEICHEN,
     CONF_KUNDENNUMMER,
     CONF_MARKTLOKATION,

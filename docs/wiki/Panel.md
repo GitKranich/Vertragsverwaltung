@@ -82,6 +82,18 @@ Im Tab **Verträge** hat jeder Vertrag in den Details den Block **Einmalposten**
 
 Ein Posten zählt ab seinem Datum (ohne Datum sofort). Er verändert den **Saldo bisher** (der Posten gehört zur Laufzeit, in der sein Datum liegt) und die **Kosten gesamt** über alle Laufzeiten: ein Bonus senkt die Kosten, eine Rechnung erhöht sie. **Prognose zum Vertragsende und die Warnung bei zu niedrigem Abschlag hängen weiter nur vom Verbrauch ab.** Die Einmalposten gelten für jede Art von Vertrag, bleiben beim Verlängern und beim Tarifwechsel erhalten und stehen in der Sicherung. Für einen Bonus des Anbieters gibt es zusätzlich die Felder **Neukundenbonus** (wird mit der Jahresrechnung verrechnet und zählt in Prognose und Abschlag-Empfehlung) und **Sofortbonus** (schon ausgezahlt, senkt nur die Gesamtkosten) im Vertragsformular.
 
+## Dokumente aus Paperless-ngx
+
+Mit der Integration [Paperless-ngx Insights](https://github.com/VexMex/paperless-ngx-Insights) (HACS) lassen sich Dokumente aus Paperless-ngx mit einem Vertrag verknüpfen, zum Beispiel der Stromvertrag, die Auftragsbestätigung oder ein Preisbrief. Der Block **Dokumente** in den Vertragsdetails zeigt die verknüpften Dokumente mit Bezeichnung, Titel und Datum:
+
+- **Öffnen** zeigt das PDF in einem neuen Tab,
+- **Herunterladen** lädt es herunter,
+- **In Paperless öffnen** springt zum Dokument in der Paperless-Oberfläche.
+
+Administratoren verknüpfen ein Dokument über **Dokument verknüpfen**: Das Suchfeld ist mit dem Anbieter vorbelegt, gesucht wird im Volltext oder im Titel; einen Treffer anklicken, optional eine **Bezeichnung** vergeben (z. B. „Vertrag“, „Preisbrief 2026“), speichern. Über den Stift lässt sich die Bezeichnung ändern oder die Verknüpfung entfernen.
+
+Tariffy speichert nur den Verweis (Dokument-ID, Titel, Datum, Bezeichnung), nie das Dokument. Suche, Vorschau und Download laufen über Paperless-ngx Insights mit dessen eigener Rechteprüfung: Wer dort keinen Zugriff hat, sieht die Verknüpfungen, kann die Dokumente aber nicht öffnen. Die Verknüpfungen bleiben beim Bearbeiten, Verlängern und beim Tarifwechsel erhalten, stehen in der Sicherung und sind im Diagnose-Download geschwärzt. Ohne Paperless-ngx Insights gibt es den Block nicht.
+
 ## Folgevertrag planen
 
 **Folgevertrag planen** (bzw. **Folgevertrag bearbeiten**, wenn schon einer eingetragen ist) öffnet dasselbe Formular wie „Konfigurieren" in Home Assistant. Felder, die du leer lässt, behalten den aktuellen Wert. Zum Wechseldatum übernimmt Home Assistant den Folgevertrag von selbst (siehe [Tarifwechsel und Erinnerungen](Tarifwechsel-und-Erinnerungen)).

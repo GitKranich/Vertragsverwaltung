@@ -61,6 +61,19 @@
       if (message.type === "tariffy/deleted_list") {
         return { deleted: [{ id: "d1", title: "Strom 2023", sparte: "electricity", deleted: "2026-07-01" }] };
       }
+      // Paperless-ngx Insights (documents); pl=0: the integration is not installed
+      if (message.type === "paperless_ngx_insights/entries") {
+        if (params.get("pl") === "0") throw Object.assign(new Error("Unknown command."), { code: "unknown_command" });
+        return [{ entry_id: "01PAPERLESS", title: "Paperless-ngx Insights" }];
+      }
+      if (message.type === "paperless_ngx_insights/search") {
+        const docs = [
+          { id: 1188, title: "Stadtwerke Nord Stromliefervertrag", created: "2025-12-01" },
+          { id: 1301, title: "Stadtwerke Nord Auftragsbestätigung", created: "2025-11-20" },
+          { id: 1239, title: "Ihr Strompreis ändert sich", created: "2026-05-16" },
+        ];
+        return { count: docs.length, page: 1, page_size: 20, documents: docs, web_url: "http://paperless.local:8000" };
+      }
       if (message.type === "tariffy/deleted_restore") return { title: "Strom 2023" };
       if (message.type === "tariffy/deleted_discard") return { ok: true };
       if (message.type === "tariffy/renew") {

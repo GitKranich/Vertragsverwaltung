@@ -57,6 +57,7 @@ from .const import (
     CONF_GAS_EINHEIT,
     CONF_GRUNDPREIS,
     CONF_AUSSENZAEHLER,
+    CONF_DOKUMENTE,
     CONF_EINMALPOSTEN,
     CONF_PREISAENDERUNGEN,
     PREISAENDERUNG_SPARTEN,
@@ -1178,6 +1179,12 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     ]
                 }
                 if self.entry.data.get(CONF_AUSSENZAEHLER)
+                else {}
+            ),
+            # verknuepfte Dokumente gehoeren zum Vertrag (alter und neuer Vertrag, Preisbriefe, ...)
+            **(
+                {CONF_DOKUMENTE: self.entry.data[CONF_DOKUMENTE]}
+                if self.entry.data.get(CONF_DOKUMENTE)
                 else {}
             ),
             # die Erinnerung haengt an der Kuendigungsfrist: sie bleibt beim Wechsel erhalten

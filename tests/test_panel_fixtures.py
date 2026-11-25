@@ -38,6 +38,11 @@ CONTRACTS = [
                 {"bezeichnung": "Wechselbonus", "betrag": 80.0, "datum": "2026-01-15"},
                 {"bezeichnung": "Honorar Makler", "betrag": -25.0, "datum": "2026-01-20"},
             ],
+            "_dokumente": [
+                {"paperless_entry": "01PAPERLESS", "id": 1188, "titel": "Stadtwerke Nord Stromliefervertrag",
+                 "erstellt": "2025-12-01", "bezeichnung": "Vertrag", "web_url": "http://paperless.local:8000"},
+                {"paperless_entry": "01PAPERLESS", "id": 1239, "titel": "Ihr Strompreis ändert sich", "erstellt": "2026-05-16"},
+            ],
             "_historie": [
                 {
                     "sparte": "electricity", "anbieter": "Stadtwerke Nord", "tarif": "Öko Fix 12",

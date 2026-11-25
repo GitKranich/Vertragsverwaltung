@@ -199,6 +199,13 @@ EINMALPOSTEN_MAX = 50
 CONF_AUSSENZAEHLER = "_aussenzaehler"
 AUSSENZAEHLER_MAX = 10
 
+# Verknuepfte Dokumente eines Vertrags (interner Schluessel, alle Sparten): Liste aus
+# {paperless_entry, id, titel, erstellt, bezeichnung, web_url}. Gespeichert wird nur der Verweis auf das
+# Dokument in Paperless-ngx (ueber die Integration "Paperless-ngx Insights"), nie das Dokument.
+CONF_DOKUMENTE = "_dokumente"
+DOKUMENTE_MAX = 30
+PAPERLESS_DOMAIN = "paperless_ngx_insights"
+
 # Abschlag-Warnung (optional, pro Vertrag): warnt, wenn die Prognose zum
 # Vertragsende eine Nachzahlung ueber der Schwelle erwarten laesst.
 CONF_ABSCHLAG_WARNUNG = "abschlag_warnung"
