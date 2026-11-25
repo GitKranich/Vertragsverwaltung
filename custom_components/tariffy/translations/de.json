@@ -15,7 +15,8 @@
           "mindestlaufzeit": "Mindestlaufzeit (Monate)",
           "kuendigungsfrist": "Kündigungsfrist (Monate)",
           "erinnerung_monate": "Kündigung erinnern",
-          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)"
+          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)",
+          "icon": "Icon"
         },
         "data_description": {
           "name": "Kurze Bezeichnung, die im Gerätenamen erscheint, z. B. 'Strom Haus'",
@@ -27,7 +28,8 @@
           "mindestlaufzeit": "Optional. Das Panel zeigt, bis wann der Vertrag mindestens läuft (Beginn + Mindestlaufzeit).",
           "kuendigungsfrist": "Optional. Monate vor Vertragsende, bis zu denen die Kündigung vorliegen muss. Wenn eingetragen, bezieht sich die Erinnerung auf diese Frist statt auf das Vertragsende.",
           "erinnerung_monate": "Wie viele Monate vor Ablauf der Kündigungsfrist soll erinnert werden (ohne eingetragene Frist: vor Vertragsende)?",
-          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)"
+          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)",
+          "icon": "Eigenes Icon für diesen Vertrag (z. B. mdi:car). Gilt im Panel und für die Sensoren des Vertrags. Leer = das Icon der Sparte."
         }
       },
       "reconfigure": {
@@ -44,7 +46,8 @@
           "mindestlaufzeit": "Mindestlaufzeit (Monate)",
           "kuendigungsfrist": "Kündigungsfrist (Monate)",
           "erinnerung_monate": "Kündigung erinnern",
-          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)"
+          "notify_target": "Benachrichtigungs-Ziel (notify-Dienst)",
+          "icon": "Icon"
         },
         "data_description": {
           "name": "Name des Vertrags: wird im Panel gezeigt und ist der Name seines Geräts",
@@ -56,7 +59,8 @@
           "mindestlaufzeit": "Optional. Das Panel zeigt, bis wann der Vertrag mindestens läuft (Beginn + Mindestlaufzeit).",
           "kuendigungsfrist": "Optional. Monate vor Vertragsende, bis zu denen die Kündigung vorliegen muss. Wenn eingetragen, bezieht sich die Erinnerung auf diese Frist statt auf das Vertragsende.",
           "erinnerung_monate": "Wie viele Monate vor Ablauf der Kündigungsfrist soll erinnert werden (ohne eingetragene Frist: vor Vertragsende)?",
-          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)"
+          "notify_target": "HA-Benachrichtigungsdienst für die Kündigungs-Erinnerung (z. B. notify.mobile_app)",
+          "icon": "Eigenes Icon für diesen Vertrag (z. B. mdi:car). Gilt im Panel und für die Sensoren des Vertrags. Leer = das Icon der Sparte."
         }
       },
       "energie": {

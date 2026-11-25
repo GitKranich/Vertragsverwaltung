@@ -312,6 +312,7 @@ Auf dem Handy werden die Karten zu aufklappbaren Zeilen:
 | Kündigungsfrist (Monate) | – | Wenn eingetragen, bezieht sich die Erinnerung auf den letzten Kündigungstag |
 | Kündigung erinnern | ✅ | 0–4 Monate vorher (0 = deaktiviert); vor Vertragsende, mit Kündigungsfrist vor Ablauf der Frist |
 | Benachrichtigungs-Ziel | – | notify-Dienst (z. B. `mobile_app_iphone`) |
+| Icon | – | Eigenes Symbol für den Vertrag (z. B. `mdi:car`), im Panel und für die Sensoren des Vertrags; leer = Symbol der Sparte |
 
 #### Schritt 2a – Strom-Details
 

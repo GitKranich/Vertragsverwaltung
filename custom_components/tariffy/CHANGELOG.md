@@ -7,11 +7,34 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-11-25
+
+Dieses Release fasst zusammen, was in den Betas `1.40.0-beta.1` und `1.41.0-beta.1` getestet wurde. **Bestehende Verträge laufen ohne jede Änderung weiter.** Beide Neuerungen sind freiwillig oder ändern nur das Aussehen.
+
+### Hinzugefügt
+
+- **Helles Design.** Das Panel folgt dem Design von Home Assistant (hell, dunkel oder automatisch); das dunkle Design bleibt unverändert. Übernommen aus dem Original (weskona/tariffy 1.32.0) und erweitert auf die Teile, die nur diese Version hat (Dokumente, Diagramme, Preisänderungen).
+- **Eigenes Icon pro Vertrag.** Optionales Feld **Icon** (z. B. `mdi:car`) im Vertragsformular, gilt im Panel und für die Sensoren des Vertrags. Leer = das Icon der Sparte. Übernommen aus dem Original (weskona/tariffy 1.32.0).
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
+## [1.41.0-beta.1] - 2026-11-25
+
+### Hinzugefügt
+
+- Enthält alles aus 1.40.0 (Ablesung korrigieren) zusätzlich zu 1.40.0-beta.1 (helles Design, eigenes Icon pro Vertrag). Nötig, weil 1.40.0 als stabile Version vor diesen Beta-Funktionen erschienen ist.
+
 ## [1.40.0] - 2026-11-25
 
 ### Hinzugefügt
 
 - **Ablesung korrigieren** für falsch erfasste Stände ("Ablesung korrigieren" im Block "Zählerstand", Administratoren; WebSocket `tariffy/ablesungen` und `tariffy/ablesung_korrigieren`): Ablesung aus der Statistik wählen, richtigen Stand eintragen, Vorschau prüfen, korrigieren. Die Statistik wird ab dieser Ablesung neu geschrieben (Stand und Summe), ohne Zählerwechsel; der Verbrauch läuft nahtlos weiter, echte Zählerwechsel bleiben erhalten. Ist es die aktuelle Ablesung, wird auch der Helfer gesetzt und die Statistik in wenigen Minuten nachgerechnet, sobald Home Assistant den neuen Wert erfasst hat.
+
+## [1.40.0-beta.1] - 2026-11-25
+
+### Hinzugefügt
+
+- **Helles Design.** Das Panel folgt dem Design von Home Assistant (hell, dunkel oder automatisch, keine eigene Einstellung; ohne Vorgabe von Home Assistant gilt die des Systems). Das dunkle Design bleibt unverändert; alle Farben des Panels stehen jetzt in Variablen mit hellem Gegenstück. Übernommen aus dem Original (weskona/tariffy 1.32.0) und erweitert auf die Teile, die nur diese Version hat (Dokumente, Diagramme, Preisänderungen).
+- **Eigenes Icon pro Vertrag.** Optionales Feld **Icon** (z. B. `mdi:car`) im Vertragsformular, im Panel mit Vorschau. Gilt im Panel und für die Sensoren des Vertrags; Sensoren mit Status-Symbol (Daumen hoch/runter) behalten ihres. Leer = das Icon der Sparte. Bleibt beim Tarifwechsel erhalten und steht in der Sicherung. Übernommen aus dem Original (weskona/tariffy 1.32.0).
 
 ## [1.39.1] - 2026-11-25
 

@@ -59,6 +59,7 @@ from .const import (
     CONF_AUSSENZAEHLER,
     CONF_DOKUMENTE,
     CONF_EINMALPOSTEN,
+    CONF_ICON,
     CONF_PREISAENDERUNGEN,
     PREISAENDERUNG_SPARTEN,
     PREISAENDERUNG_PAUSCHAL_SPARTEN,
@@ -1187,6 +1188,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if self.entry.data.get(CONF_DOKUMENTE)
                 else {}
             ),
+            # das eigene Icon gehoert zum Vertrag
+            **({CONF_ICON: self.entry.data[CONF_ICON]} if self.entry.data.get(CONF_ICON) else {}),
             # die Erinnerung haengt an der Kuendigungsfrist: sie bleibt beim Wechsel erhalten
             **(
                 {CONF_KUENDIGUNGSFRIST: self.entry.data[CONF_KUENDIGUNGSFRIST]}
@@ -2580,6 +2583,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "verbrauch_kwh": verbrauch_kwh,
             CONF_ZAEHLERNUMMER: data.get(CONF_ZAEHLERNUMMER),
             CONF_VERSICHERUNGSART: data.get(CONF_VERSICHERUNGSART),
+            CONF_ICON: data.get(CONF_ICON) or None,
             CONF_KENNZEICHEN: data.get(CONF_KENNZEICHEN),
             CONF_KM_START: _f(data.get(CONF_KM_START)),
             CONF_KM_PRO_JAHR: _f(data.get(CONF_KM_PRO_JAHR)),

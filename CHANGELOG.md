@@ -7,11 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-11-25
+
+This release brings together what was tested in the betas `1.40.0-beta.1` and `1.41.0-beta.1`. **Existing contracts keep working without any change.** Both new functions are optional or only change the look.
+
+### Added
+
+- **Light design.** The panel follows the design of Home Assistant (light, dark or automatic); the dark design is unchanged. Taken over from the original (weskona/tariffy 1.32.0) and extended to the parts that only this version has (documents, charts, price changes).
+- **Own icon for every contract.** Optional field **Icon** (for example `mdi:car`) in the contract form, used in the panel and for the sensors of the contract. Empty = the icon of the category. Taken over from the original (weskona/tariffy 1.32.0).
+- After the update reload the browser page once (Ctrl+F5).
+
+## [1.41.0-beta.1] - 2026-11-25
+
+### Added
+
+- Includes everything from 1.40.0 (correct a reading) on top of 1.40.0-beta.1 (light theme, own icon per contract). Needed because 1.40.0 was released as stable before these beta features.
+
 ## [1.40.0] - 2026-11-25
 
 ### Added
 
 - **Correct a reading** entered wrongly ("Correct reading" in the "Meter reading" block, administrators; WebSocket `tariffy/ablesungen` and `tariffy/ablesung_korrigieren`): pick a reading from the statistics, enter the right value, check the preview, correct. The statistics are rewritten from that reading on (reading and sum) without a meter change, so consumption continues seamlessly; real meter changes stay. If it is the current reading, the helper is set as well and the statistics are recalculated within a few minutes, once Home Assistant has recorded the new value.
+
+## [1.40.0-beta.1] - 2026-11-25
+
+### Added
+
+- **Light design.** The panel follows the design of Home Assistant (light, dark or automatic, no setting of its own; without one from Home Assistant the system's applies). The dark design is unchanged; all colours of the panel now live in variables with a light counterpart. Taken over from the original (weskona/tariffy 1.32.0) and extended to the parts that only this version has (documents, charts, price changes).
+- **Own icon for every contract.** Optional field **Icon** (for example `mdi:car`) in the contract form, in the panel with a preview. Used in the panel and for the sensors of the contract; sensors with a status icon (thumb up/down) keep theirs. Empty = the icon of the category. Kept at a tariff switch, part of the backup. Taken over from the original (weskona/tariffy 1.32.0).
 
 ## [1.39.1] - 2026-11-25
 
