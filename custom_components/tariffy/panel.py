@@ -26,9 +26,10 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.loader import async_get_integration
 
-from . import backup, dokumente, history, meter_import
+from . import ablesung, backup, dokumente, history, meter_import
 from .const import (
     CONF_VERBRAUCH_SENSOR,
+    CONF_ZAEHLERSTAND_EINGABE,
     DOMAIN,
     NEXT_PREFIX,
 )
@@ -509,6 +510,74 @@ async def ws_zaehler_import(hass: HomeAssistant, connection, msg: dict[str, Any]
 @websocket_api.require_admin
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): "tariffy/ablesungen",
+        vol.Required("entry_id"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_ablesungen(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Die Ablesungen aus der Statistik des Verbrauchssensors, neueste zuerst."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    sensor = entry.data.get(CONF_VERBRAUCH_SENSOR)
+    if not sensor:
+        connection.send_error(msg["id"], "kein_sensor", "kein_sensor")
+        return
+    try:
+        ergebnis = await ablesung.ablesungen(hass, sensor)
+    except ablesung.KorrekturFehler as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    connection.send_result(msg["id"], ergebnis)
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/ablesung_korrigieren",
+        vol.Required("entry_id"): str,
+        vol.Required("start"): str,
+        vol.Required("stand"): vol.All(vol.Coerce(float), vol.Range(min=0)),
+        vol.Optional("pruefen", default=True): bool,
+    }
+)
+@websocket_api.async_response
+async def ws_ablesung_korrigieren(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Prueft oder korrigiert eine falsch erfasste Ablesung, ohne dass ein Zaehlerwechsel entsteht."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    sensor = entry.data.get(CONF_VERBRAUCH_SENSOR)
+    if not sensor:
+        connection.send_error(msg["id"], "kein_sensor", "kein_sensor")
+        return
+
+    async def _neu_rechnen() -> None:
+        if entry.state is ConfigEntryState.LOADED:
+            await entry.runtime_data.async_refresh()
+
+    try:
+        ergebnis = await ablesung.ablesung_korrigieren(
+            hass,
+            sensor,
+            entry.data.get(CONF_ZAEHLERSTAND_EINGABE),
+            msg["start"],
+            msg["stand"],
+            nur_pruefen=msg["pruefen"],
+            fertig=_neu_rechnen,
+        )
+    except ablesung.KorrekturFehler as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    connection.send_result(msg["id"], ergebnis)
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): "tariffy/abschlag_korrektur",
         vol.Required("entry_id"): str,
     }
@@ -780,6 +849,8 @@ async def async_setup_panel(hass: HomeAssistant) -> None:
             websocket_api.async_register_command(hass, ws_einmal_delete)
             websocket_api.async_register_command(hass, ws_abschlag_korrektur)
             websocket_api.async_register_command(hass, ws_zaehler_import)
+            websocket_api.async_register_command(hass, ws_ablesungen)
+            websocket_api.async_register_command(hass, ws_ablesung_korrigieren)
             websocket_api.async_register_command(hass, ws_preis_save)
             websocket_api.async_register_command(hass, ws_preis_delete)
             websocket_api.async_register_command(hass, ws_aussen_save)

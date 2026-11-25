@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.40.0] - 2026-11-25
+
+### Added
+
+- **Correct a reading** entered wrongly ("Correct reading" in the "Meter reading" block, administrators; WebSocket `tariffy/ablesungen` and `tariffy/ablesung_korrigieren`): pick a reading from the statistics, enter the right value, check the preview, correct. The statistics are rewritten from that reading on (reading and sum) without a meter change, so consumption continues seamlessly; real meter changes stay. If it is the current reading, the helper is set as well and the statistics are recalculated within a few minutes, once Home Assistant has recorded the new value.
+
 ## [1.39.1] - 2026-11-25
 
 ### Fixed

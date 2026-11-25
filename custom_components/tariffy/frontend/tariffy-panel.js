@@ -127,7 +127,21 @@ const I18N = {
     meterHintLast: "Last reading: {v}. Enter the current reading of the meter.", meterHintFirst: "Enter the current reading of the meter.",
     meterSwapHint: "Meter replaced? First record the final reading of the old meter, then the reading of the new one with \"New meter\" ticked.",
     meterInvalid: "Enter a reading above zero.", meterTooBig: "The helper allows at most {v}.",
-    meterLower: "Lower than the last reading ({v}). Typo? For a replaced meter tick \"New meter\".",
+    meterLower: "Lower than the last reading ({v}). For a replaced meter tick \"New meter\". Was the last reading a typo? Use \"Correct reading\" instead.",
+    fixOpen: "Correct reading", fixTitle: "Correct a reading",
+    fixHint: "For a reading entered wrongly, e.g. 53 instead of 35. The statistics are rewritten from that reading on, without a meter change; consumption continues seamlessly. Real meter changes stay as they are.",
+    fixPick: "Reading", fixSwap: "meter change", fixValue: "Correct reading", fixCheck: "Check", fixRun: "Correct", fixClose: "Close",
+    fixLoading: "Loading readings…", fixNone: "No readings in the statistics yet.",
+    fixPreview: "Reading {a} → {b}, from {d}", fixUse: "Consumption changes by {v}",
+    fixCurrent: "This is the current reading: the helper is set to the new value and the statistics are recalculated within a few minutes.",
+    fixDone: "Reading corrected.", fixPending: "Helper set. The statistics are recalculated within a few minutes; Tariffy then shows the new values.",
+    fixErr_ungueltig: "Enter a reading of zero or more.", fixErr_gleich: "That is the same reading.", fixErr_ablesung_fehlt: "This reading is no longer in the statistics.",
+    fixErr_kleiner_als_vorher: "Lower than the reading before it. That would count as a meter change.",
+    fixErr_groesser_als_naechste: "Higher than the reading after it. Correct that one first.",
+    fixErr_aktuell_ohne_helfer: "The current reading comes from the meter itself and cannot be corrected here.",
+    fixErr_helfer_max: "The helper does not allow that high a value.",
+    fixErr_sensor_fehlt: "The consumption sensor of this contract was not found.", fixErr_kein_sensor: "This contract has no consumption sensor.",
+    fixErr_sensor_ohne_summe: "The consumption sensor needs the state class total increasing.",
     forecastMethod: "Forecast", forecast_saisonal: "seasonal (meter's monthly values)", forecast_standardprofil: "seasonal (standard profile)",
     forecast_letzte_30_tage: "last 30 days", forecast_durchschnitt: "average since start",
     bonusSignup: "Sign-up bonus", bonusSignupHint: "with the annual bill", bonusInstant: "Instant bonus", bonusInstantHint: "paid out",
@@ -323,7 +337,21 @@ const I18N = {
     meterHintLast: "Letzte Ablesung: {v}. Trag den aktuellen Stand des Zählers ein.", meterHintFirst: "Trag den aktuellen Stand des Zählers ein.",
     meterSwapHint: "Zähler gewechselt? Erst den Endstand des alten Zählers erfassen, dann den Stand des neuen mit Haken bei \"Neuer Zähler\".",
     meterInvalid: "Trag einen Stand über null ein.", meterTooBig: "Der Helfer erlaubt höchstens {v}.",
-    meterLower: "Kleiner als die letzte Ablesung ({v}). Tippfehler? Bei einem Zählerwechsel \"Neuer Zähler\" ankreuzen.",
+    meterLower: "Kleiner als die letzte Ablesung ({v}). Bei einem Zählerwechsel \"Neuer Zähler\" ankreuzen. War die letzte Ablesung ein Tippfehler? Dann \"Ablesung korrigieren\".",
+    fixOpen: "Ablesung korrigieren", fixTitle: "Ablesung korrigieren",
+    fixHint: "Für eine falsch erfasste Ablesung, z. B. 53 statt 35. Die Statistik wird ab dieser Ablesung neu geschrieben, ohne Zählerwechsel; der Verbrauch läuft nahtlos weiter. Echte Zählerwechsel bleiben erhalten.",
+    fixPick: "Ablesung", fixSwap: "Zählerwechsel", fixValue: "Richtiger Stand", fixCheck: "Prüfen", fixRun: "Korrigieren", fixClose: "Schließen",
+    fixLoading: "Ablesungen werden geladen…", fixNone: "Noch keine Ablesungen in der Statistik.",
+    fixPreview: "Stand {a} → {b}, ab {d}", fixUse: "Verbrauch ändert sich um {v}",
+    fixCurrent: "Das ist die aktuelle Ablesung: Der Helfer wird auf den neuen Wert gesetzt, die Statistik wird in wenigen Minuten nachgerechnet.",
+    fixDone: "Ablesung korrigiert.", fixPending: "Helfer gesetzt. Die Statistik wird in wenigen Minuten nachgerechnet, danach zeigt Tariffy die neuen Werte.",
+    fixErr_ungueltig: "Trag einen Stand von null oder mehr ein.", fixErr_gleich: "Das ist derselbe Stand.", fixErr_ablesung_fehlt: "Diese Ablesung ist nicht mehr in der Statistik.",
+    fixErr_kleiner_als_vorher: "Kleiner als die Ablesung davor. Das wäre ein Zählerwechsel.",
+    fixErr_groesser_als_naechste: "Größer als die Ablesung danach. Korrigier zuerst diese.",
+    fixErr_aktuell_ohne_helfer: "Der aktuelle Stand kommt vom Zähler selbst und kann hier nicht korrigiert werden.",
+    fixErr_helfer_max: "Der Helfer erlaubt keinen so hohen Wert.",
+    fixErr_sensor_fehlt: "Der Verbrauchssensor dieses Vertrags wurde nicht gefunden.", fixErr_kein_sensor: "Dieser Vertrag hat keinen Verbrauchssensor.",
+    fixErr_sensor_ohne_summe: "Der Verbrauchssensor braucht die Zustandsklasse \"Gesamt steigend\".",
     forecastMethod: "Prognose", forecast_saisonal: "saisonal (Monatswerte des Zählers)", forecast_standardprofil: "saisonal (Standardprofil)",
     forecast_letzte_30_tage: "letzte 30 Tage", forecast_durchschnitt: "Durchschnitt seit Beginn",
     bonusSignup: "Neukundenbonus", bonusSignupHint: "mit der Jahresrechnung", bonusInstant: "Sofortbonus", bonusInstantHint: "ausgezahlt",
@@ -1899,6 +1927,7 @@ class TariffyPanel extends HTMLElement {
     if (dlg.mode === "preis") { this._renderPreisDialog(); return; }
     if (dlg.mode === "meter") { this._renderMeterDialog(); return; }
     if (dlg.mode === "import") { this._renderImportDialog(); return; }
+    if (dlg.mode === "fix") { this._renderFixDialog(); return; }
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
     if (dlg.mode === "doc") { this._renderDocDialog(); return; }
     const busy = dlg.stage === "saving";
@@ -2527,7 +2556,9 @@ class TariffyPanel extends HTMLElement {
         m ? h("button", { class: "btn", type: "button", onclick: () => this._openMeter(c) }, icon("meter"), this._t("meterRecord")) : null),
       this._isAdmin ? h("div", { class: "once-add" }, h("button", {
         class: "btn", type: "button", onclick: () => this._openImport(c),
-      }, icon("plus"), this._t("impOpen"))) : null);
+      }, icon("plus"), this._t("impOpen")), m && m.value !== null ? h("button", {
+        class: "btn", type: "button", onclick: () => this._openFix(c),
+      }, icon("meter"), this._t("fixOpen")) : null) : null);
   }
 
   /* ----- import historical meter readings into the sensor's long-term statistics ----- */
@@ -2603,6 +2634,111 @@ class TariffyPanel extends HTMLElement {
         h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("impCheck"), onclick: () => this._runImport(true) }),
         r && r.anzahl ? h("button", { class: "btn go", type: "button", disabled: busy ? "" : null, text: this._t("impRun"), onclick: () => this._runImport(false) }) : null,
         h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() }),
+      ];
+    body.push(h("div", { class: "actions" }, buttons));
+    this._mountDialog(dlg, body, busy);
+  }
+
+  /* ----- correct a reading entered wrongly (rewrites the statistics without a meter change) ----- */
+  async _openFix(c) {
+    this._closeFlow();
+    const dlg = { mode: "fix", stage: "loading", id: c.entry_id, name: c.title, list: [], unit: "", start: "", value: "",
+      report: null, message: null, asking: null, fields: [], values: {}, fieldErrors: {} };
+    this._dlg = dlg;
+    this._renderFixDialog();
+    try {
+      const r = await this._hass.callWS({ type: "tariffy/ablesungen", entry_id: dlg.id });
+      if (this._dlg !== dlg) return;
+      dlg.list = r.ablesungen || [];
+      dlg.unit = r.einheit || "";
+      dlg.start = dlg.list.length ? dlg.list[0].start : "";
+      dlg.stage = "form";
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.message = this._fixError(err);
+    }
+    this._renderFixDialog();
+  }
+
+  _fixError(err) {
+    const code = err && err.code;
+    return code && this._t(`fixErr_${code}`) !== `fixErr_${code}` ? this._t(`fixErr_${code}`) : this._errorText(err);
+  }
+
+  _fixLabel(a) {
+    const when = new Date(a.zeit);
+    const time = Number.isNaN(when.getTime()) ? "" : ` ${String(when.getHours()).padStart(2, "0")}:00`;
+    return `${this._date(a.zeit.slice(0, 10))}${time} · ${this._num(a.stand, 3)} ${this._dlg.unit}${a.wechsel ? ` (${this._t("fixSwap")})` : ""}`;
+  }
+
+  async _runFix(pruefen) {
+    const dlg = this._dlg;
+    dlg.message = null;
+    const stand = Number(String(dlg.value).replace(",", "."));
+    if (String(dlg.value).trim() === "" || !Number.isFinite(stand) || stand < 0) {
+      dlg.message = this._t("fixErr_ungueltig");
+      this._renderFixDialog();
+      return;
+    }
+    dlg.stage = "saving";
+    this._renderFixDialog();
+    try {
+      const r = await this._hass.callWS({ type: "tariffy/ablesung_korrigieren", entry_id: dlg.id, start: dlg.start, stand, pruefen });
+      if (this._dlg !== dlg) return;
+      dlg.report = r;
+      dlg.stage = r.korrigiert || r.nachziehen ? "done" : "form";
+    } catch (err) {
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.report = null;
+      dlg.message = this._fixError(err);
+    }
+    this._renderFixDialog();
+  }
+
+  _renderFixDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving" || dlg.stage === "loading";
+    const r = dlg.report;
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t("fixTitle") }),
+      h("p", { class: "hint", text: dlg.name }),
+      h("p", { class: "hint", text: this._t("fixHint") }),
+    ];
+    if (dlg.stage === "loading") body.push(h("p", { class: "hint", text: this._t("fixLoading") }));
+    else if (dlg.stage !== "done") {
+      if (!dlg.list.length) body.push(h("p", { class: "hint", text: this._t("fixNone") }));
+      else {
+        const pick = h("select", { id: "f-fix-pick", onchange: (ev) => { dlg.start = ev.target.value; dlg.report = null; this._renderFixDialog(); } },
+          dlg.list.map((a) => h("option", { value: a.start, text: this._fixLabel(a) })));
+        pick.value = dlg.start;
+        const input = h("input", { id: "f-fix-value", type: "text", inputmode: "decimal", autocomplete: "off",
+          oninput: (ev) => { dlg.value = ev.target.value; dlg.report = null; } });
+        input.value = dlg.value;
+        body.push(h("label", { class: "fld", for: "f-fix-pick" }, h("span", { class: "lbl", text: this._t("fixPick") }), pick));
+        body.push(h("label", { class: "fld", for: "f-fix-value" }, h("span", { class: "lbl", text: `${this._t("fixValue")} (${dlg.unit})` }), input));
+      }
+    }
+    if (r) {
+      const sign = r.aenderung > 0 ? "+" : "";
+      const lines = dlg.stage === "done"
+        ? [this._t(r.nachziehen ? "fixPending" : "fixDone")]
+        : [
+          this._t("fixPreview", { a: this._num(r.alt, 3), b: this._num(r.neu, 3), d: this._date(r.von.slice(0, 10)) }),
+          this._t("fixUse", { v: `${sign}${this._num(r.aenderung, 3)} ${r.einheit || dlg.unit}` }),
+          r.aktuell ? this._t("fixCurrent") : null,
+        ].filter(Boolean);
+      body.push(h("div", { class: "hint" }, lines.map((t) => h("div", { text: t }))));
+    }
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    const buttons = dlg.stage === "done"
+      ? [h("button", { class: "btn go", type: "button", text: this._t("fixClose"), onclick: () => this._closeFlow() })]
+      : [
+        dlg.list.length ? h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("fixCheck"), onclick: () => this._runFix(true) }) : null,
+        r ? h("button", { class: "btn go", type: "button", disabled: busy ? "" : null, text: this._t("fixRun"), onclick: () => this._runFix(false) }) : null,
+        h("button", { class: "btn", type: "button", disabled: dlg.stage === "saving" ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() }),
       ];
     body.push(h("div", { class: "actions" }, buttons));
     this._mountDialog(dlg, body, busy);
