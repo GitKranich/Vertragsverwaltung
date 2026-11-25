@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.41.1] - 2026-11-25
+
+### Hinzugefügt
+
+- Der Sensor **Wasserpreis (Gesamt)** hat die einzelnen Gebühren als Attribute: `frischwasser`, `abwasser`, `grundpreis_monat`, `niederschlag_gebuehr`, `niederschlag_flaeche`. Damit lassen sie sich in Automationen verwenden, z. B. um sie mit der Gebührenseite der Gemeinde zu vergleichen.
+
 ## [1.41.0] - 2026-11-25
 
 Dieses Release fasst zusammen, was in den Betas `1.40.0-beta.1` und `1.41.0-beta.1` getestet wurde. **Bestehende Verträge laufen ohne jede Änderung weiter.** Beide Neuerungen sind freiwillig oder ändern nur das Aussehen.

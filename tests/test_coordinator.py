@@ -1151,3 +1151,24 @@ class TestStatistikBruch:
     async def test_normal_contract_has_no_break(self, setup_contract):
         _, d = await setup_contract(STROM, **GOLDEN_KW)
         assert d["statistik_brueche"] == 0
+
+
+async def test_wasserpreis_gesamt_hat_die_einzelnen_gebuehren(hass, setup_contract):
+    """Die Gebuehren eines Wasservertrags stehen als Attribute am Sensor Wasserpreis (Gesamt)."""
+    entry, _ = await setup_contract({
+        "sparte": "water", "anbieter": "Gemeinde", "arbeitspreis": 2.8462, "arbeitspreis_abwasser": 1.54,
+        "abwasser_typ": "price_per_unit", "grundpreis": 4.28, "niederschlag_flaeche": 159.0,
+        "niederschlag_gebuehr": 0.39, "abschlag": 41.5, "beginn": "2026-01-01", "erinnerung_monate": "0",
+    })
+    from homeassistant.helpers import entity_registry as er
+
+    eid = next(
+        e.entity_id for e in er.async_entries_for_config_entry(er.async_get(hass), entry.entry_id)
+        if e.unique_id.endswith("_arbeitspreis_gesamt_wasser")
+    )
+    attrs = hass.states.get(eid).attributes
+    assert attrs["frischwasser"] == 2.8462
+    assert attrs["abwasser"] == 1.54
+    assert attrs["grundpreis_monat"] == 4.28
+    assert attrs["niederschlag_gebuehr"] == 0.39
+    assert attrs["niederschlag_flaeche"] == 159.0

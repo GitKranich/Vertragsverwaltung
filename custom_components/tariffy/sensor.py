@@ -362,6 +362,15 @@ SENSOREN: tuple[VertragSensorDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         wasser_only=True,
         value_fn=lambda d: d.get("arbeitspreis_gesamt_wasser"),
+        # Die einzelnen Gebuehren, z. B. um sie in einer Automation mit der Gebuehrenseite des
+        # Versorgers zu vergleichen (Wasser hat keine eigenen Sensoren fuer Arbeits-/Grundpreis)
+        attr_fn=lambda d: {
+            "frischwasser": d.get("arbeitspreis"),
+            "abwasser": d.get("arbeitspreis_abwasser"),
+            "grundpreis_monat": d.get("grundpreis"),
+            "niederschlag_gebuehr": d.get("niederschlag_gebuehr"),
+            "niederschlag_flaeche": d.get("niederschlag_flaeche"),
+        },
     ),
     VertragSensorDescription(
         key="garten_verbrauch",

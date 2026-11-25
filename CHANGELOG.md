@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.41.1] - 2026-11-25
+
+### Added
+
+- The **Wasserpreis (Gesamt)** sensor carries the individual fees as attributes: `frischwasser`, `abwasser`, `grundpreis_monat`, `niederschlag_gebuehr`, `niederschlag_flaeche`, so automations can use them, for example to compare them with the municipality's fee page.
+
 ## [1.41.0] - 2026-11-25
 
 This release brings together what was tested in the betas `1.40.0-beta.1` and `1.41.0-beta.1`. **Existing contracts keep working without any change.** Both new functions are optional or only change the look.

@@ -9,7 +9,7 @@
 | Arbeitspreis (Niedertarif/NT) | €/kWh | Strom (Zweizählertarif) | Niedertarif-Preis, wie im Config Flow eingetragen |
 | Arbeitspreis (Effektiv) | €/kWh | Energie | Effektiver Ø-Preis bei Staffeltarif |
 | Arbeitspreis (Abwasser) | €/m³ | Wasser | Abwassergebühr |
-| Wasserpreis (Gesamt) | €/m³ | Wasser | Frischwasser + Abwasser kombiniert |
+| Wasserpreis (Gesamt) | €/m³ | Wasser | Frischwasser + Abwasser kombiniert; Attribute `frischwasser`, `abwasser`, `grundpreis_monat`, `niederschlag_gebuehr`, `niederschlag_flaeche` mit den einzelnen Gebühren |
 | Grundpreis | €/Monat | Energie | Monatliche Grundgebühr |
 | Abschlag | €/Monat | Alle | Monatlicher Abschlag |
 | Abschlag (Empfohlen) | €/Monat | Energie | Basiert auf realem Verbrauch der letzten Laufzeit × aktuelle Preise |
