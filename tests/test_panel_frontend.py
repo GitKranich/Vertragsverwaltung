@@ -74,3 +74,46 @@ def test_empty_overview_groups_are_not_appended():
     must never append a group directly."""
     assert "wrap.appendChild(group(" not in SOURCE
     assert "if (section) wrap.appendChild(section)" in SOURCE
+
+
+# ------------------------------------------------------------------------------ light and dark design
+def _style() -> str:
+    start = SOURCE.index("const STYLE = `")
+    return SOURCE[start : SOURCE.index("\n`;", start)]
+
+
+def _block_of(selector: str) -> str:
+    style = _style()
+    start = style.index("\n" + selector + " {")
+    return style[start : style.index("\n}\n", start)]
+
+
+def test_the_light_design_redefines_every_colour_of_the_dark_one():
+    """The panel is dark by default and light with the class `light` on its host: every colour variable of the dark
+    block must have a light counterpart, or a colour would stay dark-on-light."""
+    dark = set(re.findall(r"(--[a-z0-9-]+):", _block_of(":host")))
+    light = set(re.findall(r"(--[a-z0-9-]+):", _block_of(":host(.light)")))
+    colours = {name for name in dark if name not in {"--tile", "--tile-line", "--line"}}  # these derive from --w
+    assert colours - light == set(), f"no light value for {colours - light}"
+    assert "color-scheme: light" in _block_of(":host(.light)")
+
+
+def test_no_colour_of_one_design_is_hard_coded():
+    """White overlays and fixed hexadecimal colours would not follow the design: they live in the variables."""
+    body = _style().split("* { box-sizing", 1)[1]  # everything after the two variable blocks
+    assert "rgba(255,255,255" not in SOURCE
+    assert not re.findall(r"#[0-9a-fA-F]{6}\b", body), re.findall(r"#[0-9a-fA-F]{6}\b", body)
+    code = SOURCE.split("\n`;", 1)[1]  # the code after the styles: only the chart palette has fixed colours
+    stray = [c for c in re.findall(r'"#[0-9a-fA-F]{3,6}"', code) if c not in re.search(r"CHART_COLORS = \[(.*?)\]", SOURCE).group(1)]
+    assert not stray, stray
+
+
+def test_the_panel_follows_the_theme_of_home_assistant():
+    assert "this._hass.themes.darkMode" in SOURCE
+    assert 'this.classList.toggle("light"' in SOURCE
+    assert "this._applyTheme();" in SOURCE  # at every update of hass: a change of the theme shows at once
+
+
+def test_an_own_icon_is_only_drawn_when_it_looks_like_one():
+    assert "/^[a-z0-9_-]+:[a-z0-9_-]+$/i" in SOURCE  # mdi:car, nothing that could be markup
+    assert 'customElements.get("ha-icon")' in SOURCE  # without Home Assistant's icon element: the category icon

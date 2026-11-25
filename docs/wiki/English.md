@@ -190,6 +190,10 @@ The **Tariffy panel** is a page of its own in the Home Assistant sidebar. It sho
 
 **Open it:** the **Tariffy** entry (icon `mdi:cash-multiple`) appears in the sidebar as soon as a contract is loaded. Every user sees the panel; it follows the language of Home Assistant (German, otherwise English) and turns cards into expandable rows on phones.
 
+**Light or dark:** the panel follows the design of Home Assistant (light, dark or automatic, set in your profile); there is no setting of its own. Without one from Home Assistant, the system's applies.
+
+**Own icon:** the contract form has an optional field **Icon**, for example `mdi:car`, with a preview. It is used in the panel and for the sensors of the contract; sensors with a status icon (thumb up/down for refund and balance due) keep theirs. Empty = the icon of the category. The icon survives a tariff switch and is part of the backup.
+
 **Five views**
 
 | View | Content |

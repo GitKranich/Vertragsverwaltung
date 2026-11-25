@@ -106,7 +106,7 @@ CONTRACTS = [
     (
         "Internet",
         {
-            "sparte": "internet", "anbieter": "Glasfaser GmbH", "tarif": "FTTH 300",
+            "sparte": "internet", "anbieter": "Glasfaser GmbH", "tarif": "FTTH 300", "icon": "mdi:router-wireless",
             "abschlag": 39.99, "beginn": "2025-10-01", "ende": "2026-09-30",
             "erinnerung_monate": "3", "mindestlaufzeit": 12, "kuendigungsfrist": 3,
         },

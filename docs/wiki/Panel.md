@@ -14,6 +14,10 @@ In der Seitenleiste erscheint der Eintrag **Tariffy** (Symbol `mdi:cash-multiple
 
 Das Panel folgt der Sprache von Home Assistant (Deutsch, sonst Englisch) und passt sich der Breite an: Auf dem Handy werden die Karten zu aufklappbaren Zeilen.
 
+**Hell oder dunkel:** Das Panel folgt dem Design von Home Assistant (hell, dunkel oder automatisch, im eigenen Profil eingestellt); eine eigene Einstellung gibt es nicht. Ohne Vorgabe von Home Assistant gilt die Einstellung des Systems.
+
+**Eigenes Symbol:** Im Vertragsformular lässt sich ein **Icon** eintragen, zum Beispiel `mdi:car` oder `mdi:router-wireless`; das Feld zeigt eine Vorschau. Das Symbol erscheint im Panel und bei den Sensoren des Vertrags. Sensoren mit einem Status-Symbol (Daumen hoch/runter bei Guthaben und Nachzahlung) behalten ihres. Leer = das Symbol der Sparte. Das Symbol bleibt beim Tarifwechsel erhalten und steht in der Sicherung.
+
 ## Die fünf Ansichten
 
 | Ansicht | Inhalt |

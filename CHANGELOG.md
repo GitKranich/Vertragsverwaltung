@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.40.0-beta.1] - 2026-11-25
+
+### Added
+
+- **Light design.** The panel follows the design of Home Assistant (light, dark or automatic, no setting of its own; without one from Home Assistant the system's applies). The dark design is unchanged; all colours of the panel now live in variables with a light counterpart. Taken over from the original (weskona/tariffy 1.32.0) and extended to the parts that only this version has (documents, charts, price changes).
+- **Own icon for every contract.** Optional field **Icon** (for example `mdi:car`) in the contract form, in the panel with a preview. Used in the panel and for the sensors of the contract; sensors with a status icon (thumb up/down) keep theirs. Empty = the icon of the category. Kept at a tariff switch, part of the backup. Taken over from the original (weskona/tariffy 1.32.0).
+
 ## [1.39.1] - 2026-11-25
 
 ### Fixed

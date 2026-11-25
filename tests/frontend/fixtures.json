@@ -100,6 +100,7 @@
           "verbrauch": 3340.0
         }
       ],
+      "icon": null,
       "jahreskosten": 478.32,
       "km_pro_jahr": null,
       "km_start": null,
@@ -210,6 +211,7 @@
       "grundpreis": 9.5,
       "guthaben_bisher": 452.39,
       "historie": [],
+      "icon": null,
       "jahreskosten": 1674.11,
       "km_pro_jahr": null,
       "km_start": null,
@@ -329,6 +331,7 @@
       "grundpreis": 6.0,
       "guthaben_bisher": 7.92,
       "historie": [],
+      "icon": null,
       "jahreskosten": 334.82,
       "km_pro_jahr": null,
       "km_start": null,
@@ -439,6 +442,7 @@
       "grundpreis": 12.0,
       "guthaben_bisher": -186.57,
       "historie": [],
+      "icon": null,
       "jahreskosten": 657.69,
       "km_pro_jahr": null,
       "km_start": null,
@@ -549,6 +553,7 @@
       "grundpreis": null,
       "guthaben_bisher": null,
       "historie": [],
+      "icon": "mdi:router-wireless",
       "jahreskosten": 478.2,
       "km_pro_jahr": null,
       "km_start": null,
@@ -659,6 +664,7 @@
       "grundpreis": null,
       "guthaben_bisher": null,
       "historie": [],
+      "icon": null,
       "jahreskosten": 339.51,
       "km_pro_jahr": null,
       "km_start": null,
@@ -808,6 +814,7 @@
           "verbrauch": 2890.0
         }
       ],
+      "icon": null,
       "jahreskosten": 839.36,
       "km_pro_jahr": null,
       "km_start": null,
@@ -918,6 +925,7 @@
       "grundpreis": null,
       "guthaben_bisher": null,
       "historie": [],
+      "icon": null,
       "jahreskosten": null,
       "km_pro_jahr": null,
       "km_start": null,
@@ -1139,6 +1147,14 @@
               ],
               "sort": false
             }
+          }
+        },
+        {
+          "name": "icon",
+          "optional": true,
+          "required": false,
+          "selector": {
+            "icon": {}
           }
         }
       ],
@@ -3389,6 +3405,14 @@
                 "sort": false
               }
             }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
+            }
           }
         ],
         "description_placeholders": null,
@@ -3816,6 +3840,14 @@
                 ],
                 "sort": false
               }
+            }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
             }
           }
         ],
@@ -4250,6 +4282,14 @@
                 "sort": false
               }
             }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
+            }
           }
         ],
         "description_placeholders": null,
@@ -4638,6 +4678,14 @@
                 ],
                 "sort": false
               }
+            }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
             }
           }
         ],
@@ -5125,6 +5173,17 @@
                 "sort": false
               }
             }
+          },
+          {
+            "description": {
+              "suggested_value": "mdi:router-wireless"
+            },
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
+            }
           }
         ],
         "description_placeholders": null,
@@ -5364,6 +5423,14 @@
                 "sort": false
               }
             }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
+            }
           }
         ],
         "description_placeholders": null,
@@ -5602,6 +5669,14 @@
                 ],
                 "sort": false
               }
+            }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
             }
           }
         ],
@@ -6024,6 +6099,14 @@
                 ],
                 "sort": false
               }
+            }
+          },
+          {
+            "name": "icon",
+            "optional": true,
+            "required": false,
+            "selector": {
+              "icon": {}
             }
           }
         ],

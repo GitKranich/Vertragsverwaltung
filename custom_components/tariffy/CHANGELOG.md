@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.40.0-beta.1] - 2026-11-25
+
+### Hinzugefügt
+
+- **Helles Design.** Das Panel folgt dem Design von Home Assistant (hell, dunkel oder automatisch, keine eigene Einstellung; ohne Vorgabe von Home Assistant gilt die des Systems). Das dunkle Design bleibt unverändert; alle Farben des Panels stehen jetzt in Variablen mit hellem Gegenstück. Übernommen aus dem Original (weskona/tariffy 1.32.0) und erweitert auf die Teile, die nur diese Version hat (Dokumente, Diagramme, Preisänderungen).
+- **Eigenes Icon pro Vertrag.** Optionales Feld **Icon** (z. B. `mdi:car`) im Vertragsformular, im Panel mit Vorschau. Gilt im Panel und für die Sensoren des Vertrags; Sensoren mit Status-Symbol (Daumen hoch/runter) behalten ihres. Leer = das Icon der Sparte. Bleibt beim Tarifwechsel erhalten und steht in der Sicherung. Übernommen aus dem Original (weskona/tariffy 1.32.0).
+
 ## [1.39.1] - 2026-11-25
 
 ### Behoben

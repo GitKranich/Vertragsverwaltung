@@ -52,6 +52,7 @@ from .const import (
     CONF_BRENNWERT,
     CONF_ENDE,
     CONF_ERINNERUNG_MONATE,
+    CONF_ICON,
     CONF_KUENDIGUNGSFRIST,
     CONF_MINDESTLAUFZEIT,
     CONF_KUENDIGUNG_BESTAETIGT,
@@ -492,6 +493,7 @@ def _common_schema(
     notify_options = _notify_options(hass)
     if notify_options:
         fields[_opt(CONF_NOTIFY_TARGET, d.get(CONF_NOTIFY_TARGET))] = _select(notify_options, custom=True)
+    fields[_opt(CONF_ICON, d.get(CONF_ICON))] = selector.IconSelector()
     return vol.Schema(fields)
 
 

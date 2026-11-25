@@ -199,6 +199,9 @@ EINMALPOSTEN_MAX = 50
 CONF_AUSSENZAEHLER = "_aussenzaehler"
 AUSSENZAEHLER_MAX = 10
 
+# Eigenes Icon eines Vertrags (mdi:...): gilt im Panel und fuer die Sensoren des Vertrags
+CONF_ICON = "icon"
+
 # Verknuepfte Dokumente eines Vertrags (interner Schluessel, alle Sparten): Liste aus
 # {paperless_entry, id, titel, erstellt, bezeichnung, web_url}. Gespeichert wird nur der Verweis auf das
 # Dokument in Paperless-ngx (ueber die Integration "Paperless-ngx Insights"), nie das Dokument.

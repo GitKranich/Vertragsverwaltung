@@ -66,6 +66,7 @@ DATA_KEY = f"{DOMAIN}_panel"
 # and internal flags are not sent.
 CONTRACT_FIELDS = (
     "sparte",
+    "icon",
     "anbieter",
     "tarif",
     "versicherungsart",

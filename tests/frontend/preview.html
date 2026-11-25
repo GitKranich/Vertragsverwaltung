@@ -144,6 +144,7 @@
       return { message: "Flow aborted" };
     },
     language: lang,
+    themes: { darkMode: params.get("theme") !== "light" },
     locale: { language: params.get("lang") === "en" ? "en-GB" : "de-DE" },
     connection: {
       subscribeMessage: async (callback) => {

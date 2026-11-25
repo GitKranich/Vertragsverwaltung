@@ -20,6 +20,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    CONF_ICON,
     CONF_ABSCHLAG,
     CONF_ANBIETER,
     CONF_ARBEITSPREIS,
@@ -739,6 +740,9 @@ class VertragSensor(CoordinatorEntity[TariffyCoordinator], SensorEntity):
     def icon(self) -> str | None:
         if self.entity_description.icon_fn is not None:
             return self.entity_description.icon_fn(self.coordinator.data or {})
+        eigenes = (self.coordinator.data or {}).get(CONF_ICON)
+        if eigenes:  # das eigene Icon des Vertrags; Sensoren mit Statusicon (Guthaben/Nachzahlung) behalten ihres
+            return str(eigenes)
         if self.entity_description.currency_icon:
             currency = (self.coordinator.data or {}).get("currency", "EUR")
             return _CURRENCY_ICON.get(currency, "mdi:cash")

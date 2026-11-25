@@ -15,7 +15,8 @@
           "mindestlaufzeit": "Minimum term (months)",
           "kuendigungsfrist": "Notice period (months)",
           "erinnerung_monate": "Cancellation reminder",
-          "notify_target": "Notification target (notify service)"
+          "notify_target": "Notification target (notify service)",
+          "icon": "Icon"
         },
         "data_description": {
           "name": "Short label shown in the device name, e.g. 'Electricity House'",
@@ -27,7 +28,8 @@
           "mindestlaufzeit": "Optional. The panel shows until when the contract runs at least (start + minimum term).",
           "kuendigungsfrist": "Optional. Months before contract end by which the cancellation must be received. If set, the reminder refers to this deadline instead of the contract end.",
           "erinnerung_monate": "How many months before the cancellation deadline to show a reminder (before contract end, if no notice period is entered)",
-          "notify_target": "Home Assistant notification service for the cancellation reminder"
+          "notify_target": "Home Assistant notification service for the cancellation reminder",
+          "icon": "Own icon for this contract (for example mdi:car). Used in the panel and for the sensors of the contract. Empty = the icon of the category."
         }
       },
       "reconfigure": {
@@ -44,7 +46,8 @@
           "mindestlaufzeit": "Minimum term (months)",
           "kuendigungsfrist": "Notice period (months)",
           "erinnerung_monate": "Cancellation reminder",
-          "notify_target": "Notification target (notify service)"
+          "notify_target": "Notification target (notify service)",
+          "icon": "Icon"
         },
         "data_description": {
           "name": "Name of the contract: shown in the panel and used as the name of its device",
@@ -56,7 +59,8 @@
           "mindestlaufzeit": "Optional. The panel shows until when the contract runs at least (start + minimum term).",
           "kuendigungsfrist": "Optional. Months before contract end by which the cancellation must be received. If set, the reminder refers to this deadline instead of the contract end.",
           "erinnerung_monate": "How many months before the cancellation deadline to show a reminder (before contract end, if no notice period is entered)",
-          "notify_target": "Home Assistant notification service for the cancellation reminder"
+          "notify_target": "Home Assistant notification service for the cancellation reminder",
+          "icon": "Own icon for this contract (for example mdi:car). Used in the panel and for the sensors of the contract. Empty = the icon of the category."
         }
       },
       "energie": {
