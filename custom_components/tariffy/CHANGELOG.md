@@ -7,6 +7,18 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.41.0-beta.1] - 2026-11-25
+
+### Hinzugefügt
+
+- Enthält alles aus 1.40.0 (Ablesung korrigieren) zusätzlich zu 1.40.0-beta.1 (helles Design, eigenes Icon pro Vertrag). Nötig, weil 1.40.0 als stabile Version vor diesen Beta-Funktionen erschienen ist.
+
+## [1.40.0] - 2026-11-25
+
+### Hinzugefügt
+
+- **Ablesung korrigieren** für falsch erfasste Stände ("Ablesung korrigieren" im Block "Zählerstand", Administratoren; WebSocket `tariffy/ablesungen` und `tariffy/ablesung_korrigieren`): Ablesung aus der Statistik wählen, richtigen Stand eintragen, Vorschau prüfen, korrigieren. Die Statistik wird ab dieser Ablesung neu geschrieben (Stand und Summe), ohne Zählerwechsel; der Verbrauch läuft nahtlos weiter, echte Zählerwechsel bleiben erhalten. Ist es die aktuelle Ablesung, wird auch der Helfer gesetzt und die Statistik in wenigen Minuten nachgerechnet, sobald Home Assistant den neuen Wert erfasst hat.
+
 ## [1.40.0-beta.1] - 2026-11-25
 
 ### Hinzugefügt
