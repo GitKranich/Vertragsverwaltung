@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0-beta.1] - 2026-11-25
+
+### Changed
+
+- **The panel is split into several files** (internal, nothing changes in what it shows or does): the code (`tariffy-panel.js`), the texts in German and English (`tariffy-i18n.js`), the icons (`tariffy-icons.js`) and the styles (`tariffy-style.js`). The parts are loaded with the version of the panel in the address, so a browser never mixes new code with old texts after an update; the panel is defined at once and draws itself when its parts have arrived, and if a part cannot be loaded it shows an error instead of staying empty. Same structure as in the original (weskona/tariffy 1.32.0), which makes taking over later changes from it easier.
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.41.1] - 2026-11-25
 
 ### Added

@@ -9,9 +9,12 @@ import pytest
 
 from custom_components.tariffy.panel import PANEL_ELEMENT, PANEL_FILE
 
-SOURCE = (
-    Path(__file__).parent.parent / "custom_components" / "tariffy" / "frontend" / PANEL_FILE
-).read_text(encoding="utf-8")
+FRONTEND = Path(__file__).parent.parent / "custom_components" / "tariffy" / "frontend"
+# the panel is split into the code (SOURCE) and the files with its texts, icons and styles
+SOURCE = (FRONTEND / PANEL_FILE).read_text(encoding="utf-8")
+TEXTS = (FRONTEND / "tariffy-i18n.js").read_text(encoding="utf-8")
+STYLE = (FRONTEND / "tariffy-style.js").read_text(encoding="utf-8")
+FILES = sorted(FRONTEND.glob("*.js"))
 
 # Contract names, providers and tariffs are typed in by the user. They must only
 # ever reach the page as text, never as HTML.
@@ -22,28 +25,61 @@ FORBIDDEN = (
 
 
 @pytest.mark.parametrize("sink", FORBIDDEN)
-def test_no_html_sinks(sink):
-    assert sink not in SOURCE
+@pytest.mark.parametrize("path", FILES, ids=lambda p: p.name)
+def test_no_html_sinks(sink, path):
+    assert sink not in path.read_text(encoding="utf-8")
 
 
 def test_registers_the_element_the_backend_announces():
     assert f'customElements.define("{PANEL_ELEMENT}"' in SOURCE
 
 
-def test_is_small_enough_to_ship():
+@pytest.mark.parametrize("path", FILES, ids=lambda p: p.name)
+def test_every_file_is_small_enough_to_ship(path):
     # eigene Version: Preisaenderungen, Boni, Prognose, Zaehlerstand-Erfassung und Dokumente brauchen Platz
-    assert len(SOURCE.encode("utf-8")) < 240_000
+    assert len(path.read_bytes()) < 190_000
+
+
+def test_the_element_is_defined_without_waiting_for_its_parts():
+    """Home Assistant may create the element and set `hass` before it is defined; a module that waits (top-level
+    await) for its parts defines it late, the values then hide the setters and the panel stays black."""
+    assert not re.search(r"^(const|let|var)\s[^=\n]*=\s*await\b|^await\b", SOURCE, flags=re.M)
+    assert "customElements.define(" in SOURCE
+    # values given before the definition are taken back through the setters
+    assert 'for (const prop of ["hass", "narrow", "panel"])' in SOURCE
+    # nothing draws before the parts are there
+    assert "if (!STYLE) return;" in SOURCE
+
+
+def test_the_panel_loads_its_parts_with_its_own_version():
+    """The static path is cached for a long time: the texts, icons and styles must be requested with the
+    `?v=` of the panel file, or a browser could mix new code with old texts after an update."""
+    assert "new URL(import.meta.url).search" in SOURCE
+    for part in ("tariffy-i18n.js", "tariffy-icons.js", "tariffy-style.js"):
+        assert f"import(`./{part}${{VERSION}}`)" in SOURCE
+        assert (FRONTEND / part).is_file()
+    # nothing is imported without the version
+    assert not re.search(r"^\s*import\s.*from\s", SOURCE, flags=re.M)
+    assert not re.search(r"import\(\"", SOURCE)
+
+
+@pytest.mark.parametrize("path", [p for p in FILES if p.name != PANEL_FILE], ids=lambda p: p.name)
+def test_the_parts_export_what_the_panel_imports(path):
+    text = path.read_text(encoding="utf-8")
+    name = {"tariffy-i18n.js": "I18N", "tariffy-icons.js": "ICONS", "tariffy-style.js": "STYLE"}[path.name]
+    assert f"export const {name} =" in text
+    assert "customElements.define" not in text
 
 
 def _block(language: str) -> str:
-    start = SOURCE.index(f"  {language}: {{")
+    start = TEXTS.index(f"  {language}: {{")
     other = {"en": "de", "de": "en"}[language]
     # the two language blocks follow each other, the second ends at the first "};"
-    if SOURCE.index(f"  {other}: {{") > start:
-        end = SOURCE.index(f"  {other}: {{")
+    if TEXTS.index(f"  {other}: {{") > start:
+        end = TEXTS.index(f"  {other}: {{")
     else:
-        end = SOURCE.index("};", start)
-    return SOURCE[start:end]
+        end = TEXTS.index("};", start)
+    return TEXTS[start:end]
 
 
 def _keys(block: str) -> set[str]:
@@ -78,8 +114,7 @@ def test_empty_overview_groups_are_not_appended():
 
 # ------------------------------------------------------------------------------ light and dark design
 def _style() -> str:
-    start = SOURCE.index("const STYLE = `")
-    return SOURCE[start : SOURCE.index("\n`;", start)]
+    return STYLE
 
 
 def _block_of(selector: str) -> str:
@@ -101,10 +136,11 @@ def test_the_light_design_redefines_every_colour_of_the_dark_one():
 def test_no_colour_of_one_design_is_hard_coded():
     """White overlays and fixed hexadecimal colours would not follow the design: they live in the variables."""
     body = _style().split("* { box-sizing", 1)[1]  # everything after the two variable blocks
-    assert "rgba(255,255,255" not in SOURCE
+    assert "rgba(255,255,255" not in STYLE and "rgba(255,255,255" not in SOURCE
     assert not re.findall(r"#[0-9a-fA-F]{6}\b", body), re.findall(r"#[0-9a-fA-F]{6}\b", body)
-    code = SOURCE.split("\n`;", 1)[1]  # the code after the styles: only the chart palette has fixed colours
-    stray = [c for c in re.findall(r'"#[0-9a-fA-F]{3,6}"', code) if c not in re.search(r"CHART_COLORS = \[(.*?)\]", SOURCE).group(1)]
+    # the code: only the chart palette and the message when a part cannot be loaded have fixed colours
+    palette = re.search(r"CHART_COLORS = \[(.*?)\]", SOURCE).group(1)
+    stray = [c for c in re.findall(r'"#[0-9a-fA-F]{3,6}"', SOURCE) if c not in palette]
     assert not stray, stray
 
 
