@@ -127,3 +127,28 @@ async def test_the_form_has_the_field_for_the_first_debit(frontend_env, contract
         result = await hass.config_entries.flow.async_configure(result["flow_id"], _form_defaults(result))
     names = [str(key) for key in result["data_schema"].schema]
     assert names.index("abschlag") < names.index("erste_zahlung") < names.index("grundpreis")
+
+
+@pytest.mark.parametrize("zahlweise", ["quarterly", "halfyearly", "yearly"])
+async def test_the_interval_stays_at_a_tariff_switch(contract, hass, zahlweise):
+    """A yearly premium fell back to monthly at a switch: the new term must keep the interval."""
+    entry, _ = await contract.setup(
+        {**INSURANCE, "zahlweise": zahlweise, "erste_zahlung": "2026-02-15"}, today="2026-07-12"
+    )
+    options = {"next_beginn": "2026-07-01", "next_ende": "2027-06-30", "next_anbieter": "Neu", "next_abschlag": 60.0}
+    hass.config_entries.async_update_entry(entry, options=options)
+    await entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert entry.data["anbieter"] == "Neu" and entry.data["abschlag"] == 60.0
+    assert entry.data["zahlweise"] == zahlweise
+    assert "erste_zahlung" not in entry.data  # the first debit belonged to the old term
+
+
+async def test_an_energy_contract_gets_no_interval_at_a_switch(contract, hass):
+    entry, _ = await contract.setup(STROM, **GOLDEN)
+    options = {"next_beginn": "2026-07-01", "next_ende": "2027-06-30", "next_anbieter": "Neu", "next_arbeitspreis": 0.25}
+    hass.config_entries.async_update_entry(entry, options=options)
+    await entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert entry.data["anbieter"] == "Neu"
+    assert "zahlweise" not in entry.data

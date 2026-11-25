@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.39.1] - 2026-11-25
+
+### Behoben
+
+- **Ein Pauschalvertrag mit vierteljährlicher, halbjährlicher oder jährlicher Zahlweise fiel beim Tarifwechsel auf monatlich zurück** (automatisch oder "Jetzt wechseln"). Die Zahlweise bleibt jetzt für die neue Laufzeit erhalten; das Datum der ersten Abbuchung gehörte zur alten Laufzeit und entfällt wie bisher. Verbrauchsverträge haben weiterhin keine Zahlweise. Übernommen aus dem Original (weskona/tariffy 1.32.0).
+- **Das offene Panel blieb leer, nachdem ein Vertrag angelegt oder geändert wurde**, bis ein anderer Vertrag neu geladen wurde: Ein Vertrag, der gerade eingerichtet wird, gehört jetzt zur Liste, die das Panel bekommt. Übernommen aus dem Original (weskona/tariffy 1.32.0, Issue #102).
+
 ## [1.39.0] - 2026-11-25
 
 ### Hinzugefügt

@@ -215,7 +215,10 @@ def async_contracts(hass: HomeAssistant) -> list[dict[str, Any]]:
     """All loaded contracts."""
     contracts = []
     for entry in hass.config_entries.async_entries(DOMAIN):
-        if entry.state is not ConfigEntryState.LOADED:
+        # Ein Vertrag, der gerade eingerichtet wird, zaehlt mit: er meldet sich aus async_setup_entry beim Panel,
+        # wenn sein Zustand noch nicht LOADED ist. Ohne ihn bekam das offene Panel nach jedem Anlegen und
+        # Neuladen eine leere Liste. Ein Vertrag, der entladen wird oder fehlgeschlagen ist, hat nichts zu zeigen.
+        if entry.state not in (ConfigEntryState.LOADED, ConfigEntryState.SETUP_IN_PROGRESS):
             continue
         if getattr(entry, "runtime_data", None) is None:
             continue

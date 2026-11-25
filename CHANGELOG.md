@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.39.1] - 2026-11-25
+
+### Fixed
+
+- **A flat-rate contract with a quarterly, half-yearly or yearly payment fell back to monthly at a tariff switch** (automatic or "Switch now"). The payment interval is now kept for the new term; the date of the first debit belonged to the old term and is dropped as before. Energy contracts still have no payment interval. Taken over from the original (weskona/tariffy 1.32.0).
+- **The open panel stayed empty after a contract was created or changed** until another contract was reloaded: a contract that is being set up is now part of the list sent to the panel. Taken over from the original (weskona/tariffy 1.32.0, issue #102).
+
 ## [1.39.0] - 2026-11-25
 
 ### Added

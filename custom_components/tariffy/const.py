@@ -278,6 +278,8 @@ BASIS_FELDER = [
     CONF_VERSICHERUNGSART,
     CONF_KENNZEICHEN,
     CONF_KM_PRO_JAHR,
+    # die Zahlweise eines Pauschalvertrags gilt auch fuer den Folgevertrag (sonst fiel er auf monatlich zurueck)
+    CONF_ZAHLWEISE,
 ]
 
 # Kredit / Finanzierung (Sparte "loan"): getrennt von den Vertraegen, zaehlt nicht in deren Summen.
