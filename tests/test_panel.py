@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -28,6 +29,8 @@ SECRET = {
     "marktlokation": "DE0001",
     "notify_target": "mobile_app_secret",
 }
+
+FRONTEND = Path(__file__).parent.parent / "custom_components" / "tariffy" / "frontend"
 
 
 @pytest.fixture
@@ -82,6 +85,8 @@ class TestPanelRegistration:
             ("tariffy-i18n.js", "export const I18N"),
             ("tariffy-icons.js", "export const ICONS"),
             ("tariffy-style.js", "export const STYLE"),
+            *((p.name, "=> class {") for p in FRONTEND.glob("tariffy-*.js")
+              if p.name not in {"tariffy-panel.js", "tariffy-i18n.js", "tariffy-icons.js", "tariffy-style.js"}),
         ):
             response = await client.get(f"/tariffy_static/{name}?v=1")
             assert response.status == 200, name

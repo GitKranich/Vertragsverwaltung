@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0-beta.2] - 2026-11-25
+
+### Changed
+
+Internal restructuring; nothing changes in what Tariffy shows or calculates. Checked with the full test suite, the unchanged panel fixtures from the real backend and a comparison of the drawn panel (every tab and every dialog) with 1.42.0-beta.1.
+
+- **Panel: one module per tab or area** (overview, costs, contracts, history, backup, forms, contract changes, meter readings, documents), loaded with the panel's version like the texts and styles. After the update reload the browser page once (Ctrl+F5).
+- **Calculations in their own modules** without Home Assistant: `werte.py`, `preise.py` (price changes), `prognose.py` (seasonal forecast), `abschlaege.py` (instalments, one-time items, bonuses). The coordinator calls them.
+- **WebSocket commands of the panel in `websocket.py`**; `panel.py` only registers the panel.
+- **Browser test in CI**: every tab in German and English, wide and narrow, light and dark, and every dialog of the panel; any browser error fails the build.
+- **`UPSTREAM.md`** records up to which version of the original (weskona/tariffy) was compared, what was taken over and what is still open.
+
 ## [1.42.0-beta.1] - 2026-11-25
 
 ### Changed

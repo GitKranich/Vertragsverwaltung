@@ -74,3 +74,23 @@ jobs:
 
       - name: Run tests
         run: pytest
+
+  panel-browser:
+    name: Panel in the browser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Playwright with Chromium
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Smoke test of the panel (every tab, states, dialogs)
+        run: python tests/frontend/smoke.py

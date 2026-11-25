@@ -7,6 +7,18 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.42.0-beta.2] - 2026-11-25
+
+### Geändert
+
+Interner Umbau; an Anzeige und Berechnung ändert sich nichts. Geprüft mit allen Tests, den unveränderten Panel-Daten aus dem echten Backend und einem Vergleich des gezeichneten Panels (jeder Tab, jeder Dialog) mit 1.42.0-beta.1.
+
+- **Panel: ein Modul je Tab bzw. Bereich** (Übersicht, Kosten, Verträge, Historie, Sicherung, Formulare, Änderungen am Vertrag, Zählerstände, Dokumente), geladen mit der Version des Panels wie Texte und Styles. Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+- **Berechnungen in eigenen Modulen** ohne Home Assistant: `werte.py`, `preise.py` (Preisänderungen), `prognose.py` (saisonale Prognose), `abschlaege.py` (Abschläge, Einmalposten, Boni). Der Coordinator ruft sie auf.
+- **WebSocket-Befehle des Panels in `websocket.py`**; `panel.py` registriert nur noch das Panel.
+- **Browser-Test im CI**: jeder Tab auf Deutsch und Englisch, breit und schmal, hell und dunkel, und jeder Dialog des Panels; jeder Fehler im Browser lässt den Build scheitern.
+- **`UPSTREAM.md`** hält fest, bis zu welcher Version des Originals (weskona/tariffy) verglichen wurde, was übernommen wurde und was offen ist.
+
 ## [1.42.0-beta.1] - 2026-11-25
 
 ### Geändert

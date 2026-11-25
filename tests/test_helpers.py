@@ -1,4 +1,4 @@
-"""Tests for the pure helper functions in coordinator.py."""
+"""Tests for the pure helper functions (werte.py, preise.py, abschlaege.py) and the statistics helpers in coordinator.py."""
 
 from __future__ import annotations
 
@@ -6,16 +6,10 @@ from datetime import date
 
 import pytest
 
-from custom_components.tariffy.coordinator import (
-    _abschlag_bisher_gezahlt,
-    _extract_tiers,
-    _f,
-    _minus_months,
-    _parse_date,
-    _pick_verbrauch_delta,
-    _tiered_cost,
-    _verbrauch_aus_zeilen,
-)
+from custom_components.tariffy.abschlaege import abschlag_bisher_gezahlt as _abschlag_bisher_gezahlt
+from custom_components.tariffy.coordinator import _pick_verbrauch_delta, _verbrauch_aus_zeilen
+from custom_components.tariffy.preise import extract_tiers as _extract_tiers, tiered_cost as _tiered_cost
+from custom_components.tariffy.werte import f as _f, minus_months as _minus_months, parse_date as _parse_date
 
 
 class TestParsing:

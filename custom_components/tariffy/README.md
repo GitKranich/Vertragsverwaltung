@@ -179,3 +179,38 @@ Seit Version 1.27.0 zeigt eine Seite **Tariffy** in der Seitenleiste alle Vertr�
 - `empfohlener_abschlag` fällt auf eine 12-Monats-Annahme zurück, wenn die Dauer der letzten Laufzeit nicht bekannt ist (z. B. bei Verträgen, die vor Einführung dieses Felds gewechselt haben).
 - Ohne konfigurierten `verbrauch_sensor` bleiben alle "echten" Verbrauchssensoren (`verbrauch_bisher`, `verbrauch_hochgerechnet`, `prognose_real`, `kosten_bisher`) auf `unknown` — nur die eingetragenen Vertragsdaten (Preise, Restlaufzeit, Kosten laut Abschlag) sind dann verfügbar.
 - Beim dynamischen Tarif wird mit dem **Durchschnittspreis** über den bisherigen Zeitraum gerechnet, nicht stundengenau mit Preis × Verbrauch je Stunde — bei starken Verbrauchsspitzen zu ungünstigen Preiszeiten weicht die tatsächliche Rechnung des Anbieters entsprechend ab.
+
+## Aufbau des Codes (für Entwickler)
+
+**Backend (Python)**
+
+| Datei | Aufgabe |
+|---|---|
+| `coordinator.py` | Der Coordinator: holt Verbrauch aus der Langzeitstatistik, rechnet je Vertrag, Tarifwechsel, Erinnerungen und Warnungen |
+| `werte.py` | Hilfsfunktionen für Werte: Zahlen, Datumsangaben, Monate, Einheiten |
+| `preise.py` | Staffelpreise, Preisänderungen im laufenden Vertrag (Segmente), Kosten nach Arbeitspreis |
+| `prognose.py` | Monatsprofile (eigene Statistik oder Standardprofil) und Verteilung des Restverbrauchs |
+| `abschlaege.py` | Gezahlte Abschläge, Abbuchungen ab der ersten Zahlung, Abschlags-Segmente, Einmalposten und Boni |
+| `loan.py`, `ablesung.py`, `meter_import.py`, `dokumente.py`, `history.py`, `backup.py` | Kredite, Ablesung korrigieren, Zählerstand-Import, Paperless-Dokumente, Historie, Sicherung |
+| `panel.py` | Registriert das Seitenleisten-Panel, liefert seine Dateien und baut die Vertragsdaten für das Panel |
+| `websocket.py` | Alle WebSocket-Befehle des Panels (`tariffy/...`); ändernde Befehle nur für Administratoren |
+
+`werte.py`, `preise.py`, `prognose.py` und `abschlaege.py` sind reine Funktionen ohne Home Assistant (ein Test prüft das).
+
+**Panel (JavaScript, ohne Build-Schritt)**
+
+| Datei | Aufgabe |
+|---|---|
+| `tariffy-panel.js` | Das Element: Lebenszyklus, Laden der Teile, Formatierung, Zeichnen, Kopfzeile |
+| `tariffy-i18n.js`, `tariffy-icons.js`, `tariffy-style.js` | Texte (DE/EN), Icons, Styles |
+| `tariffy-overview.js` | Tab „Übersicht“: Summen, Vertrags- und Kreditkarten, Aktionen |
+| `tariffy-costs.js`, `tariffy-contracts.js`, `tariffy-history.js`, `tariffy-backup.js` | Tabs „Kosten“, „Verträge“, „Historie“, „Sicherung“ |
+| `tariffy-flow.js` | Formulare der Integration im Dialog (anlegen, Folgevertrag, bearbeiten, löschen) |
+| `tariffy-contract.js` | Verlängern, Einmalposten, Preisänderungen |
+| `tariffy-meter.js` | Zählerstand erfassen, importieren, korrigieren; Außenzähler |
+| `tariffy-docs.js` | Paperless-Dokumente |
+
+Alle Teile werden mit der Version des Panels in der Adresse (`?v=`) geladen. Die Tab-Module liefern eine Klasse, deren
+Methoden beim Laden auf das Panel-Element übertragen werden; sie schreiben sich also genau wie Methoden der Klasse.
+Ein Browser-Test (`tests/frontend/smoke.py`, im CI) öffnet jeden Tab und jeden Dialog und schlägt bei jedem Fehler fehl.
+Was aus dem Original übernommen wurde und was noch offen ist, steht in `UPSTREAM.md`.

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import calendar
 from collections.abc import Callable
 from datetime import date, datetime, timedelta
 import logging
@@ -96,11 +95,8 @@ from .const import (
     CONF_EINSPEISEVERGUETUNG,
     CONF_JAHRESVERBRAUCH_NACHT,
     CONF_JAHRESVERBRAUCH_TAG,
-    CONF_TIER_LIMITS,
-    CONF_TIER_PRICES,
     CONF_TIERED,
     CONF_WASSER_EINHEIT,
-    MAX_TIERS,
     GAS_SPARTE,
     WASSER_SPARTE,
     NEXT_PREFIX,
@@ -113,513 +109,46 @@ from .const import (
     CONF_VERBRAUCH_START_WERT_NT,
     CONF_ZAEHLERNUMMER_NT,
 )
+from .werte import (
+    f as _f,
+    parse_date as _parse_date,
+    wasser_einheit as _wasser_einheit,
+    in_einheit as _in_einheit,
+    monate_wert as _monate_wert,
+    minus_months as _minus_months,
+    plus_months as _plus_months,
+)
+from .preise import (
+    tiered_cost as _tiered_cost,
+    extract_tiers as _extract_tiers,
+    PREIS_FELDER as _PREIS_FELDER,
+    preis_segmente as _preis_segmente,
+    segment_am as _segment_am,
+    arbeitspreis_kosten as _arbeitspreis_kosten,
+    rest_arbeitspreis_kosten as _rest_arbeitspreis_kosten,
+    preisaenderungen_anzeige as _preisaenderungen_anzeige,
+)
+from .prognose import (
+    MONAT_TAGE as _MONAT_TAGE,
+    standardprofil as _standardprofil,
+    monatsprofil_aus_statistik as _monatsprofil_aus_statistik,
+    prognose_abschnitte as _prognose_abschnitte,
+    rest_arbeitspreis_kosten_abschnitte as _rest_arbeitspreis_kosten_abschnitte,
+    integral_monate as _integral_monate,
+)
+from .abschlaege import (
+    abschlag_bisher_gezahlt as _abschlag_bisher_gezahlt,
+    einmal_summen as _einmal_summen,
+    abschlag_nach_zahlungen as _abschlag_nach_zahlungen,
+    abschlag_segmente as _abschlag_segmente,
+    abschlag_zahlungen as _abschlag_zahlungen,
+)
 
 if TYPE_CHECKING:
     from . import TariffyConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(hours=6)
-
-
-def _tiered_cost(verbrauch: float, limits: list, prices: list) -> float | None:
-    """Berechnet gestaffelte Kosten für gegebenen Jahresverbrauch.
-
-    limits: Obergrenzen je Block (letzter Block = unbegrenzt wenn None)
-    prices: Preis je Block
-    Beispiel: limits=[5,10], prices=[0.5,0.8,1.2]
-    → Block1: 0-5, Block2: 5-10, Block3: >10
-    """
-    if not limits or not prices:
-        return None
-    total = 0.0
-    remaining = verbrauch
-    prev = 0.0
-    for i, price in enumerate(prices):
-        if remaining <= 0:
-            break
-        if i < len(limits) and limits[i] is not None:
-            block_size = min(remaining, limits[i] - prev)
-            total += block_size * price
-            remaining -= block_size
-            prev = limits[i]
-        else:
-            # Letzter Block: unbegrenzt
-            total += remaining * price
-            remaining = 0
-    return round(total, 2)
-
-
-def _extract_tiers(data: dict) -> tuple[list, list]:
-    """Extrahiert Tier-Listen aus entry.data (tier_limit_0..N, tier_price_0..N)."""
-    limits = []
-    prices = []
-    # Zuerst prüfen ob alte Listen-Form vorhanden
-    if data.get(CONF_TIER_LIMITS):
-        return list(data[CONF_TIER_LIMITS]), list(data[CONF_TIER_PRICES] or [])
-    # Neue Form: einzelne Felder
-    for i in range(MAX_TIERS):
-        lim = _f(data.get(f"tier_limit_{i}"))
-        prc = _f(data.get(f"tier_price_{i}"))
-        if prc is None:
-            break
-        limits.append(lim)  # None = unbegrenzt
-        prices.append(prc)
-    return limits, prices
-
-
-def _parse_date(value: Any) -> date | None:
-    if not value:
-        return None
-    try:
-        return date.fromisoformat(str(value))
-    except (ValueError, TypeError):
-        return None
-
-
-def _abschlag_bisher_gezahlt(
-    abschlag: float, vergangene_monate: float, beginn: date, data: dict[str, Any]
-) -> float:
-    """Tatsaechlich bis heute gezahlter Abschlag — beruecksichtigt eine
-    Abschlags-Aenderung waehrend der laufenden Vertragslaufzeit (siehe
-    config_flow.py::_stamp_abschlag_change), damit ein kuerzlich geaenderter
-    Abschlag nicht rueckwirkend auf die Zeit VOR der Aenderung angewendet
-    wird (sonst wuerden "Guthaben/Nachzahlung (Bisher)" und "Abschlag
-    (Anpassung empfohlen)" faelschlich optimistischer/pessimistischer
-    ausfallen, als tatsaechlich gezahlt wurde).
-    """
-    ab_datum = _parse_date(data.get(CONF_ABSCHLAG_AB_DATUM))
-    vorheriger_wert = data.get(CONF_ABSCHLAG_VORHERIGER_WERT)
-    # Ein vorheriger Wert von 0 heisst: vorher war kein Abschlag eingetragen (aeltere Staende haben
-    # so einen Stempel noch); dann gilt der Betrag fuer die ganze Laufzeit.
-    if ab_datum is None or not vorheriger_wert or ab_datum <= beginn:
-        return abschlag * vergangene_monate
-    monate_alt = (ab_datum - beginn).days / 30.44
-    if monate_alt >= vergangene_monate:
-        # Aenderung liegt (rechnerisch) noch nicht in der Vergangenheit —
-        # konservativ den alten Wert fuer die gesamte bisherige Zeit annehmen.
-        return vorheriger_wert * vergangene_monate
-    monate_neu = vergangene_monate - monate_alt
-    return vorheriger_wert * monate_alt + abschlag * monate_neu
-
-
-def _f(value: Any) -> float | None:
-    if value in (None, ""):
-        return None
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def _wasser_einheit(hass: HomeAssistant, entity_id: str | None) -> str:
-    state = hass.states.get(entity_id) if entity_id else None
-    unit = state.attributes.get("unit_of_measurement") if state else None
-    return str(unit or "").strip().lower().replace("m3", "m³")
-
-
-def _in_einheit(wert: float | None, von: str, nach: str) -> float | None:
-    """Rechnet einen Wasserverbrauch von Liter in m³ (oder zurueck) um; sonst unveraendert."""
-    if wert is None:
-        return None
-    if von == "l" and nach == "m³":
-        return wert / 1000
-    if von == "m³" and nach == "l":
-        return wert * 1000
-    return wert
-
-
-def _monate_wert(value: Any) -> int:
-    """Monate aus einer optionalen Eingabe (leer, 0 oder ungueltig = 0)."""
-    zahl = _f(value)
-    return int(zahl) if zahl is not None and zahl > 0 else 0
-
-
-def _minus_months(d: date, months: int) -> date:
-    if not months:
-        return d
-    index = (d.month - 1) - months
-    year = d.year + index // 12
-    month = index % 12 + 1
-    day = min(d.day, calendar.monthrange(year, month)[1])
-    return date(year, month, day)
-
-
-def _plus_months(d: date, months: int) -> date:
-    return _minus_months(d, -months)
-
-
-def _einmal_summen(
-    data: dict[str, Any], beginn: date | None, heute: date
-) -> tuple[list[dict[str, Any]], float, float]:
-    """Einmalposten des Vertrags: (Liste, Summe bis heute ueber alle Laufzeiten, Summe bis
-    heute in der laufenden Laufzeit). Positiv = Gutschrift, negativ = Rechnung. Ein Posten
-    mit Datum in der Zukunft zaehlt erst ab diesem Tag; einer ohne Datum zaehlt sofort."""
-    posten: list[dict[str, Any]] = []
-    gesamt = 0.0
-    laufend = 0.0
-    for item in data.get(CONF_EINMALPOSTEN) or []:
-        betrag = _f(item.get("betrag")) if isinstance(item, dict) else None
-        if betrag is None:
-            continue
-        tag = _parse_date(item.get("datum"))
-        posten.append(
-            {
-                "bezeichnung": str(item.get("bezeichnung") or "")[:100],
-                "betrag": round(betrag, 2),
-                "datum": tag.isoformat() if tag else None,
-            }
-        )
-        if tag is not None and tag > heute:
-            continue
-        gesamt += betrag
-        if tag is None or beginn is None or tag >= beginn:
-            laufend += betrag
-    return posten, round(gesamt, 2), round(laufend, 2)
-
-
-
-def _abschlag_nach_zahlungen(
-    abschlag: float,
-    intervall: int,
-    beginn: date,
-    ende: date | None,
-    heute: date,
-    data: dict[str, Any],
-    segmente: list[dict[str, Any]] | None = None,
-) -> tuple[float, date | None]:
-    """Bis heute tatsaechlich abgebuchte Betraege bei nicht monatlicher Zahlweise (zum Beispiel eine
-    Versicherung, die jaehrlich im Voraus bezahlt wird): gezaehlt wird jede Zahlung ab der ersten
-    Abbuchung (leer = Vertragsbeginn), nicht ein monatlicher Anteil. Bei monatlicher Zahlung zaehlt
-    eine Rate, sobald ihr Monat begonnen hat, auch wenn der Tag im Monat noch aussteht. Gibt auch die naechste Zahlung
-    zurueck. Eine Preisaenderung gilt fuer Zahlungen ab ihrem Datum."""
-    erste = _parse_date(data.get(CONF_ERSTE_ZAHLUNG)) or beginn
-    monat_heute = (heute.year, heute.month)
-    ab_datum = _parse_date(data.get(CONF_ABSCHLAG_AB_DATUM))
-    vorher = _f(data.get(CONF_ABSCHLAG_VORHERIGER_WERT))
-    summe = 0.0
-    zahlung = 0
-    naechste: date | None = None
-    while zahlung < 1200:
-        termin = _plus_months(erste, zahlung * intervall)
-        if ende is not None and termin > ende:
-            break
-        if termin > heute and naechste is None:
-            naechste = termin
-        # Monatliche Zahlung: die Rate zaehlt, sobald ihr Monat begonnen hat (egal, an welchem Tag des
-        # Monats sie liegt); sonst zaehlt jede Abbuchung am Tag der Zahlung
-        if (intervall == 1 and (termin.year, termin.month) > monat_heute) or (
-            intervall != 1 and termin > heute
-        ):
-            break
-        if segmente:
-            # Preis-/Beitragsaenderungen: der am Zahltag gueltige Betrag (die gemerkte
-            # Abschlagsaenderung steckt schon in den Abschnitten, siehe _abschlag_segmente)
-            monatlich = _segment_am(segmente, termin)["abschlag"] or 0.0
-        else:
-            monatlich = vorher if (ab_datum is not None and vorher and termin < ab_datum) else abschlag
-        summe += round(monatlich * intervall, 2)
-        zahlung += 1
-    if naechste is None:  # die naechste Abbuchung nach heute, falls der Vertrag dann noch laeuft
-        termin = _plus_months(erste, zahlung * intervall)
-        if termin > heute and (ende is None or termin <= ende):
-            naechste = termin
-    return round(summe, 2), naechste
-
-
-# ------------------------------------------------- Preisaenderungen im Vertrag
-_MONAT_TAGE = 30.44
-_PREIS_FELDER = ("arbeitspreis", "grundpreis", "abschlag")
-
-
-def _preis_segmente(data: dict[str, Any], beginn: date) -> list[dict[str, Any]]:
-    """Zeitabschnitte des Vertrags mit den jeweils gueltigen Preisen.
-
-    Der erste Abschnitt beginnt am Vertragsbeginn mit den Werten aus den Vertragsdaten; jede
-    Preisaenderung (CONF_PREISAENDERUNGEN) beginnt einen neuen Abschnitt. Ein leerer Wert in
-    einer Preisaenderung uebernimmt den Wert des vorherigen Abschnitts. Aenderungen am oder vor
-    dem Vertragsbeginn werden ignoriert (sie gehoeren zu keinem Abschnitt dieses Vertrags)."""
-    basis = {
-        "von": beginn,
-        "arbeitspreis": _f(data.get(CONF_ARBEITSPREIS)),
-        "grundpreis": _f(data.get(CONF_GRUNDPREIS)),
-        "abschlag": _f(data.get(CONF_ABSCHLAG)),
-        "zaehlerstand": None,
-    }
-    aenderungen = []
-    for item in data.get(CONF_PREISAENDERUNGEN) or []:
-        if not isinstance(item, dict):
-            continue
-        tag = _parse_date(item.get("datum"))
-        if tag is None or tag <= beginn:
-            continue
-        aenderungen.append((tag, item))
-    aenderungen.sort(key=lambda paar: paar[0])
-    segmente = [basis]
-    for tag, item in aenderungen:
-        vorher = segmente[-1]
-        segment = {"von": tag, "zaehlerstand": _f(item.get("zaehlerstand"))}
-        for feld in _PREIS_FELDER:
-            wert = _f(item.get(feld))
-            segment[feld] = wert if wert is not None else vorher[feld]
-        if vorher["von"] == tag:  # zwei Aenderungen am selben Tag: die spaetere zaehlt
-            segmente[-1] = segment
-        else:
-            segmente.append(segment)
-    return segmente
-
-
-def _segment_am(segmente: list[dict[str, Any]], tag: date) -> dict[str, Any]:
-    """Der am `tag` gueltige Abschnitt (vor dem ersten Abschnitt: der erste)."""
-    aktiv = segmente[0]
-    for segment in segmente:
-        if segment["von"] <= tag:
-            aktiv = segment
-    return aktiv
-
-
-def _abschlag_segmente(
-    segmente: list[dict[str, Any]], beginn: date, data: dict[str, Any]
-) -> list[dict[str, Any]]:
-    """Abschnitte fuer den Abschlag. Beruecksichtigt zusaetzlich eine Abschlags-Aenderung beim
-    Bearbeiten des Vertrags (CONF_ABSCHLAG_AB_DATUM, siehe _abschlag_bisher_gezahlt), aber nur,
-    wenn sie im ersten Abschnitt liegt: dort hat sie den Abschlag ab Vertragsbeginn geaendert."""
-    ab_datum = _parse_date(data.get(CONF_ABSCHLAG_AB_DATUM))
-    vorher = _f(data.get(CONF_ABSCHLAG_VORHERIGER_WERT))
-    naechster = segmente[1]["von"] if len(segmente) > 1 else None
-    if (
-        ab_datum is None
-        or not vorher
-        or ab_datum <= beginn
-        or (naechster is not None and ab_datum >= naechster)
-    ):
-        return segmente
-    erster = segmente[0]
-    return [
-        {**erster, "abschlag": vorher},
-        {**erster, "von": ab_datum},
-        *segmente[1:],
-    ]
-
-
-def _abschlag_zahlungen(
-    ab_segmente: list[dict[str, Any]], erste: date, ende: date, heute: date
-) -> tuple[float, float, int]:
-    """Monatliche Abschlagszahlungen ab `erste` bis `ende`: (bis heute gezahlt, Summe ueber die
-    Laufzeit, Anzahl der noch offenen Raten). Eine Rate zaehlt als gezahlt, sobald ihr Monat
-    begonnen hat; ihr Betrag ist der am Zahltag gueltige Abschlag."""
-    bisher = gesamt = 0.0
-    offen = 0
-    monat_heute = (heute.year, heute.month)
-    for nummer in range(240):
-        termin = _plus_months(erste, nummer)
-        if termin > ende:
-            break
-        betrag = _segment_am(ab_segmente, termin)["abschlag"] or 0.0
-        gesamt += betrag
-        if (termin.year, termin.month) <= monat_heute:
-            bisher += betrag
-        else:
-            offen += 1
-    return round(bisher, 2), round(gesamt, 2), offen
-
-
-# ------------------------------------------------------------ Verbrauchsprognose
-# Standardprofile als relative Tagesintensitaet je Kalendermonat (1 = Jahresmittel), fuer
-# Vertraege ohne genug eigene Statistik. Strom: Naeherung an das Haushaltsprofil (Winter etwa
-# 15 % ueber, Sommer etwa 15 % unter dem Mittel). Gas: 80 % Heizung nach Gradtagzahlen
-# (VDI 2067, Jahressumme 1000) plus 20 % gleichmaessiger Anteil fuer Warmwasser und Kochen.
-_PROFIL_STROM = {
-    1: 1.15, 2: 1.08, 3: 1.02, 4: 0.93, 5: 0.88, 6: 0.85,
-    7: 0.85, 8: 0.86, 9: 0.90, 10: 1.00, 11: 1.10, 12: 1.18,
-}
-_GRADTAGE = {1: 170, 2: 150, 3: 130, 4: 80, 5: 40, 6: 13.3, 7: 13.3, 8: 13.4, 9: 30, 10: 80, 11: 120, 12: 160}
-
-
-def _standardprofil(sparte: str | None) -> dict[int, float]:
-    if sparte == GAS_SPARTE:
-        return {
-            monat: 0.8 * (_GRADTAGE[monat] / 1000) * 365 / calendar.monthrange(2001, monat)[1] + 0.2
-            for monat in range(1, 13)
-        }
-    return dict(_PROFIL_STROM)
-
-
-def _monatsprofil_aus_statistik(
-    monate: dict[tuple[int, int], float]
-) -> dict[int, float]:
-    """Mittlerer Tagesverbrauch je Kalendermonat aus vollstaendigen Monatswerten
-    {(jahr, monat): verbrauch}, ueber alle vorhandenen Jahre gemittelt."""
-    summen: dict[int, list[float]] = {}
-    for (jahr, monat), menge in monate.items():
-        if menge is None or menge < 0:
-            continue
-        summen.setdefault(monat, []).append(menge / calendar.monthrange(jahr, monat)[1])
-    return {monat: sum(werte) / len(werte) for monat, werte in summen.items()}
-
-
-def _profil_summe(profil: dict[int, float], von: date, bis: date) -> float | None:
-    """Summe der Tagesintensitaeten von `von` (einschliesslich) bis `bis` (ausschliesslich).
-    None, wenn ein beruehrter Kalendermonat im Profil fehlt."""
-    summe = 0.0
-    tag = von
-    while tag < bis:
-        naechster = date(tag.year + (tag.month == 12), tag.month % 12 + 1, 1)
-        ende = min(naechster, bis)
-        wert = profil.get(tag.month)
-        if wert is None:
-            return None
-        summe += wert * (ende - tag).days
-        tag = ende
-    return summe
-
-
-def _prognose_abschnitte(
-    profil: dict[int, float],
-    beginn: date,
-    heute: date,
-    vertrag_ende: date,
-    verbrauch_bisher: float,
-) -> list[tuple[date, date, float]] | None:
-    """Restverbrauch von heute bis Vertragsende je Kalendermonat, nach dem Profil verteilt und an
-    den bisherigen Verbrauch angepasst: Rest = bisher x Profil(Rest) / Profil(bisher)."""
-    bisher_gewicht = _profil_summe(profil, beginn, heute)
-    if not bisher_gewicht or bisher_gewicht <= 0:
-        return None
-    abschnitte: list[tuple[date, date, float]] = []
-    tag = heute
-    while tag < vertrag_ende:
-        naechster = date(tag.year + (tag.month == 12), tag.month % 12 + 1, 1)
-        ende = min(naechster, vertrag_ende)
-        gewicht = _profil_summe(profil, tag, ende)
-        if gewicht is None:
-            return None
-        abschnitte.append((tag, ende, verbrauch_bisher * gewicht / bisher_gewicht))
-        tag = ende
-    return abschnitte
-
-
-def _rest_arbeitspreis_kosten_abschnitte(
-    segmente: list[dict[str, Any]],
-    abschnitte: list[tuple[date, date, float]],
-    faktor: float,
-) -> float | None:
-    """Arbeitspreis-Kosten eines je Monat verteilten Restverbrauchs: jeder Monatsabschnitt
-    rechnet tagesanteilig mit den in ihm gueltigen Preisabschnitten."""
-    summe = 0.0
-    for von, bis, menge in abschnitte:
-        teil = _rest_arbeitspreis_kosten(segmente, von, bis, menge * faktor)
-        if teil is None:
-            return None
-        summe += teil
-    return summe
-
-
-def _monat_von(beginn: date, tag: date) -> float:
-    return (tag - beginn).days / _MONAT_TAGE
-
-
-def _integral_monate(
-    segmente: list[dict[str, Any]], feld: str, beginn: date, von_m: float, bis_m: float
-) -> float | None:
-    """Summe eines Monatsbetrags (Grundpreis, Abschlag) ueber den Zeitraum [von_m, bis_m] in
-    Monaten ab Vertragsbeginn, je Abschnitt mit dessen Wert. None, wenn ein Abschnitt im
-    Zeitraum keinen Wert hat."""
-    if bis_m <= von_m:
-        return 0.0
-    summe = 0.0
-    for index, segment in enumerate(segmente):
-        start = 0.0 if index == 0 else _monat_von(beginn, segment["von"])
-        ende = (
-            _monat_von(beginn, segmente[index + 1]["von"])
-            if index + 1 < len(segmente)
-            else float("inf")
-        )
-        anteil = min(ende, bis_m) - max(start, von_m)
-        if anteil <= 0:
-            continue
-        wert = segment[feld]
-        if wert is None:
-            return None
-        summe += wert * anteil
-    return summe
-
-
-def _arbeitspreis_kosten(
-    segmente: list[dict[str, Any]],
-    grenzen: list[float],
-    faktor: float,
-) -> float | None:
-    """Arbeitspreis-Kosten des bisherigen Verbrauchs: `grenzen` ist der kumulierte Verbrauch
-    seit Vertragsbeginn zu Beginn jedes Abschnitts, mit dem Verbrauch bis heute als letztem
-    Wert (len(grenzen) == Anzahl der bisherigen Abschnitte + 1)."""
-    summe = 0.0
-    for index in range(len(grenzen) - 1):
-        menge = grenzen[index + 1] - grenzen[index]
-        if menge == 0:
-            continue
-        preis = segmente[index]["arbeitspreis"]
-        if preis is None:
-            return None
-        summe += menge * faktor * preis
-    return summe
-
-
-def _rest_arbeitspreis_kosten(
-    segmente: list[dict[str, Any]],
-    heute: date,
-    vertrag_ende: date,
-    rest_menge: float,
-) -> float | None:
-    """Arbeitspreis-Kosten des fuer die Restlaufzeit hochgerechneten Verbrauchs, gleichmaessig
-    auf die verbleibenden Tage verteilt; ein kuenftiger Abschnitt rechnet ab seinem Datum mit
-    seinem Preis."""
-    rest_tage = (vertrag_ende - heute).days
-    if rest_tage <= 0 or rest_menge <= 0:
-        return 0.0
-    summe = 0.0
-    for index, segment in enumerate(segmente):
-        start = segment["von"] if index else date.min
-        ende = segmente[index + 1]["von"] if index + 1 < len(segmente) else date.max
-        tage = (min(ende, vertrag_ende) - max(start, heute)).days
-        if tage <= 0:
-            continue
-        if segment["arbeitspreis"] is None:
-            return None
-        summe += rest_menge * tage / rest_tage * segment["arbeitspreis"]
-    return summe
-
-
-def _preisaenderungen_anzeige(
-    data: dict[str, Any], beginn: date | None, heute: date
-) -> list[dict[str, Any]]:
-    """Die gespeicherten Preisaenderungen fuer Panel und Attribute, in gespeicherter Reihenfolge
-    (der Index ist der zum Bearbeiten), mit den ab dem Datum gueltigen Werten und dem Status
-    (aktiv, kuenftig, vergangen, ungueltig = am oder vor dem Vertragsbeginn)."""
-    liste = [item for item in data.get(CONF_PREISAENDERUNGEN) or [] if isinstance(item, dict)]
-    if not liste:
-        return []
-    segmente = _preis_segmente(data, beginn) if beginn is not None else []
-    aktiv = _segment_am(segmente, heute) if segmente else None
-    ergebnis = []
-    for index, item in enumerate(liste):
-        tag = _parse_date(item.get("datum"))
-        segment = next((s for s in segmente[1:] if s["von"] == tag), None)
-        if segment is None:
-            status = "ungueltig"
-        elif segment is aktiv:
-            status = "aktiv"
-        else:
-            status = "kuenftig" if tag > heute else "vergangen"
-        ergebnis.append(
-            {
-                "index": index,
-                "datum": tag.isoformat() if tag else None,
-                **{feld: _f(item.get(feld)) for feld in (*_PREIS_FELDER, "zaehlerstand")},
-                "gilt": {feld: segment[feld] for feld in _PREIS_FELDER} if segment else None,
-                "status": status,
-            }
-        )
-    return ergebnis
 
 
 def _entry_sum_state(entry: dict) -> tuple[float | None, float | None]:

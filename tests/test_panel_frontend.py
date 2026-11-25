@@ -15,6 +15,11 @@ SOURCE = (FRONTEND / PANEL_FILE).read_text(encoding="utf-8")
 TEXTS = (FRONTEND / "tariffy-i18n.js").read_text(encoding="utf-8")
 STYLE = (FRONTEND / "tariffy-style.js").read_text(encoding="utf-8")
 FILES = sorted(FRONTEND.glob("*.js"))
+DATA_PARTS = {"tariffy-i18n.js": "I18N", "tariffy-icons.js": "ICONS", "tariffy-style.js": "STYLE"}
+# the tabs and dialogs: modules that return a class whose methods are copied onto the panel
+MIXINS = [p for p in FILES if p.name != PANEL_FILE and p.name not in DATA_PARTS]
+# all the code of the panel (the element and its tabs and dialogs), without texts, icons and styles
+CODE = "\n".join(p.read_text(encoding="utf-8") for p in FILES if p.name not in DATA_PARTS)
 
 # Contract names, providers and tariffs are typed in by the user. They must only
 # ever reach the page as text, never as HTML.
@@ -63,12 +68,38 @@ def test_the_panel_loads_its_parts_with_its_own_version():
     assert not re.search(r"import\(\"", SOURCE)
 
 
-@pytest.mark.parametrize("path", [p for p in FILES if p.name != PANEL_FILE], ids=lambda p: p.name)
+@pytest.mark.parametrize("path", list(DATA_PARTS), ids=str)
 def test_the_parts_export_what_the_panel_imports(path):
-    text = path.read_text(encoding="utf-8")
-    name = {"tariffy-i18n.js": "I18N", "tariffy-icons.js": "ICONS", "tariffy-style.js": "STYLE"}[path.name]
-    assert f"export const {name} =" in text
+    text = (FRONTEND / path).read_text(encoding="utf-8")
+    assert f"export const {DATA_PARTS[path]} =" in text
     assert "customElements.define" not in text
+
+
+def test_every_tab_module_is_loaded_with_the_version_and_every_module_is_used():
+    listed = re.search(r"const MIXINS = \[(.*?)\];", SOURCE).group(1)
+    names = set(re.findall(r'"([a-z]+)"', listed))
+    assert names == {p.name.removeprefix("tariffy-").removesuffix(".js") for p in MIXINS}
+    assert "import(`./tariffy-${name}.js${VERSION}`)" in SOURCE
+
+
+@pytest.mark.parametrize("path", MIXINS, ids=lambda p: p.name)
+def test_a_tab_module_returns_a_class_and_imports_nothing(path):
+    text = path.read_text(encoding="utf-8")
+    assert re.search(r"^export default \(\{[^}]*\}\) => class \{$", text, flags=re.M)
+    assert "customElements.define" not in text
+    assert not re.search(r"^\s*import\b", text, flags=re.M)  # helpers come from the panel, with its version
+
+
+def test_no_method_is_defined_twice():
+    """The methods of all modules end up on one element: a name used twice would silently replace the other."""
+    seen: dict[str, str] = {}
+    for path in [FRONTEND / PANEL_FILE, *MIXINS]:
+        for name in re.findall(r"^  (?:async |get |set )?([_a-zA-Z]+)\(.*\) \{$", path.read_text(encoding="utf-8"), flags=re.M):
+            key = name
+            if key in seen and key not in {"hass", "narrow", "panel"}:
+                assert False, f"{name} in {path.name} and {seen[key]}"
+            seen[key] = path.name
+    assert "is defined twice" in SOURCE  # and the panel refuses it when loading
 
 
 def _block(language: str) -> str:
@@ -97,7 +128,7 @@ def test_german_and_english_have_the_same_texts():
 
 
 def test_every_used_text_exists():
-    used = set(re.findall(r'this\._t\("([A-Za-z]+)"', SOURCE))
+    used = set(re.findall(r'this\._t\("([A-Za-z]+)"', CODE))
     # texts selected through a variable (tabs, tariff rows)
     used |= {"overview", "costs", "contracts", "highTariff", "lowTariff", "sparte"}
     missing = used - _keys(_block("en"))
@@ -108,8 +139,8 @@ def test_empty_overview_groups_are_not_appended():
     """Issue #50: with only metered or only flat-rate contracts one group is null.
     `appendChild(null)` throws and leaves the whole panel empty, so the overview
     must never append a group directly."""
-    assert "wrap.appendChild(group(" not in SOURCE
-    assert "if (section) wrap.appendChild(section)" in SOURCE
+    assert "wrap.appendChild(group(" not in CODE
+    assert "if (section) wrap.appendChild(section)" in CODE
 
 
 # ------------------------------------------------------------------------------ light and dark design
@@ -136,11 +167,11 @@ def test_the_light_design_redefines_every_colour_of_the_dark_one():
 def test_no_colour_of_one_design_is_hard_coded():
     """White overlays and fixed hexadecimal colours would not follow the design: they live in the variables."""
     body = _style().split("* { box-sizing", 1)[1]  # everything after the two variable blocks
-    assert "rgba(255,255,255" not in STYLE and "rgba(255,255,255" not in SOURCE
+    assert "rgba(255,255,255" not in STYLE and "rgba(255,255,255" not in CODE
     assert not re.findall(r"#[0-9a-fA-F]{6}\b", body), re.findall(r"#[0-9a-fA-F]{6}\b", body)
     # the code: only the chart palette and the message when a part cannot be loaded have fixed colours
     palette = re.search(r"CHART_COLORS = \[(.*?)\]", SOURCE).group(1)
-    stray = [c for c in re.findall(r'"#[0-9a-fA-F]{3,6}"', SOURCE) if c not in palette]
+    stray = [c for c in re.findall(r'"#[0-9a-fA-F]{3,6}"', CODE) if c not in palette]
     assert not stray, stray
 
 
@@ -151,5 +182,5 @@ def test_the_panel_follows_the_theme_of_home_assistant():
 
 
 def test_an_own_icon_is_only_drawn_when_it_looks_like_one():
-    assert "/^[a-z0-9_-]+:[a-z0-9_-]+$/i" in SOURCE  # mdi:car, nothing that could be markup
-    assert 'customElements.get("ha-icon")' in SOURCE  # without Home Assistant's icon element: the category icon
+    assert "/^[a-z0-9_-]+:[a-z0-9_-]+$/i" in CODE  # mdi:car, nothing that could be markup
+    assert 'customElements.get("ha-icon")' in CODE  # without Home Assistant's icon element: the category icon
