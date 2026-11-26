@@ -20,7 +20,7 @@ let STYLE;
  * still waiting for its parts defines it too late. The parts arrive a moment later and the panel draws itself then. */
 /* The tabs and dialogs are modules of their own (tariffy-overview.js, tariffy-costs.js, ...). Each one returns a class
  * whose methods are copied onto the panel once everything has arrived, so they are written exactly as in the class. */
-const MIXINS = ["overview", "flow", "backup", "contract", "meter", "docs", "history", "costs", "contracts"];
+const MIXINS = ["overview", "flow", "backup", "contract", "meter", "docs", "history", "costs", "contracts", "objekte"];
 const PARTS = Promise.all([
   import(`./tariffy-i18n.js${VERSION}`),
   import(`./tariffy-icons.js${VERSION}`),
@@ -107,7 +107,11 @@ class TariffyPanel extends HTMLElement {
     super();
     this._hass = null;
     this._unsub = null;
-    this._contracts = null; // null = loading
+    this._contracts = null; // null = loading; the contracts of the chosen property (see tariffy-objekte.js)
+    this._all = null; // all contracts as the backend sends them
+    this._objekte = []; // the properties ("Objekte") and the default one
+    this._defaultObjekt = null;
+    this._objekt = null; // the property shown; null = the default one when the panel opens
     this._error = null;
     this._narrow = false;
     this._tab = this._loadTab();
@@ -182,6 +186,7 @@ class TariffyPanel extends HTMLElement {
   disconnectedCallback() {
     if (this._observer) this._observer.disconnect();
     this._closeFlow();
+    this._objekt = null; // opened again, the panel shows the default property
     if (this._unsub) {
       this._unsub();
       this._unsub = null;
@@ -192,9 +197,15 @@ class TariffyPanel extends HTMLElement {
     try {
       this._unsub = await this._hass.connection.subscribeMessage(
         (event) => {
-          this._contracts = Array.isArray(event.contracts) ? event.contracts : [];
+          this._all = Array.isArray(event.contracts) ? event.contracts : [];
+          this._objekte = Array.isArray(event.objekte) ? event.objekte : [];
+          this._defaultObjekt = event.default_objekt || null;
+          this._pickObjekt();
+          this._filterObjekt();
           this._error = null;
           this._render();
+          // the dialog that manages the properties shows the new state at once
+          if (this._dlg && this._dlg.mode === "objekte" && this._renderObjekteDialog) this._renderDialog();
         },
         { type: "tariffy/subscribe" }
       );
@@ -202,6 +213,32 @@ class TariffyPanel extends HTMLElement {
       this._error = String((err && err.message) || err);
       this._render();
     }
+  }
+
+  /* ----- the property shown (part of the element itself: the subscription calls it before the modules arrive) ----- */
+
+  /* the property to show: the chosen one if it still exists, else the default one, else the first */
+  _pickObjekt() {
+    const list = this._objekte || [];
+    const has = (id) => id && list.some((o) => o.id === id);
+    const before = this._objekt;
+    this._objekt = has(this._objekt) ? this._objekt : has(this._defaultObjekt) ? this._defaultObjekt : (list[0] && list[0].id) || null;
+    if (this._objekt && this._objekt !== before) this._tellObjekt();
+  }
+
+  /* the contracts of the chosen property (all of them while there are no properties, for example an older backend) */
+  _filterObjekt() {
+    const all = this._all;
+    if (all === null) { this._contracts = null; return; }
+    this._contracts = this._objekt && (this._objekte || []).length ? all.filter((c) => c.objekt_id === this._objekt) : all;
+  }
+
+  /* the backend preselects this property when a new contract is added */
+  _tellObjekt() {
+    if (!this._hass || !this._objekt) return;
+    try {
+      Promise.resolve(this._hass.callWS({ type: "tariffy/objekt_aktiv", objekt_id: this._objekt })).catch(() => {});
+    } catch (_err) { /* only a preselection */ }
   }
 
   _loadTab() {
@@ -374,8 +411,10 @@ class TariffyPanel extends HTMLElement {
       wrap.appendChild(h("div", { class: "state", text: this._t("loading") }));
     } else if (this._tab === "backup" && this._isAdmin) {
       wrap.appendChild(this._backup());
-    } else if (this._contracts.length === 0) {
+    } else if (this._all.length === 0) {
       wrap.appendChild(this._empty());
+    } else if (this._contracts.length === 0) {
+      wrap.appendChild(this._objektEmpty());
     } else if (this._tab === "history") {
       wrap.appendChild(this._history());
     } else if (this._live.length === 0 && this._loans.length === 0) {
@@ -419,6 +458,7 @@ class TariffyPanel extends HTMLElement {
       "div", { class: "top" },
       menu,
       h("div", { class: "brand" }, "Tariffy"),
+      this._objektBar(),
       tabs,
       h("div", { class: "spacer" })
     );

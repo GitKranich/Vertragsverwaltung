@@ -41,6 +41,7 @@ On a phone the cards turn into expandable rows:
 ### Features
 
 - **Categories:** Electricity, Gas, Water, Internet, Mobile, Streaming, Loan, Insurance, House costs (waste fees, street cleaning, …), Other
+- **Properties:** contracts of several houses or flats, each assigned to one property; the panel shows one property at a time and opens with the default one
 - **Real consumption tracking** – connect any HA sensor as your meter; Tariffy reads the meter value at contract start from Long-Term Statistics and calculates consumption since contract start and projected annual usage
 - **Real billing forecast** – forecast based on actual measured consumption (credit or surcharge)
 - **Last contract period consumption** – frozen at tariff switch; used to calculate the recommended monthly payment for the new period
@@ -277,6 +278,7 @@ Auf dem Handy werden die Karten zu aufklappbaren Zeilen:
 ### Features
 
 - **Sparten:** Strom, Gas, Wasser, Internet, Mobilfunk, Streaming, Kredit, Versicherung, Hauskosten (Abfallgebühren, Straßenreinigung, …), Sonstiges
+- **Objekte:** Verträge mehrerer Häuser oder Wohnungen, jeder Vertrag gehört zu einem Objekt; das Panel zeigt jeweils ein Objekt und öffnet mit dem Default-Objekt
 - **Echte Verbrauchsmessung** – beliebigen HA-Sensor als Zähler einbinden; Tariffy liest den Stand zum Vertragsbeginn aus den Long-Term Statistics und berechnet Verbrauch seit Vertragsbeginn sowie hochgerechneten Jahresverbrauch
 - **Abrechnungsprognose (real)** – Prognose basierend auf dem tatsächlich gemessenen Verbrauch (Guthaben oder Nachzahlung)
 - **Verbrauch letzte Vertragslaufzeit** – wird beim Tarifwechsel eingefroren; Basis für den empfohlenen Abschlag
@@ -313,6 +315,7 @@ Auf dem Handy werden die Karten zu aufklappbaren Zeilen:
 | Kündigung erinnern | ✅ | 0–4 Monate vorher (0 = deaktiviert); vor Vertragsende, mit Kündigungsfrist vor Ablauf der Frist |
 | Benachrichtigungs-Ziel | – | notify-Dienst (z. B. `mobile_app_iphone`) |
 | Icon | – | Eigenes Symbol für den Vertrag (z. B. `mdi:car`), im Panel und für die Sensoren des Vertrags; leer = Symbol der Sparte |
+| Objekt | – | Objekt, zu dem der Vertrag gehört (erst ab zwei Objekten im Formular); vorbelegt mit dem im Panel gewählten Objekt |
 
 #### Schritt 2a – Strom-Details
 

@@ -38,6 +38,27 @@ export const STYLE = `
 .tab[aria-selected="true"] { background: rgba(var(--w),.09); color: var(--text); }
 .tab:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 .spacer { width: 90px; }
+/* the property switcher in the head */
+.objsel { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 4px 3px 10px; background: var(--panel2);
+  border: 1px solid var(--line); border-radius: 12px; }
+.objsel-ic { display: grid; place-items: center; color: var(--muted); }
+.objsel-ic svg, .obj-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.objsel-ic ha-icon, .obj-ic ha-icon { --mdc-icon-size: 18px; }
+.objsel-in { appearance: auto; min-width: 0; max-width: 260px; font: inherit; font-size: 14px; font-weight: 600; color: var(--text);
+  background: transparent; border: 0; padding: 6px 4px; cursor: pointer; color-scheme: inherit; }
+.objsel-in option { background: var(--option-bg); color: var(--text); }
+.objsel-in:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; border-radius: 6px; }
+.objsel-name { font-size: 14px; font-weight: 600; padding: 6px 4px; overflow-wrap: anywhere; }
+.objsel-btn { width: 30px; height: 30px; }
+.obj-list { display: grid; gap: 0; margin: 6px 0 4px; }
+.obj-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
+.obj-row.editing { display: block; }
+.obj-row .ask .fld { flex-basis: 100%; margin: 0; }
+.obj-ic { display: grid; place-items: center; color: var(--muted); }
+.obj-name { flex: 1 1 140px; min-width: 0; overflow-wrap: anywhere; }
+.obj-name .t2 { display: block; font-size: 12px; color: var(--muted); }
+.obj-new-title { margin-top: 16px; }
+.state .btn { display: inline-flex; align-items: center; gap: 8px; }
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px; }
 @container (min-width: 1100px) { .summary { grid-template-columns: repeat(4, 1fr); } }
@@ -304,6 +325,8 @@ details[open] summary .caret svg { transform: rotate(90deg); }
   .wrap { padding: 12px 12px 32px; }
   .top { gap: 10px; }
   .tabs { order: 3; width: 100%; margin: 0; overflow-x: auto; scrollbar-width: none; }
+  .objsel { flex: 1 1 auto; }
+  .objsel-in { flex: 1 1 auto; max-width: none; }
   .tab { flex: 1; padding: 9px 6px; }
   .spacer { display: none; }
   .summary { grid-template-columns: 1fr; gap: 10px; }

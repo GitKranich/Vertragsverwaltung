@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 
 from . import loan
+from .objekte import cached as objekte_cache
 from .const import (
     BASIS_FELDER,
     CONF_EFFEKTIVZINS,
@@ -72,6 +73,7 @@ from .const import (
     CONF_MARKTLOKATION,
     CONF_NOTIFY_GESENDET,
     CONF_NOTIFY_TARGET,
+    CONF_OBJEKT,
     CONF_OEKOSTROM,
     CONF_PREISGARANTIE,
     CONF_SPARTE,
@@ -727,6 +729,8 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 else {}
             ),
             CONF_NOTIFY_TARGET: self.entry.data.get(CONF_NOTIFY_TARGET),
+            # der Folgevertrag bleibt im selben Objekt
+            **({CONF_OBJEKT: self.entry.data[CONF_OBJEKT]} if self.entry.data.get(CONF_OBJEKT) else {}),
         }
         for feld in BASIS_FELDER:
             wert = nxt.get(NEXT_PREFIX + feld)
@@ -796,6 +800,15 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         await self.async_request_refresh()
 
+    def _titel(self) -> str:
+        """Name des Vertrags fuer Meldungen; mit mehreren Objekten steht das Objekt davor."""
+        objekte = objekte_cache(self.hass)
+        if objekte is not None and len(objekte.items) > 1:
+            name = objekte.name(self.entry.data.get(CONF_OBJEKT))
+            if name:
+                return f"{name} · {self.entry.title}"
+        return self.entry.title
+
     async def _send_notify(self, title: str, message: str) -> None:
         target = self.entry.data.get(CONF_NOTIFY_TARGET)
         if not target:
@@ -814,7 +827,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return
         frist = _monate_wert(data.get(CONF_KUENDIGUNGSFRIST))
         kuendigung_bis = _minus_months(ende, frist) if (ende is not None and frist) else None
-        title = f"Kündigung: {self.entry.title}"
+        title = f"Kündigung: {self._titel()}"
         ende_str = ende.isoformat() if ende else "?"
         message = (
             f"Vertrag **{data.get(CONF_ANBIETER) or ''}** "
@@ -884,7 +897,7 @@ class TariffyCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             return
         if data.get(CONF_ABSCHLAG_WARNUNG_BESTAETIGT):
             return
-        title = f"Abschlag zu niedrig: {self.entry.title}"
+        title = f"Abschlag zu niedrig: {self._titel()}"
         empfehlung_zeile = (
             f"Empfehlung: Abschlag für die restliche Laufzeit auf ca. "
             f"**{abschlag_empfehlung:.2f} €/Monat** anpassen.\n\n"

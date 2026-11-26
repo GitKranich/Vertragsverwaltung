@@ -7,6 +7,18 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.43.0-beta.1] - 2026-11-26
+
+### Hinzugefügt
+
+- **Objekte** für Verträge mehrerer Häuser, Wohnungen oder Ferienhäuser: Jeder Vertrag und alle Kosten gehören zu genau einem Objekt. Das Panel zeigt nur die Verträge eines Objekts (Übersicht, Kosten, Verträge, Historie; Summen je Objekt) und hat oben einen **Umschalter**. Beim Öffnen zeigt es immer das **Default-Objekt**. Administratoren verwalten die Objekte über den Stift neben dem Umschalter: anlegen, umbenennen, eigenes Icon, **als Default** setzen, löschen (ein Objekt mit Verträgen erst nach der Wahl, wohin seine Verträge kommen; das letzte Objekt bleibt immer).
+- **Neuer Vertrag und Bearbeiten:** Ab zwei Objekten hat der erste Schritt des Formulars das Feld **Objekt**, vorbelegt mit dem im Panel gewählten Objekt. Beim Bearbeiten lässt sich ein Vertrag in ein anderes Objekt verschieben.
+- **Update:** Das erste Objekt („Zuhause“) wird von selbst angelegt, ist Default und bekommt **alle vorhandenen Verträge** (fest im Vertrag gespeichert, sie wandern also nicht mit, wenn später ein anderes Objekt Default wird). Mit nur einem Objekt sieht alles aus wie bisher, bis auf den Objektnamen oben im Panel.
+- Sensoren haben das Attribut `objekt` (Name des Objekts); mit mehreren Objekten nennen Benachrichtigungen das Objekt vor dem Vertrag („Ferienwohnung · Strom“). Ein Folgevertrag bleibt im Objekt.
+- **Sicherung:** Die Datei enthält die Objekte; beim Wiederherstellen werden fehlende Objekte angelegt und jeder Vertrag kommt in sein Objekt. Ein Vertrag mit gleichem Namen und gleicher Sparte in einem anderen Objekt gilt als eigener Vertrag. Ältere Sicherungen landen im Default-Objekt.
+- Neue WebSocket-Befehle `tariffy/objekt_save`, `tariffy/objekt_delete`, `tariffy/objekt_default` (Administratoren) und `tariffy/objekt_aktiv`; `tariffy/contracts` und `tariffy/subscribe` senden zusätzlich `objekte` und `default_objekt`. Die Objekte stehen in `.storage/tariffy.objekte`.
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.42.0] - 2026-11-26
 
 Dieses Release fasst die Betas `1.42.0-beta.1` bis `1.42.0-beta.4` zusammen. **Bestehende Verträge laufen ohne jede Änderung weiter.**

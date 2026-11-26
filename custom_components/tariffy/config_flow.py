@@ -17,6 +17,7 @@ from homeassistant.helpers import selector
 from homeassistant.util import dt as dt_util
 
 from .backup import BackupError, sanitize_contract
+from .objekte import async_get as objekte_get, cached as objekte_cache
 from .const import (
     CONF_ABSCHLAG,
     CONF_EFFEKTIVZINS,
@@ -69,6 +70,7 @@ from .const import (
     CONF_KUNDENNUMMER,
     CONF_MARKTLOKATION,
     CONF_NOTIFY_TARGET,
+    CONF_OBJEKT,
     CONF_OEKOSTROM,
     CONF_PREISGARANTIE,
     CONF_SPARTE,
@@ -249,6 +251,8 @@ _INTERNER_ZUSTAND = (
     CONF_AUSSENZAEHLER,
     CONF_PREISAENDERUNGEN,
     CONF_DOKUMENTE,
+    # ohne Auswahlfeld (nur ein Objekt) bleibt der Vertrag in seinem Objekt
+    CONF_OBJEKT,
 )
 
 
@@ -474,6 +478,12 @@ def _common_schema(
             fields[vol.Required("name", default=name)] = selector.TextSelector()
         else:
             fields[vol.Required("name")] = selector.TextSelector()
+    # Objekt: erst ab zwei Objekten eine Auswahl (mit einem landet der Vertrag ohnehin dort)
+    objekte = objekte_cache(hass)
+    if objekte is not None and len(objekte.items) > 1:
+        fields[vol.Required(CONF_OBJEKT, default=objekte.gueltig(d.get(CONF_OBJEKT) or objekte.vorauswahl))] = _select(
+            [selector.SelectOptionDict(value=o["id"], label=o["name"]) for o in objekte.items]
+        )
     fields[vol.Required(CONF_SPARTE, default=d.get(CONF_SPARTE, "electricity"))] = _select(
         SPARTEN, translation_key="sparte"
     )
@@ -937,9 +947,11 @@ class TariffyConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        objekte = await objekte_get(self.hass)
         if user_input is not None:
             self._data = dict(user_input)
             self._entry_title = self._data.pop("name", "")
+            self._data[CONF_OBJEKT] = objekte.gueltig(self._data.get(CONF_OBJEKT) or objekte.vorauswahl)
             if user_input[CONF_SPARTE] == GAS_SPARTE:
                 return await self.async_step_gas()
             if user_input[CONF_SPARTE] == WASSER_SPARTE:
@@ -1076,8 +1088,11 @@ class TariffyConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         entry = self._get_reconfigure_entry()
+        objekte = await objekte_get(self.hass)
         if user_input is not None:
             self._data = dict(user_input)
+            if CONF_OBJEKT in self._data:
+                self._data[CONF_OBJEKT] = objekte.gueltig(self._data[CONF_OBJEKT])
             # der Name ist der Titel des Vertrags, kein Vertragsdatum; leer = bleibt wie er ist
             self._entry_title = str(self._data.pop("name", "") or "").strip() or entry.title
             if user_input[CONF_SPARTE] == GAS_SPARTE:

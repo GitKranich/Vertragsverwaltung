@@ -6,6 +6,7 @@
         "description": "Allgemeine Vertragsdaten.",
         "data": {
           "name": "Bezeichnung (z. B. Strom Haus)",
+          "objekt_id": "Objekt",
           "sparte": "Sparte",
           "anbieter": "Anbieter",
           "kundennummer": "Kundennummer",
@@ -20,6 +21,7 @@
         },
         "data_description": {
           "name": "Kurze Bezeichnung, die im Gerätenamen erscheint, z. B. 'Strom Haus'",
+          "objekt_id": "Objekt, zu dem der Vertrag gehört (Haus, Wohnung, Ferienhaus, ...). Das Panel zeigt jeweils die Verträge eines Objekts.",
           "anbieter": "Name des Energieversorgers oder Anbieters",
           "kundennummer": "Deine Kundennummer aus den Vertragsunterlagen",
           "tarif": "Bezeichnung des Tarifs, z. B. 'Ökostrom Plus'",
@@ -37,6 +39,7 @@
         "description": "Allgemeine Vertragsdaten.",
         "data": {
           "name": "Name",
+          "objekt_id": "Objekt",
           "sparte": "Sparte",
           "anbieter": "Anbieter",
           "kundennummer": "Kundennummer",
@@ -51,6 +54,7 @@
         },
         "data_description": {
           "name": "Name des Vertrags: wird im Panel gezeigt und ist der Name seines Geräts",
+          "objekt_id": "Objekt, zu dem der Vertrag gehört (Haus, Wohnung, Ferienhaus, ...). Das Panel zeigt jeweils die Verträge eines Objekts.",
           "anbieter": "Name des Energieversorgers oder Anbieters",
           "kundennummer": "Deine Kundennummer aus den Vertragsunterlagen",
           "tarif": "Bezeichnung des Tarifs, z. B. 'Ökostrom Plus'",

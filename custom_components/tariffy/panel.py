@@ -24,8 +24,9 @@ from homeassistant.helpers.dispatcher import (
 )
 from homeassistant.loader import async_get_integration
 
-from . import dokumente
+from . import dokumente, objekte as objekte_mod
 from .const import (
+    CONF_OBJEKT,
     CONF_VERBRAUCH_SENSOR,
     DOMAIN,
     NEXT_PREFIX,
@@ -191,6 +192,8 @@ def contract_payload(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
     payload["verbrauch_einheit"] = "kWh" if str(unit or "").strip().lower() in ("wh", "mwh") else unit
     # verknuepfte Paperless-Dokumente: nur Verweise; Vorschau und Download prueft die Paperless-Integration
     payload["dokumente"] = dokumente.payload(entry.data)
+    # das Objekt, zu dem der Vertrag gehoert: das Panel zeigt jeweils die Vertraege eines Objekts
+    payload["objekt_id"] = entry.data.get(CONF_OBJEKT)
     return payload
 
 
@@ -208,6 +211,16 @@ def async_contracts(hass: HomeAssistant) -> list[dict[str, Any]]:
             continue
         contracts.append(contract_payload(hass, entry))
     return contracts
+
+
+@callback
+def async_snapshot(hass: HomeAssistant) -> dict[str, Any]:
+    """Alles, was das Panel braucht: die Vertraege, die Objekte und das Default-Objekt."""
+    objekte = objekte_mod.cached(hass)
+    return {
+        "contracts": async_contracts(hass),
+        **(objekte.payload() if objekte is not None else {"objekte": [], "default_objekt": None}),
+    }
 
 
 @callback
@@ -288,6 +301,7 @@ __all__ = [
     "async_contracts",
     "async_notify",
     "async_setup_panel",
+    "async_snapshot",
     "async_unload_panel",
     "contract_payload",
 ]

@@ -2,7 +2,7 @@
 
 Loads tests/frontend/preview.html (a mock `hass` fed with fixtures.json) and checks that the panel draws without a
 single browser error: every tab in German and English, wide and narrow, dark and light, the states loading / empty /
-error, the element getting `hass` before it is defined, and every button in the contract rows and in the contract
+error, the element getting `hass` before it is defined, the property switcher and its dialog, and every button in the contract rows and in the contract
 details that opens a dialog.
 
 Run it from the repository root:
@@ -181,6 +181,55 @@ def dialogs(browser, base: str) -> None:
     check(opened > 0, f"{opened} buttons opened a dialog")
 
 
+def properties(browser, base: str) -> None:
+    """The property switcher, the "no contracts here" state and the dialog that manages the properties."""
+    root = "window.__panel.shadowRoot"
+    page, errors = open_page(browser, f"{base}?lang=de")
+    check(shadow_count(page, ".objsel-in option") == 2, "two properties in the switcher")
+    selected = page.evaluate(f"() => {root}.querySelector('.objsel-in').value")
+    check(selected == "haus", "the default property is shown when the panel opens")
+    page.evaluate(f"() => {{ const s = {root}.querySelector('.objsel-in'); s.value = 'ferienwohnung';"
+                  " s.dispatchEvent(new Event('change')); }")
+    page.wait_for_timeout(150)
+    shown = page.evaluate(f"() => {root}.textContent")
+    check("Für Ferienwohnung gibt es noch keine Verträge" in shown, "another property shows only its own contracts")
+    check(any(c["type"] == "tariffy/objekt_aktiv" for c in page.evaluate("() => window.__calls")),
+          "the chosen property is told to the backend (preselection for a new contract)")
+    for index in range(TABS - 1):  # every tab of the empty property (the backup tab stays the same)
+        click_tab(page, index)
+        check(shadow_count(page, ".wrap *") > 3, f"empty property: tab {index + 1} draws")
+    # manage: add a property, make it the default, delete it again with its contracts moved
+    page.evaluate(f"() => {root}.querySelector('.objsel-btn').click()")
+    page.wait_for_timeout(150)
+    check(shadow_count(page, ".overlay .obj-row") == 2, "the dialog lists the properties")
+    page.evaluate(f"() => {{ const i = {root}.querySelector('[name=obj-new-name]'); i.value = 'Garage';"
+                  " i.dispatchEvent(new Event('input')); }")
+    page.evaluate(f"() => [...{root}.querySelectorAll('.overlay .actions .btn.go')].pop().click()")
+    page.wait_for_timeout(250)
+    check(shadow_count(page, ".overlay .obj-row") == 3, "a new property is added")
+    check(shadow_count(page, ".objsel-in option") == 3, "and offered in the switcher")
+    page.evaluate(f"() => [...{root}.querySelectorAll('.overlay .obj-row')][0].querySelector('.btn.red').click()")
+    page.wait_for_timeout(150)
+    check(shadow_count(page, ".overlay [name=obj-ziel]") == 1, "deleting a property with contracts asks where they go")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(100)
+    check(shadow_count(page, ".overlay .dialog") == 0, "Escape closes the dialog")
+    check(not errors, f"properties: no browser error {errors}")
+    page.close()
+
+    page, errors = open_page(browser, f"{base}?lang=en&objekt=ferienwohnung&narrow=1", 390)
+    shown = page.evaluate(f"() => {root}.textContent")
+    check("No contracts for Ferienwohnung yet" in shown, "the default property is chosen when the panel opens (narrow)")
+    check(not errors, f"default property: no browser error {errors}")
+    page.close()
+
+    page, errors = open_page(browser, f"{base}?lang=de&admin=0")
+    check(shadow_count(page, ".objsel-in") == 1 and shadow_count(page, ".objsel-btn") == 0,
+          "without administrator rights: switch, but not manage")
+    check(not errors, f"properties, no administrator: no browser error {errors}")
+    page.close()
+
+
 def main() -> int:
     server, base = serve()
     try:
@@ -190,6 +239,7 @@ def main() -> int:
             states(browser, base)
             long_names(browser, base)
             dialogs(browser, base)
+            properties(browser, base)
             browser.close()
     finally:
         server.shutdown()

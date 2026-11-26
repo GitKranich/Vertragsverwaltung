@@ -146,6 +146,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
@@ -258,6 +259,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
@@ -379,6 +381,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
@@ -491,6 +494,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
@@ -603,6 +607,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
@@ -722,6 +727,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
@@ -866,6 +872,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
@@ -978,6 +985,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": false,
       "preisaenderungen": [],
@@ -1090,6 +1098,7 @@
       "niederschlag_flaeche": null,
       "niederschlag_gebuehr": null,
       "niederschlag_jahr": null,
+      "objekt_id": "haus",
       "preis_basis": null,
       "preisaenderung_moeglich": true,
       "preisaenderungen": [],
@@ -1126,6 +1135,29 @@
             "text": {
               "multiline": false,
               "multiple": false
+            }
+          }
+        },
+        {
+          "default": "haus",
+          "name": "objekt_id",
+          "required": true,
+          "selector": {
+            "select": {
+              "custom_value": false,
+              "mode": "dropdown",
+              "multiple": false,
+              "options": [
+                {
+                  "label": "Haus",
+                  "value": "haus"
+                },
+                {
+                  "label": "Ferienwohnung",
+                  "value": "ferienwohnung"
+                }
+              ],
+              "sort": false
             }
           }
         },
@@ -2404,6 +2436,7 @@
       }
     }
   },
+  "default_objekt": "haus",
   "flows": {
     "contract-1": {
       "data_schema": [
@@ -3447,6 +3480,18 @@
       "type": "form"
     }
   },
+  "objekte": [
+    {
+      "icon": "mdi:home",
+      "id": "haus",
+      "name": "Haus"
+    },
+    {
+      "icon": "mdi:beach",
+      "id": "ferienwohnung",
+      "name": "Ferienwohnung"
+    }
+  ],
   "reconfigure": {
     "contract-1": {
       "first": {
@@ -3459,6 +3504,29 @@
               "text": {
                 "multiline": false,
                 "multiple": false
+              }
+            }
+          },
+          {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
               }
             }
           },
@@ -3896,6 +3964,29 @@
               "text": {
                 "multiline": false,
                 "multiple": false
+              }
+            }
+          },
+          {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
               }
             }
           },
@@ -4342,6 +4433,29 @@
             }
           },
           {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
+              }
+            }
+          },
+          {
             "default": "water",
             "name": "sparte",
             "required": true,
@@ -4736,6 +4850,29 @@
               "text": {
                 "multiline": false,
                 "multiple": false
+              }
+            }
+          },
+          {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
               }
             }
           },
@@ -5229,6 +5366,29 @@
             }
           },
           {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
+              }
+            }
+          },
+          {
             "default": "internet",
             "name": "sparte",
             "required": true,
@@ -5486,6 +5646,29 @@
             }
           },
           {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
+              }
+            }
+          },
+          {
             "default": "mobile",
             "name": "sparte",
             "required": true,
@@ -5730,6 +5913,29 @@
               "text": {
                 "multiline": false,
                 "multiple": false
+              }
+            }
+          },
+          {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
               }
             }
           },
@@ -6168,6 +6374,29 @@
             }
           },
           {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
+              }
+            }
+          },
+          {
             "default": "loan",
             "name": "sparte",
             "required": true,
@@ -6466,6 +6695,29 @@
               "text": {
                 "multiline": false,
                 "multiple": false
+              }
+            }
+          },
+          {
+            "default": "haus",
+            "name": "objekt_id",
+            "required": true,
+            "selector": {
+              "select": {
+                "custom_value": false,
+                "mode": "dropdown",
+                "multiple": false,
+                "options": [
+                  {
+                    "label": "Haus",
+                    "value": "haus"
+                  },
+                  {
+                    "label": "Ferienwohnung",
+                    "value": "ferienwohnung"
+                  }
+                ],
+                "sort": false
               }
             }
           },

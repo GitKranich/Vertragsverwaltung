@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.0-beta.1] - 2026-11-26
+
+### Added
+
+- **Properties ("Objekte")** for contracts of more than one house, flat or holiday home: every contract and every cost belongs to exactly one property. The panel shows the contracts of one property only (overview, costs, contracts, history; totals per property) and has a **switcher** in its head. When the panel opens it always shows the **default property**. Administrators manage the properties with the pencil next to the switcher: add, rename, own icon, **make default**, delete (a property with contracts only after choosing where its contracts go; the last property always stays).
+- **New contract and editing:** from two properties on, the first step of the form has a field **Property**, preselected with the property chosen in the panel. Editing a contract moves it to another property.
+- **Update:** the first property ("Zuhause"/"Home") is created by itself, becomes the default and gets **all existing contracts** (stored in the contract, so they do not move along when another property becomes the default later). With only one property nothing looks different, apart from the property's name in the head of the panel.
+- Sensors have the attribute `objekt` (name of the property); with several properties notifications name it before the contract ("Ferienwohnung · Strom"). A next contract stays in its property.
+- **Backup:** the file contains the properties; restoring creates missing properties and puts each contract into its property. A contract with the same name and kind in another property counts as another contract. Older backups go into the default property.
+- New WebSocket commands `tariffy/objekt_save`, `tariffy/objekt_delete`, `tariffy/objekt_default` (administrators) and `tariffy/objekt_aktiv`; `tariffy/contracts` and `tariffy/subscribe` also send `objekte` and `default_objekt`. The properties are stored in `.storage/tariffy.objekte`.
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.42.0] - 2026-11-26
 
 This release brings together the betas `1.42.0-beta.1` to `1.42.0-beta.4`. **Existing contracts keep working without any change.**

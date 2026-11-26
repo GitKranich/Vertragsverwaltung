@@ -20,6 +20,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    CONF_OBJEKT,
     CONF_ICON,
     CONF_ABSCHLAG,
     CONF_ANBIETER,
@@ -61,6 +62,7 @@ from .const import (
     CONF_ZAEHLERNUMMER_NT,
 )
 from .coordinator import TariffyCoordinator
+from .objekte import cached as objekte_cache
 
 if TYPE_CHECKING:
     from . import TariffyConfigEntry
@@ -763,6 +765,10 @@ class VertragSensor(CoordinatorEntity[TariffyCoordinator], SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
-        if self.entity_description.attr_fn is not None:
-            return self.entity_description.attr_fn(self.coordinator.data)
-        return None
+        attrs = dict(self.entity_description.attr_fn(self.coordinator.data) or {}) if self.entity_description.attr_fn is not None else {}
+        # das Objekt, zu dem der Vertrag gehoert (Name, damit Vorlagen und Karten danach filtern koennen)
+        objekte = objekte_cache(self.hass) if self.hass is not None else None
+        name = objekte.name(self.coordinator.config_entry.data.get(CONF_OBJEKT)) if objekte is not None else None
+        if name:
+            attrs["objekt"] = name
+        return attrs or None

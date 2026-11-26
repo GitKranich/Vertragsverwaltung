@@ -8,6 +8,7 @@ from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
+from . import objekte
 from .backup import async_remember_deleted
 from .const import (
     CONF_SPARTE,
@@ -54,6 +55,8 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: TariffyConfigEntry) -> bool:
     """Einen Vertrag (ConfigEntry) einrichten."""
+    # jeder Vertrag gehoert fest zu einem Objekt (alte Vertraege kommen hier ins Default-Objekt)
+    await objekte.async_setup_entry(hass, entry)
     coordinator = TariffyCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator

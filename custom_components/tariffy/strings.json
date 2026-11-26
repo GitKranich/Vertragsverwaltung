@@ -6,6 +6,7 @@
         "description": "General contract data.",
         "data": {
           "name": "Label (e.g. Electricity House)",
+          "objekt_id": "Property",
           "sparte": "Category",
           "anbieter": "Provider",
           "kundennummer": "Customer number",
@@ -20,6 +21,7 @@
         },
         "data_description": {
           "name": "Short label shown in the device name, e.g. 'Electricity House'",
+          "objekt_id": "Property the contract belongs to (house, flat, holiday home, ...). The panel shows the contracts of one property at a time.",
           "anbieter": "Name of the energy provider or supplier",
           "kundennummer": "Your customer number from the provider's documents",
           "tarif": "Tariff name, e.g. 'Eco Power Plus'",
@@ -37,6 +39,7 @@
         "description": "General contract data.",
         "data": {
           "name": "Name",
+          "objekt_id": "Property",
           "sparte": "Category",
           "anbieter": "Provider",
           "kundennummer": "Customer number",
@@ -51,6 +54,7 @@
         },
         "data_description": {
           "name": "Name of the contract: shown in the panel and used as the name of its device",
+          "objekt_id": "Property the contract belongs to (house, flat, holiday home, ...). The panel shows the contracts of one property at a time.",
           "anbieter": "Name of the energy provider or supplier",
           "kundennummer": "Your customer number from the provider's documents",
           "tarif": "Tariff name, e.g. 'Eco Power Plus'",

@@ -56,6 +56,11 @@ async def _add(hass, title, data, options=None):
     return entry
 
 
+def _ohne_objekt(data):
+    """Vertragsdaten ohne die Objekt-Zuordnung (die bekommt jeder Vertrag beim Einrichten)."""
+    return {key: value for key, value in dict(data).items() if key != "objekt_id"}
+
+
 def _entries(hass):
     return {entry.title: entry for entry in hass.config_entries.async_entries(DOMAIN)}
 
@@ -116,7 +121,7 @@ class TestExportAndRestore:
         assert data["tariffy_backup"] == 1 and data["version"] and data["created"]
         by_title = {c["title"]: c for c in data["contracts"]}
         assert set(by_title) == {"Strom Haus", "Wasser"}
-        assert by_title["Strom Haus"]["data"] == RICH  # personal data, history, flags: all of it
+        assert _ohne_objekt(by_title["Strom Haus"]["data"]) == RICH  # personal data, history, flags: all of it
         assert by_title["Strom Haus"]["options"] == NEXT
         json.dumps(data)  # can be written to a file
         assert backup.sanitize_backup(data)  # and read back
@@ -164,7 +169,7 @@ class TestExportAndRestore:
         await _call(client, "backup_restore", backup=saved)
         await hass.async_block_till_done()
         restored = _entries(hass)["Strom Haus"]
-        assert dict(restored.data) == RICH
+        assert _ohne_objekt(restored.data) == RICH
         assert dict(restored.options) == NEXT
         assert restored.entry_id != original.entry_id  # a new entry, nothing is shared
 
@@ -229,7 +234,7 @@ class TestDeletedContracts:
         assert reply["result"] == {"title": "Strom Haus"}
         await hass.async_block_till_done()
         restored = _entries(hass)["Strom Haus"]
-        assert dict(restored.data) == RICH and dict(restored.options) == NEXT
+        assert _ohne_objekt(restored.data) == RICH and dict(restored.options) == NEXT
         assert (await _call(client, "deleted_list"))["result"]["deleted"] == []  # used up
 
     async def test_it_cannot_be_restored_over_an_existing_contract(self, frontend_env, hass, hass_ws_client):  # noqa: F811

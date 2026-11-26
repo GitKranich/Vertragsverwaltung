@@ -29,8 +29,8 @@ from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 
-from . import const
-from .const import BASIS_FELDER, CONF_SPARTE, DOMAIN, NEXT_PREFIX, SPARTEN
+from . import const, objekte as objekte_mod
+from .const import BASIS_FELDER, CONF_OBJEKT, CONF_SPARTE, DOMAIN, NEXT_PREFIX, SPARTEN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -125,6 +125,43 @@ def sanitize_backup(raw: Any) -> list[dict[str, Any]]:
     return [sanitize_contract(contract) for contract in contracts]
 
 
+def sanitize_objekte(raw: Any) -> list[dict[str, Any]]:
+    """Die Objekte einer Sicherung (Id, Name, Icon); unbrauchbare werden uebersprungen.
+
+    Aeltere Sicherungen haben keine Objekte: dann ist die Liste leer und alles kommt ins Default-Objekt."""
+    items = raw.get("objekte") if isinstance(raw, dict) else None
+    if not isinstance(items, list):
+        return []
+    result = []
+    for item in items[: objekte_mod.MAX_OBJEKTE]:
+        if not isinstance(item, dict):
+            continue
+        objekt_id, name, icon = item.get("id"), item.get("name"), item.get("icon")
+        if not isinstance(objekt_id, str) or not objekt_id or len(objekt_id) > 64:
+            continue
+        if not isinstance(name, str) or not name.strip() or len(name) > objekte_mod.MAX_NAME:
+            continue
+        result.append({"id": objekt_id, "name": name.strip(), "icon": icon if isinstance(icon, str) and len(icon) <= 64 else None})
+    return result
+
+
+def _objekt_hier(hass: HomeAssistant, objekt_id: Any, backup_objekte: list[dict[str, Any]]) -> str | None:
+    """In welchem Objekt hier ein Vertrag der Sicherung laege. None = es gibt noch keine Objekte (nur Name und Sparte
+    zaehlen), "" = ein Objekt, das erst angelegt wird (dort gibt es noch keinen Vertrag)."""
+    objekte = objekte_mod.cached(hass)
+    if objekte is None:
+        return None
+    if not isinstance(objekt_id, str) or not objekt_id:
+        return objekte.default
+    if objekte.get(objekt_id):
+        return objekt_id
+    name = next((o["name"] for o in backup_objekte if o["id"] == objekt_id), None)
+    if name is None:
+        return objekte.default  # Objekt fehlt auch in der Sicherung: der Vertrag kommt ins Default-Objekt
+    gleich = next((o for o in objekte.items if o["name"].casefold() == name.casefold()), None)
+    return gleich["id"] if gleich else ""
+
+
 def _contract_of(entry: ConfigEntry) -> dict[str, Any]:
     return {"title": entry.title, "data": dict(entry.data), "options": dict(entry.options)}
 
@@ -137,28 +174,41 @@ async def async_build_backup(hass: HomeAssistant) -> dict[str, Any]:
         "created": dt_util.now().isoformat(timespec="seconds"),
         "version": str(version),
         "contracts": [_contract_of(entry) for entry in hass.config_entries.async_entries(DOMAIN)],
+        **(objekte.payload() if (objekte := objekte_mod.cached(hass)) is not None else {}),
     }
 
 
-def _exists(hass: HomeAssistant, title: str, sparte: str | None) -> bool:
+def _exists(hass: HomeAssistant, title: str, sparte: str | None, objekt: str | None = None) -> bool:
+    """Gibt es den Vertrag schon (gleicher Name und gleiche Sparte, mit Objekten auch im gleichen Objekt)?"""
     return any(
-        entry.title == title and entry.data.get(CONF_SPARTE) == sparte
+        entry.title == title
+        and entry.data.get(CONF_SPARTE) == sparte
+        and (objekt is None or objekte_mod.objekt_von(entry) == objekt)
         for entry in hass.config_entries.async_entries(DOMAIN)
     )
 
 
-def plan(hass: HomeAssistant, contracts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def plan(
+    hass: HomeAssistant, contracts: list[dict[str, Any]], backup_objekte: list[dict[str, Any]] | None = None
+) -> list[dict[str, Any]]:
     """Was beim Wiederherstellen passiert: anlegen oder ueberspringen."""
-    seen: set[tuple[str, str | None]] = set()
+    backup_objekte = backup_objekte or []
+    namen = {o["id"]: o["name"] for o in backup_objekte}
+    objekte = objekte_mod.cached(hass)
+    mehrere = len(backup_objekte) > 1 or (objekte is not None and len(objekte.items) > 1)
+    seen: set[tuple[str, str | None, str | None]] = set()
     result = []
     for contract in contracts:
         sparte = contract["data"].get(CONF_SPARTE)
-        key = (contract["title"], sparte)
-        skip = key in seen or _exists(hass, contract["title"], sparte)
+        backup_objekt = contract["data"].get(CONF_OBJEKT)
+        objekt = _objekt_hier(hass, backup_objekt, backup_objekte)
+        key = (contract["title"], sparte, objekt if objekt else namen.get(backup_objekt))
+        skip = key in seen or (objekt != "" and _exists(hass, contract["title"], sparte, objekt))
         seen.add(key)
-        result.append(
-            {"title": contract["title"], "sparte": sparte, "action": "skip" if skip else "create"}
-        )
+        step = {"title": contract["title"], "sparte": sparte, "action": "skip" if skip else "create"}
+        if mehrere:  # mit mehreren Objekten zeigt die Vorschau, wohin der Vertrag kommt
+            step["objekt"] = namen.get(backup_objekt) or (objekte.name(objekt) if objekte and objekt else None)
+        result.append(step)
     return result
 
 
@@ -173,12 +223,19 @@ async def _create(hass: HomeAssistant, contract: dict[str, Any]) -> None:
 async def async_restore(hass: HomeAssistant, raw: Any) -> dict[str, list[str]]:
     """Legt die fehlenden Vertraege einer Sicherung an. Vorhandene bleiben unberuehrt."""
     contracts = sanitize_backup(raw)
+    backup_objekte = sanitize_objekte(raw)
+    steps = plan(hass, contracts, backup_objekte)
+    # erst die fehlenden Objekte anlegen, dann die Vertraege dort hinein
+    mapping = await objekte_mod.async_restore(hass, backup_objekte)
     created: list[str] = []
     skipped: list[str] = []
-    for contract, step in zip(contracts, plan(hass, contracts), strict=True):
+    for contract, step in zip(contracts, steps, strict=True):
         if step["action"] == "skip":
             skipped.append(contract["title"])
             continue
+        backup_objekt = contract["data"].get(CONF_OBJEKT)
+        if backup_objekt in mapping:
+            contract = {**contract, "data": {**contract["data"], CONF_OBJEKT: mapping[backup_objekt]}}
         await _create(hass, contract)
         created.append(contract["title"])
     return {"created": created, "skipped": skipped}
@@ -242,7 +299,8 @@ async def async_restore_deleted(hass: HomeAssistant, item_id: str) -> str:
     if item is None:
         raise BackupError("not_found")
     contract = sanitize_contract(item)
-    if _exists(hass, contract["title"], contract["data"].get(CONF_SPARTE)):
+    objekt = _objekt_hier(hass, contract["data"].get(CONF_OBJEKT), [])
+    if _exists(hass, contract["title"], contract["data"].get(CONF_SPARTE), objekt):
         raise BackupError("exists")
     await _create(hass, contract)
     await _store(hass).async_save({"contracts": [entry for entry in items if entry is not item]})

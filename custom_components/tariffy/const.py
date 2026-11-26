@@ -14,6 +14,8 @@ CONF_KUNDENNUMMER = "kundennummer"
 CONF_TARIF = "tarif"
 CONF_BEGINN = "beginn"
 CONF_ENDE = "ende"
+# Objekt (Haus, Wohnung, ...), zu dem der Vertrag gehoert; die Objekte selbst stehen in objekte.py
+CONF_OBJEKT = "objekt_id"
 
 # Kosten
 CONF_ARBEITSPREIS = "arbeitspreis"

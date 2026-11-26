@@ -106,7 +106,7 @@ export default ({ h, I18N }) => class {
     const plan = bk.plan ? [
       h("table", {}, h("thead", {}, h("tr", {}, [this._t("colContract"), ""].map((label) => h("th", { text: label })))),
         h("tbody", {}, bk.plan.map((step) => h("tr", {},
-          h("td", {}, step.title, h("span", { class: "t2", text: this._t("sparte")[step.sparte] || step.sparte })),
+          h("td", {}, step.title, h("span", { class: "t2", text: [this._t("sparte")[step.sparte] || step.sparte, step.objekt].filter(Boolean).join(" · ") })),
           h("td", { class: step.action === "create" ? "green-t" : "muted-t", text: this._t(step.action === "create" ? "bkPlanCreate" : "bkPlanSkip") }))))),
       creating === 0 ? h("p", { text: this._t("bkNothing") }) : null,
       creating > 0 && bk.asking === "restore"

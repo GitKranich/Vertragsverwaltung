@@ -1,7 +1,7 @@
 <!doctype html>
 <!-- Preview harness for the Tariffy panel: a mock `hass` fed with fixtures.json,
      which tests/test_panel_fixtures.py keeps in sync with the real backend.
-     Query: ?lang=de|en  &state=loading|empty|error  &narrow=1  &admin=0  &fail=1  &flowfail=1 (backend rejects the form)  &flowerr=1 (REST error)  &reload=N (action answers not_found N times)  &deletefail=1 (removing fails)  &kind=metered|flat (only contracts of that kind)  &late=1 (hass before the element is defined)  &theme=light -->
+     Query: ?lang=de|en  &state=loading|empty|error  &narrow=1  &admin=0  &fail=1  &flowfail=1 (backend rejects the form)  &flowerr=1 (REST error)  &reload=N (action answers not_found N times)  &deletefail=1 (removing fails)  &kind=metered|flat (only contracts of that kind)  &objekt=ferienwohnung (the property chosen by default; it has no contracts)  &late=1 (hass before the element is defined)  &theme=light -->
 <html>
 <head>
   <meta charset="utf-8">
@@ -33,6 +33,12 @@
   window.__api = [];
   let notFound = Number(params.get("reload") || 0);
   const reconfigureSteps = {};
+  // the properties: kept here like the backend keeps them, every change is pushed to the panel again
+  let objekte = JSON.parse(JSON.stringify(fixtures.objekte || []));
+  let defaultObjekt = params.get("objekt") || fixtures.default_objekt || null;
+  let push = null;
+  let contractList = [];
+  const send = () => push && push({ contracts: contractList, objekte: JSON.parse(JSON.stringify(objekte)), default_objekt: defaultObjekt });
   let createSteps = 0;
   panel.hass = {
     user: { is_admin: params.get("admin") !== "0" },
@@ -48,6 +54,23 @@
         const saldo = v.saldo !== undefined ? v.saldo : (kosten !== null && paid !== null ? round(paid - kosten) : null);
         return { values: { verbrauch, kosten, abschlag_gezahlt: paid, saldo },
           source: v.verbrauch !== undefined ? "manual" : "statistics", sensors: ["sensor.strom_haus"], months: 11.99 };
+      }
+      if (message.type === "tariffy/objekt_aktiv") return { ok: true };
+      if (message.type === "tariffy/objekt_save") {
+        if (!String(message.name || "").trim()) throw Object.assign(new Error("invalid_name"), { code: "invalid_name" });
+        const hit = objekte.find((o) => o.id === message.objekt_id);
+        if (hit) Object.assign(hit, { name: message.name.trim(), icon: message.icon || null });
+        else objekte.push({ id: `obj-${objekte.length + 1}`, name: message.name.trim(), icon: message.icon || null });
+        setTimeout(send);
+        return { objekt_id: hit ? hit.id : objekte[objekte.length - 1].id };
+      }
+      if (message.type === "tariffy/objekt_default") { defaultObjekt = message.objekt_id; setTimeout(send); return { ok: true }; }
+      if (message.type === "tariffy/objekt_delete") {
+        contractList = contractList.map((c) => (c.objekt_id === message.objekt_id ? { ...c, objekt_id: message.ziel } : c));
+        objekte = objekte.filter((o) => o.id !== message.objekt_id);
+        if (defaultObjekt === message.objekt_id) defaultObjekt = message.ziel || objekte[0].id;
+        setTimeout(send);
+        return { moved: 0 };
       }
       if (message.type === "tariffy/backup_export") {
         return { backup: { tariffy_backup: 1, created: "2026-07-12T12:00:00+02:00", version: "1.28.0",
@@ -156,7 +179,9 @@
         const metered = ["electricity", "electricity_ht_nt", "gas", "water"];
         const kind = params.get("kind");
         const list = fixtures.contracts.filter((c) => !kind || (kind === "metered") === metered.includes(c.sparte));
-        callback({ contracts: state === "empty" ? [] : list });
+        contractList = state === "empty" ? [] : list;
+        push = callback;
+        send();
         return () => {};
       },
     },

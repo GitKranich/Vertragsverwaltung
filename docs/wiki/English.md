@@ -194,6 +194,8 @@ The **Tariffy panel** is a page of its own in the Home Assistant sidebar. It sho
 
 **Own icon:** the contract form has an optional field **Icon**, for example `mdi:car`, with a preview. It is used in the panel and for the sensors of the contract; sensors with a status icon (thumb up/down for refund and balance due) keep theirs. Empty = the icon of the category. The icon survives a tariff switch and is part of the backup.
 
+**Properties:** contracts belong to a **property** ("Objekt"), for example "Home", "Holiday flat" and "Garage"; every contract and its costs belong to exactly one. The head of the panel shows the chosen property; with several, a switcher chooses another one, and overview, costs, contracts and history then show only its contracts (totals per property; the backup always covers all). When the panel opens it shows the **default property** (marked ★). Administrators manage the properties with the pencil next to the switcher: add (name, optional icon such as `mdi:beach`), edit, make default, delete (a property with contracts asks where they go; the last one stays). From two properties on, the contract form asks for the **Property**, preselected with the one chosen in the panel; editing a contract moves it. After the update Tariffy creates the first property ("Home"), makes it the default and assigns every existing contract to it. Sensors have the attribute `objekt`; with several properties notifications name it before the contract.
+
 **Five views**
 
 | View | Content |

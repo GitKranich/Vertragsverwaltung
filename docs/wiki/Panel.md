@@ -18,6 +18,17 @@ Das Panel folgt der Sprache von Home Assistant (Deutsch, sonst Englisch) und pas
 
 **Eigenes Symbol:** Im Vertragsformular lässt sich ein **Icon** eintragen, zum Beispiel `mdi:car` oder `mdi:router-wireless`; das Feld zeigt eine Vorschau. Das Symbol erscheint im Panel und bei den Sensoren des Vertrags. Sensoren mit einem Status-Symbol (Daumen hoch/runter bei Guthaben und Nachzahlung) behalten ihres. Leer = das Symbol der Sparte. Das Symbol bleibt beim Tarifwechsel erhalten und steht in der Sicherung.
 
+## Objekte
+
+Verträge lassen sich **Objekten** zuordnen, zum Beispiel „Zuhause“, „Ferienwohnung“ und „Garage“. Jeder Vertrag und alle seine Kosten gehören zu genau einem Objekt.
+
+- **Umschalter:** Oben im Panel steht das gewählte Objekt. Mit mehreren Objekten wählst du dort ein anderes; Übersicht, Kosten, Verträge und Historie zeigen dann nur dessen Verträge, alle Summen gelten für dieses Objekt. Die Sicherung gilt immer für alle Objekte.
+- **Default-Objekt:** Beim Öffnen zeigt das Panel immer das Default-Objekt (im Umschalter mit ★). Ein Wechsel gilt, bis du das Panel verlässt.
+- **Verwalten** (nur Administratoren, Stift neben dem Umschalter): Objekt **anlegen** (Name, nach Wunsch ein Icon wie `mdi:beach`), **bearbeiten**, **als Default** setzen und **löschen**. Hat ein Objekt noch Verträge, wählst du beim Löschen, in welches Objekt sie kommen. Das letzte Objekt lässt sich nicht löschen.
+- **Neuer Vertrag:** Ab zwei Objekten fragt das Formular nach dem **Objekt**, vorbelegt mit dem im Panel gewählten. Über **Vertrag bearbeiten** ziehst du einen Vertrag in ein anderes Objekt um.
+- **Nach dem Update:** Tariffy legt das erste Objekt („Zuhause“) selbst an, macht es zum Default und ordnet ihm alle vorhandenen Verträge fest zu. Mit nur einem Objekt ändert sich sonst nichts.
+- **Sensoren und Meldungen:** Jeder Sensor hat das Attribut `objekt` mit dem Namen des Objekts (für Vorlagen und Karten). Mit mehreren Objekten steht das Objekt in den Benachrichtigungen vor dem Vertrag, z. B. „Kündigung: Ferienwohnung · Strom“.
+
 ## Die fünf Ansichten
 
 | Ansicht | Inhalt |
@@ -55,7 +66,7 @@ Beide fragen **ein zweites Mal** nach („Ja, bestätigen" / „Abbrechen"), dam
 Die normalen Backups von Home Assistant sichern Tariffy schon vollständig mit. Der Tab **Sicherung** (nur Administratoren) ergänzt das um eine Sicherung nur für Tariffy:
 
 - **Sicherung herunterladen:** Speichert alle Verträge in einer Datei `tariffy-backup-<Datum>.json`: Vertragsdaten, Historie, archivierte Verträge, geplanten Folgevertrag und den internen Zustand (zum Beispiel bestätigte Erinnerungen). **Die Datei enthält persönliche Daten** (Kundennummer, Zählernummer, Marktlokations-ID, Benachrichtigungsziel). Bewahre sie sicher auf und gib sie nicht weiter.
-- **Aus Datei wiederherstellen:** Du wählst die Datei und siehst zuerst, was passieren würde: Verträge, die es noch nicht gibt, werden **angelegt**, Verträge mit gleichem Namen und gleicher Sparte werden **übersprungen** und nie verändert. Erst nach einer Rückfrage wird angelegt. Die Datei wird streng geprüft (nur bekannte Einstellungen, nur einfache Werte, höchstens 1 MB und 200 Verträge); eine kaputte Datei legt nichts an. Wiederhergestellte Verträge sind neue Verträge mit neuen Sensoren; Statistiken des alten Vertrags bleiben bei dessen Sensoren in Home Assistant.
+- **Aus Datei wiederherstellen:** Du wählst die Datei und siehst zuerst, was passieren würde: Verträge, die es noch nicht gibt, werden **angelegt**, Verträge mit gleichem Namen und gleicher Sparte (im gleichen Objekt) werden **übersprungen** und nie verändert. Die Objekte stehen mit in der Datei; fehlende werden angelegt, ältere Sicherungen ohne Objekte landen im Default-Objekt. Erst nach einer Rückfrage wird angelegt. Die Datei wird streng geprüft (nur bekannte Einstellungen, nur einfache Werte, höchstens 1 MB und 200 Verträge); eine kaputte Datei legt nichts an. Wiederhergestellte Verträge sind neue Verträge mit neuen Sensoren; Statistiken des alten Vertrags bleiben bei dessen Sensoren in Home Assistant.
 - **Gelöschte Verträge:** Wird ein Vertrag gelöscht (im Panel oder in Home Assistant), merkt sich Tariffy ihn **30 Tage lang** (höchstens die letzten 20) und bietet ihn im Tab **Sicherung** zum **Zurückholen** an, mit Rückfrage. Das geht nicht, wenn es inzwischen einen Vertrag mit gleichem Namen und gleicher Sparte gibt. Die Daten liegen in Home Assistants Speicher (`.storage/tariffy.deleted`) und werden nach 30 Tagen entfernt; mit **Jetzt vergessen** (mit Rückfrage) verschwindet ein Eintrag sofort, auch seine persönlichen Daten.
 - **Grenze:** Das Panel gibt es erst, wenn mindestens ein Vertrag existiert. Wurde der letzte Vertrag gelöscht, legst du zuerst irgendeinen neuen Vertrag an, dann steht das Panel wieder zur Verfügung.
 

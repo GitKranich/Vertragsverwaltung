@@ -17,9 +17,9 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from . import ablesung, backup, dokumente, history, meter_import
+from . import ablesung, backup, dokumente, history, meter_import, objekte
 from .const import CONF_VERBRAUCH_SENSOR, CONF_ZAEHLERSTAND_EINGABE, DOMAIN
-from .panel import SIGNAL_CONTRACTS, async_contracts
+from .panel import SIGNAL_CONTRACTS, async_notify, async_snapshot
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ ACTIONS = (
 @callback
 def ws_contracts(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
     """Return all contracts."""
-    connection.send_result(msg["id"], {"contracts": async_contracts(hass)})
+    connection.send_result(msg["id"], async_snapshot(hass))
 
 
 @websocket_api.websocket_command({vol.Required("type"): "tariffy/subscribe"})
@@ -54,7 +54,7 @@ def ws_subscribe(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
     @callback
     def _push() -> None:
         connection.send_message(
-            websocket_api.event_message(msg["id"], {"contracts": async_contracts(hass)})
+            websocket_api.event_message(msg["id"], async_snapshot(hass))
         )
 
     connection.subscriptions[msg["id"]] = async_dispatcher_connect(
@@ -571,7 +571,9 @@ def ws_backup_preview(hass: HomeAssistant, connection, msg: dict[str, Any]) -> N
     except backup.BackupError as err:
         connection.send_error(msg["id"], err.code, err.code)
         return
-    connection.send_result(msg["id"], {"contracts": backup.plan(hass, contracts)})
+    connection.send_result(
+        msg["id"], {"contracts": backup.plan(hass, contracts, backup.sanitize_objekte(msg["backup"]))}
+    )
 
 
 @websocket_api.require_admin
@@ -627,6 +629,86 @@ async def ws_deleted_discard(hass: HomeAssistant, connection, msg: dict[str, Any
     connection.send_result(msg["id"], {"ok": True})
 
 
+# ------------------------------------------------------------------ Objekte
+async def _objekt_geaendert(hass: HomeAssistant) -> None:
+    objekte.async_refresh_entities(hass)
+    async_notify(hass)
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/objekt_save",
+        vol.Optional("objekt_id"): vol.Any(None, str),
+        vol.Required("name"): str,
+        vol.Optional("icon"): vol.Any(None, str),
+    }
+)
+@websocket_api.async_response
+async def ws_objekt_save(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Legt ein Objekt an (ohne objekt_id) oder aendert Name und Icon."""
+    store = await objekte.async_get(hass)
+    try:
+        objekt_id = await store.async_save_objekt(msg.get("objekt_id"), msg["name"], msg.get("icon"))
+    except objekte.ObjektError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    await _objekt_geaendert(hass)
+    connection.send_result(msg["id"], {"objekt_id": objekt_id})
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/objekt_delete",
+        vol.Required("objekt_id"): str,
+        vol.Optional("ziel"): vol.Any(None, str),
+    }
+)
+@websocket_api.async_response
+async def ws_objekt_delete(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Loescht ein Objekt; seine Vertraege ziehen vorher in das Objekt `ziel` um."""
+    store = await objekte.async_get(hass)
+    try:
+        moved = await store.async_delete(msg["objekt_id"], msg.get("ziel"))
+    except objekte.ObjektError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    await _objekt_geaendert(hass)
+    connection.send_result(msg["id"], {"moved": moved})
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {vol.Required("type"): "tariffy/objekt_default", vol.Required("objekt_id"): str}
+)
+@websocket_api.async_response
+async def ws_objekt_default(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Macht ein Objekt zum Default (das Panel zeigt es beim Oeffnen)."""
+    store = await objekte.async_get(hass)
+    try:
+        await store.async_set_default(msg["objekt_id"])
+    except objekte.ObjektError as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    async_notify(hass)
+    connection.send_result(msg["id"], {"ok": True})
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "tariffy/objekt_aktiv", vol.Required("objekt_id"): str}
+)
+@websocket_api.async_response
+async def ws_objekt_aktiv(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Merkt sich das im Panel gewaehlte Objekt (nur im Speicher): Vorauswahl beim Anlegen eines Vertrags."""
+    store = await objekte.async_get(hass)
+    if store.get(msg["objekt_id"]) is None:
+        connection.send_error(msg["id"], "not_found", "not_found")
+        return
+    store.aktiv = msg["objekt_id"]
+    connection.send_result(msg["id"], {"ok": True})
+
+
 COMMANDS = (
     ws_contracts,
     ws_subscribe,
@@ -653,6 +735,10 @@ COMMANDS = (
     ws_deleted_list,
     ws_deleted_restore,
     ws_deleted_discard,
+    ws_objekt_save,
+    ws_objekt_delete,
+    ws_objekt_default,
+    ws_objekt_aktiv,
 )
 
 

@@ -15,15 +15,20 @@ from unittest.mock import patch
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.data_entry_flow import FlowManagerResourceView
+from homeassistant.helpers.storage import Store
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.tariffy import panel
+from custom_components.tariffy import objekte, panel
 from custom_components.tariffy.const import DOMAIN
 
 from .test_reconfigure import _form_defaults
 
 FIXTURE = Path(__file__).parent / "frontend" / "fixtures.json"
 TODAY = "2026-07-12"
+OBJEKTE = [
+    {"id": "haus", "name": "Haus", "icon": "mdi:home"},
+    {"id": "ferienwohnung", "name": "Ferienwohnung", "icon": "mdi:beach"},
+]
 
 CONTRACTS = [
     (
@@ -197,8 +202,15 @@ async def _build(hass: HomeAssistant, freezer) -> tuple[list[dict], dict[str, di
         patch("custom_components.tariffy.coordinator._get_historic_value", offset),
         patch("custom_components.tariffy.coordinator._get_average_price", average),
     ):
+        # two properties with fixed ids (the fixture must not change from run to run); every contract is in the
+        # first one, the second one has none yet (the panel's "no contracts for this property" state)
+        hass.data[objekte.DATA_KEY] = objekte.Objekte(
+            hass, Store(hass, objekte.STORE_VERSION, objekte.STORE_KEY), [dict(o) for o in OBJEKTE], OBJEKTE[0]["id"]
+        )
         for title, data, _sensors, options in CONTRACTS:
-            entry = MockConfigEntry(domain=DOMAIN, title=title, data=data, options=options)
+            entry = MockConfigEntry(
+                domain=DOMAIN, title=title, data={**data, "objekt_id": OBJEKTE[0]["id"]}, options=options
+            )
             entry.add_to_hass(hass)
             assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -262,13 +274,14 @@ async def _build(hass: HomeAssistant, freezer) -> tuple[list[dict], dict[str, di
         hass.config_entries.flow.async_abort(result["flow_id"])
         steps[sparte] = form
     create = {"first": start, "steps": steps}
-    return contracts, flows, reconfigure, create
+    return contracts, flows, reconfigure, create, objekte.cached(hass).payload()
 
 
 async def test_panel_fixtures_match_the_backend(hass: HomeAssistant, freezer):
-    contracts, flows, reconfigure, create = await _build(hass, freezer)
+    contracts, flows, reconfigure, create, objekt_payload = await _build(hass, freezer)
     document = {
         "today": TODAY, "contracts": contracts, "flows": flows, "reconfigure": reconfigure, "create": create,
+        **objekt_payload,
     }
     text = json.dumps(document, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
 
