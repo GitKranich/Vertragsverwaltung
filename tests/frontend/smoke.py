@@ -109,6 +109,45 @@ def states(browser, base: str) -> None:
     page.close()
 
 
+OVERLAP_JS = """() => { const r = window.__panel.shadowRoot; const bad = [];
+  r.querySelectorAll('summary').forEach((s) => {
+    const who = s.querySelector('.who'), end = s.querySelector(':scope > .end, :scope > .row-end');
+    if (!who || !end) return;
+    const box = end.getBoundingClientRect();
+    const walker = document.createTreeWalker(who, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const range = document.createRange(); range.selectNodeContents(node);
+      for (const k of range.getClientRects()) {
+        if (k.right > box.left + 1 && k.left < box.right && k.bottom > box.top && k.top < box.bottom) {
+          bad.push(who.textContent.slice(0, 40)); return;
+        }
+      }
+    }
+  });
+  return bad; }"""
+
+LONG_NAMES_JS = """() => { const p = window.__panel;
+  p._contracts.filter((c) => !['loan'].includes(c.sparte)).forEach((c, i) => {
+    c.title = ['Gebäudeversicherung', 'Mici Handyvertrag', 'Rechtsschutzversicherung'][i % 3];
+    c.anbieter = 'Sparkassenversicherung'; c.tarif = 'Gebäude Feuer-/Elementarschadenversicherung';
+  });
+  p._render(); }"""
+
+
+def long_names(browser, base: str) -> None:
+    """Long names and tariffs must never run under the amount next to them (phones, large fonts)."""
+    for width in (320, 390, 430, 760, 1280):
+        for tab in (0, 2):
+            page, errors = open_page(browser, f"{base}?lang=de&theme=light", width)
+            page.evaluate(LONG_NAMES_JS)
+            click_tab(page, tab)
+            bad = page.evaluate(OVERLAP_JS)
+            check(not bad, f"long names, {width} px, tab {tab + 1}: no text under the amount {bad}")
+            check(not errors, f"long names, {width} px: no browser error {errors}")
+            page.close()
+
+
 def dialogs(browser, base: str) -> None:
     """Every button in the contract rows and in the opened contract details: a fresh page each time, so that one
     dialog cannot hide a problem of the next one."""
@@ -149,6 +188,7 @@ def main() -> int:
             browser = p.chromium.launch()
             tabs_and_variants(browser, base)
             states(browser, base)
+            long_names(browser, base)
             dialogs(browser, base)
             browser.close()
     finally:

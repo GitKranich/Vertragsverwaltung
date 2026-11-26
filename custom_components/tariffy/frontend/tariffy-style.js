@@ -105,6 +105,9 @@ section.card .foot { padding-top: 12px; }
 .title { font-size: 17px; font-weight: 700; line-height: 1.2; }
 .meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .who { min-width: 0; flex: 1; }
+/* long names and tariffs ("Elementarschadenversicherung") must not run under the amount next to them: hyphenate
+ * them (language of the panel) and, if that is not enough, break them anywhere */
+.who .title, .who .meta { overflow-wrap: anywhere; hyphens: auto; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .chip { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap;
   background: rgba(var(--w),.06); color: var(--muted); }

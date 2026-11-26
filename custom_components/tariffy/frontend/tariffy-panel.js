@@ -364,7 +364,8 @@ class TariffyPanel extends HTMLElement {
     if (!STYLE) return; // the texts and styles are still loading: PARTS draws the panel when they are here
     const root = this.shadowRoot;
     root.replaceChildren(h("style", { text: STYLE }));
-    const wrap = h("div", { class: "wrap" });
+    // the language of the texts, so that the browser can hyphenate long words (names on narrow screens)
+    const wrap = h("div", { class: "wrap", lang: this._lang });
     wrap.appendChild(this._top());
 
     if (this._error) {

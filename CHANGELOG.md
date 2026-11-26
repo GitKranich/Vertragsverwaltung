@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0-beta.4] - 2026-11-26
+
+### Fixed
+
+- **Long names no longer run under the amount** in the overview and the contracts list on phones (for example "Elementarschadenversicherung" or a name in capitals next to "28,21 € / Monat"). Long words are now hyphenated in the language of the panel and, if that is not enough, broken. The browser test in CI checks this with long names at 320 to 1280 px. After the update reload the browser page once (Ctrl+F5).
+
 ## [1.42.0-beta.3] - 2026-11-25
 
 ### Added

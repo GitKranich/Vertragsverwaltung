@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.42.0-beta.4] - 2026-11-26
+
+### Behoben
+
+- **Lange Namen laufen nicht mehr unter den Betrag** in der Übersicht und der Vertragsliste auf dem Handy (z. B. „Elementarschadenversicherung“ oder ein Name in Großbuchstaben neben „28,21 € / Monat“). Lange Wörter werden jetzt in der Sprache des Panels getrennt und, falls das nicht reicht, umbrochen. Der Browser-Test im CI prüft das mit langen Namen von 320 bis 1280 px. Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.42.0-beta.3] - 2026-11-25
 
 ### Hinzugefügt
