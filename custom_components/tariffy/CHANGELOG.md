@@ -7,6 +7,25 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.42.0] - 2026-11-26
+
+Dieses Release fasst die Betas `1.42.0-beta.1` bis `1.42.0-beta.4` zusammen. **Bestehende Verträge laufen ohne jede Änderung weiter.**
+
+### Hinzugefügt
+
+- **Neue Sparte „Hauskosten“** (übernommen aus dem Original, weskona/tariffy 1.33.0): Abfallgebühren, Straßenreinigung, Niederschlagswasser, Grundsteuer, Schornsteinfeger, Winterdienst und Ähnliches als Pauschalvertrag mit freiwilliger Art (aus der Liste oder eingetippt), mit Preisänderungen, zählt in den Summen, eigene Gruppe mit Haus-Icon.
+
+### Behoben
+
+- **Lange Namen laufen auf dem Handy nicht mehr unter den Betrag:** lange Wörter werden in der Sprache des Panels getrennt.
+
+### Geändert (intern)
+
+- Das Panel ist aufgeteilt in das Element, Texte, Icons, Styles und ein Modul je Tab bzw. Bereich, alle geladen mit der Version des Panels.
+- Berechnungen in eigenen Modulen ohne Home Assistant (`werte.py`, `preise.py`, `prognose.py`, `abschlaege.py`); die WebSocket-Befehle des Panels in `websocket.py`.
+- Browser-Test im CI (jeder Tab, jeder Dialog, lange Namen); `UPSTREAM.md` hält den Abgleich mit dem Original fest.
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.42.0-beta.4] - 2026-11-26
 
 ### Behoben

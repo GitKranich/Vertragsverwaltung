@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.42.0] - 2026-11-26
+
+This release brings together the betas `1.42.0-beta.1` to `1.42.0-beta.4`. **Existing contracts keep working without any change.**
+
+### Added
+
+- **New category "House costs"** (taken over from the original, weskona/tariffy 1.33.0): waste fees, street cleaning, rainwater, property tax, chimney sweep, winter service and the like as a flat-rate contract with an optional type (from the list or typed), with price changes, counting in the totals, in a group of their own with a house icon.
+
+### Fixed
+
+- **Long names no longer run under the amount** on phones: long words are hyphenated in the language of the panel.
+
+### Changed (internal)
+
+- The panel is split into the element, its texts, icons, styles and one module per tab or area, all loaded with the panel's version.
+- Calculations in their own modules without Home Assistant (`werte.py`, `preise.py`, `prognose.py`, `abschlaege.py`); the panel's WebSocket commands in `websocket.py`.
+- Browser test in CI (every tab, every dialog, long names); `UPSTREAM.md` records the comparison with the original.
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.42.0-beta.4] - 2026-11-26
 
 ### Fixed
