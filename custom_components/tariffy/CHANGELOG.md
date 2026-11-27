@@ -7,6 +7,12 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.43.0-beta.3] - 2026-11-27
+
+### Geändert
+
+- Zurückgenommen: Die Änderung aus `1.43.0-beta.2` (Abschläge als Kosten bisher bei Verbrauchsverträgen ohne Verbrauchssensor) ist rückgängig gemacht; solche Verträge zeigen wieder keine Kosten bisher. Stand wie `1.43.0-beta.1`.
+
 ## [1.43.0-beta.2] - 2026-11-27
 
 ### Geändert

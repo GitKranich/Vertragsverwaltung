@@ -39,8 +39,6 @@ Verträge lassen sich **Objekten** zuordnen, zum Beispiel „Zuhause“, „Feri
 | **Historie** | Die **früheren Laufzeiten** jedes Vertrags (Zeitraum, Anbieter, Tarif, Abschlag, Kosten, Verbrauch und Saldo am Ende) und die **archivierten Verträge**. Wer keinen Folgevertrag hatte und keinen Vertrag archiviert hat, sieht hier zunächst nur einen kurzen Hinweis. |
 | **Sicherung** | Nur für Administratoren: **Sicherung herunterladen**, **aus Datei wiederherstellen** und die **gelöschten Verträge** der letzten 30 Tage zurückholen (siehe unten). |
 
-**Verbrauchsvertrag ohne Verbrauchssensor:** Ohne gemessenen Verbrauch gibt es keine echten Kosten. Dann zählen die bis heute fälligen Abschläge als Kosten bisher, gekennzeichnet mit „aus den Abschlägen“; Saldo und Prognose bleiben leer.
-
 Vorzeichen: **Plus** ist Guthaben, **Minus** ist Nachzahlung. „Zum Vertragsende" ist aus dem bisherigen Verbrauch hochgerechnet. Deckt ein Guthaben die Kosten bis zum Vertragsende schon ab, steht beim empfohlenen Abschlag „0,00 €" mit dem Hinweis „Guthaben deckt die Kosten", nie ein negativer Betrag. Alle Werte sind dieselben wie bei den Sensoren und aktualisieren sich von selbst.
 
 ## Wer sieht und darf was

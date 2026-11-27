@@ -172,8 +172,7 @@ export default ({ h, svg, icon, isNum, METERED, GRID }) => class {
 
     // costs so far: measured for metered contracts, instalments due for flat-rate ones
     const costs = sum(contracts, (c) => this._costSoFar(c));
-    const due = sum(metered, (c) => (isNum(c.kosten_bisher) && isNum(c.guthaben_bisher) ? c.kosten_bisher + c.guthaben_bisher
-      : this._fromInstalments(c) ? c.abschlag_bisher_gezahlt : 0))
+    const due = sum(metered, (c) => (isNum(c.kosten_bisher) && isNum(c.guthaben_bisher) ? c.kosten_bisher + c.guthaben_bisher : 0))
       + sum(flat, (c) => c.abschlag_bisher_gezahlt);
     const withBalance = metered.filter((c) => isNum(c.guthaben_bisher));
     const balance = sum(withBalance, (c) => c.guthaben_bisher);
@@ -265,13 +264,7 @@ export default ({ h, svg, icon, isNum, METERED, GRID }) => class {
   /* Cost so far: measured for metered contracts, the instalments due until today for flat-rate ones. */
   _costSoFar(c) {
     if (isNum(c.kosten_bisher)) return c.kosten_bisher;
-    return (!METERED.has(c.sparte) || this._fromInstalments(c)) && isNum(c.abschlag_bisher_gezahlt) ? c.abschlag_bisher_gezahlt : null;
-  }
-
-  /* A metered contract without any measured consumption (no consumption sensor): its cost so far are the instalments
-   * due until today, marked as such, so it still counts in the costs (the real cost comes with the bill). */
-  _fromInstalments(c) {
-    return METERED.has(c.sparte) && !isNum(c.kosten_bisher) && !isNum(c.verbrauch_bisher) && isNum(c.abschlag_bisher_gezahlt);
+    return !METERED.has(c.sparte) && isNum(c.abschlag_bisher_gezahlt) ? c.abschlag_bisher_gezahlt : null;
   }
 
   _tile(label, value, sub, tone) {
@@ -369,9 +362,6 @@ export default ({ h, svg, icon, isNum, METERED, GRID }) => class {
           isNum(c.verbrauch_hochgerechnet) ? this._t("projected", { v: `${this._num(c.verbrauch_hochgerechnet, 0)} ${unit}` }) : null),
       ]
       : [
-        this._fromInstalments(c)
-          ? this._tile(this._t("costSoFar"), this._money(c.abschlag_bisher_gezahlt, c.currency, { digits: 2 }), this._t("fromInstalments"))
-          : null,
         this._tile(this._t("instalment"), this._money(c.abschlag, c.currency, { digits: 2 })),
         c.ende ? this._tile(this._t("contractEnd"), this._date(c.ende)) : null,
       ];

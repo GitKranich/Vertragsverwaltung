@@ -95,8 +95,7 @@ export default ({ h, icon, isNum, METERED }) => class {
           ? `${money(c.abschlag_je_zahlung)} ${this._t("interval")[c.zahlweise] || c.zahlweise}` : null),
         row(this._t("firstDebit"), c.zahlweise && c.zahlweise !== "monthly" && c.erste_zahlung ? this._date(c.erste_zahlung) : null),
         row(this._t("nextPayment"), c.naechste_zahlung ? this._date(c.naechste_zahlung) : null),
-        row(this._t("costSoFar"), !METERED.has(c.sparte) && isNum(this._costSoFar(c)) ? money(this._costSoFar(c))
-          : this._fromInstalments(c) ? `${money(c.abschlag_bisher_gezahlt)} · ${this._t("fromInstalments")}` : null),
+        row(this._t("costSoFar"), !METERED.has(c.sparte) && isNum(this._costSoFar(c)) ? money(this._costSoFar(c)) : null),
         row(this._t("totalCost"), this._total(c) ? `${this._total(c).value} · ${this._total(c).since}` : null),
       ]),
       this._meterSection(c),

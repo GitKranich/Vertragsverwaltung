@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.0-beta.3] - 2026-11-27
+
+### Changed
+
+- Withdrawn: the change of `1.43.0-beta.2` (instalments as cost so far for metered contracts without a consumption sensor) is undone; such contracts again show no cost so far. Same state as `1.43.0-beta.1`.
+
 ## [1.43.0-beta.2] - 2026-11-27
 
 ### Changed
