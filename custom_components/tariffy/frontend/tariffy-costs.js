@@ -141,7 +141,10 @@ export default ({ h, svg, isNum, METERED, GRID, CHART_COLORS }) => class {
     for (const c of metered) {
       meteredRows.push(h("tr", {},
         name(c),
-        cell(this._t("colCost"), this._money(this._costSoFar(c), c.currency, { digits: 2 })),
+        this._fromInstalments(c)
+          ? h("td", { "data-label": this._t("colCost") }, this._money(this._costSoFar(c), c.currency, { digits: 2 }),
+            h("span", { class: "t2", text: this._t("fromInstalments") }))
+          : cell(this._t("colCost"), this._money(this._costSoFar(c), c.currency, { digits: 2 })),
         cell(this._t("colBalance"), this._money(c.guthaben_bisher, c.currency, { sign: true, digits: 2 }), tone(c.guthaben_bisher)),
         cell(this._t("colForecast"), this._money(c.prognose_real, c.currency, { sign: true }), tone(c.prognose_real)),
         cell(this._t("colInstalment"), this._money(c.abschlag, c.currency, { digits: 2 })),

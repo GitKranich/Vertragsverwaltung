@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.0-beta.2] - 2026-11-27
+
+### Changed
+
+- **Metered contracts without a consumption sensor** (for example gas without a meter in Home Assistant) now count with their **instalments due so far** as cost so far, marked "from the instalments (no consumption measured)": in the costs tab (table, cost split and year view), in the overview tile "Cost so far" and card, and in the contract details. Before, they showed no cost at all. With a consumption sensor nothing changes.
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.43.0-beta.1] - 2026-11-26
 
 ### Added

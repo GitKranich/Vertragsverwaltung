@@ -230,6 +230,22 @@ def properties(browser, base: str) -> None:
     page.close()
 
 
+def instalments_as_cost(browser, base: str) -> None:
+    """A metered contract without a consumption sensor: the cost so far are its instalments, marked as such."""
+    root = "window.__panel.shadowRoot"
+    page, errors = open_page(browser, f"{base}?lang=de")
+    page.evaluate("""() => { const p = window.__panel; const c = p._all.find((x) => x.sparte === 'gas');
+      Object.assign(c, { kosten_bisher: null, verbrauch_bisher: null, guthaben_bisher: null, prognose_real: null,
+        abschlag_bisher_gezahlt: 1912.17 }); p._render(); }""")
+    page.wait_for_timeout(100)
+    check("aus den Abschlägen" in page.evaluate(f"() => {root}.textContent"), "overview: cost so far from the instalments")
+    click_tab(page, 1)
+    shown = page.evaluate(f"() => {root}.textContent")
+    check("aus den Abschlägen" in shown and "1.912,17" in shown, "costs: the instalments count as cost so far")
+    check(not errors, f"instalments as cost: no browser error {errors}")
+    page.close()
+
+
 def main() -> int:
     server, base = serve()
     try:
@@ -240,6 +256,7 @@ def main() -> int:
             long_names(browser, base)
             dialogs(browser, base)
             properties(browser, base)
+            instalments_as_cost(browser, base)
             browser.close()
     finally:
         server.shutdown()

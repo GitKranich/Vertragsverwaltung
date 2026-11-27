@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.43.0-beta.2] - 2026-11-27
+
+### Geändert
+
+- **Verbrauchsverträge ohne Verbrauchssensor** (z. B. Gas ohne Zähler in Home Assistant) zählen jetzt mit ihren **bis heute fälligen Abschlägen** als Kosten bisher, gekennzeichnet mit „aus den Abschlägen (kein Verbrauch gemessen)“: im Tab Kosten (Tabelle, Kostenaufteilung und Jahresansicht), in der Kachel „Kosten bisher“ und auf der Karte der Übersicht sowie in den Vertragsdetails. Bisher hatten sie dort gar keine Kosten. Mit Verbrauchssensor ändert sich nichts.
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.43.0-beta.1] - 2026-11-26
 
 ### Hinzugefügt
