@@ -7,6 +7,13 @@ das Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [1.43.0-beta.4] - 2026-11-27
+
+### Hinzugefügt
+
+- **Zähler im Panel anlegen:** Ein Strom-, Gas- oder Wasservertrag ohne Verbrauchssensor hat in seinen Details (Tab Verträge, Administratoren) den Button **Zähler anlegen**. Er legt zwei **echte Helfer in Home Assistant** an und ordnet sie dem Vertrag zu: einen Zahl-Helfer „<Name> Ablesung“ für die Ablesungen (angelegt wie in den Helfer-Einstellungen, Startwert = aktueller Zählerstand) und einen Template-Sensor „<Name>“ mit `total_increasing`, Geräteklasse und Einheit des Vertrags (Gas `gas`, Wasser `water`, Strom/kWh `energy`), der die Langzeitstatistik führt. Vorgeschlagen wird als Name die Zählerart und das Objekt, z. B. „Gaszähler Bahnhofstraße“, änderbar. Die Helfer gehören zu Home Assistant: Sie und ihre Statistik bleiben, wenn der Vertrag gelöscht oder Tariffy entfernt wird, und ein Folgevertrag kann denselben Zähler nutzen. Danach funktionieren „Zählerstand erfassen“, „Verlauf importieren“ und „Ablesung korrigieren“ wie bei jedem Zähler. Nicht für Strom mit Zweitarif (HT/NT). Neue WebSocket-Befehle `tariffy/zaehler_vorschlag` und `tariffy/zaehler_anlegen`.
+- Nach dem Update die Browserseite einmal neu laden (Strg+F5).
+
 ## [1.43.0-beta.3] - 2026-11-27
 
 ### Geändert

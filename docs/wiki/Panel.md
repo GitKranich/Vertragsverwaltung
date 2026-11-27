@@ -70,6 +70,17 @@ Die normalen Backups von Home Assistant sichern Tariffy schon vollständig mit. 
 - **Gelöschte Verträge:** Wird ein Vertrag gelöscht (im Panel oder in Home Assistant), merkt sich Tariffy ihn **30 Tage lang** (höchstens die letzten 20) und bietet ihn im Tab **Sicherung** zum **Zurückholen** an, mit Rückfrage. Das geht nicht, wenn es inzwischen einen Vertrag mit gleichem Namen und gleicher Sparte gibt. Die Daten liegen in Home Assistants Speicher (`.storage/tariffy.deleted`) und werden nach 30 Tagen entfernt; mit **Jetzt vergessen** (mit Rückfrage) verschwindet ein Eintrag sofort, auch seine persönlichen Daten.
 - **Grenze:** Das Panel gibt es erst, wenn mindestens ein Vertrag existiert. Wurde der letzte Vertrag gelöscht, legst du zuerst irgendeinen neuen Vertrag an, dann steht das Panel wieder zur Verfügung.
 
+## Zähler anlegen
+
+Ein Strom-, Gas- oder Wasservertrag ohne Verbrauchssensor hat im Tab **Verträge** in den Details den Button **Zähler anlegen** (nur Administratoren). Du gibst den Namen (vorgeschlagen: Zählerart und Objekt, z. B. „Gaszähler Bahnhofstraße“) und den heutigen Zählerstand ein. Tariffy legt dann zwei echte Helfer in Home Assistant an und ordnet sie dem Vertrag zu:
+
+| Helfer | Beispiel | Wofür |
+|---|---|---|
+| Zahl-Helfer | „Gaszähler Bahnhofstraße Ablesung“ (`input_number.gaszahler_bahnhofstrasse_ablesung`) | die Ablesungen, über „Zählerstand erfassen“ |
+| Template-Sensor | „Gaszähler Bahnhofstraße“ (`sensor.gaszahler_bahnhofstrasse`) | Zählerstand mit `total_increasing`, Geräteklasse und Einheit; führt die Langzeitstatistik (auch fürs Energie-Dashboard) |
+
+Die Helfer gehören zu Home Assistant (Einstellungen → Helfer): Sie und ihre Statistik bleiben, wenn der Vertrag gelöscht oder Tariffy entfernt wird, und ein Folgevertrag nutzt denselben Zähler weiter. Ältere Ablesungen holst du danach mit **Verlauf importieren** nach. Für Strom mit Zweitarif (HT/NT) gibt es den Button nicht.
+
 ## Pauschalvertrag verlängern
 
 Bei Verträgen ohne Verbrauch (Versicherung, Internet, Mobilfunk, Streaming, Sonstiges), die ein **Vertragsende** haben, steht in jeder Zeile des Tabs **Verträge** ein Symbol **Vertrag verlängern** (zwei Pfeile im Kreis, nur Administratoren). Der Dialog schlägt vor: Beginn am Tag nach dem bisherigen Ende, neues Ende ein Jahr später, Zahlweise und Betrag wie bisher. Du trägst zum Beispiel den neuen Beitrag ein, und der Dialog zeigt sofort, um wie viel Prozent der Vertrag teurer oder günstiger wird (verglichen pro Monat). Mit **Verlängern** passiert Folgendes:

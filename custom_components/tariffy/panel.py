@@ -189,6 +189,8 @@ def contract_payload(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
     state = hass.states.get(sensor_id) if sensor_id else None
     unit = state.attributes.get("unit_of_measurement") if state else None
     # a meter reporting Wh or MWh is calculated in kWh (see coordinator._einheit_faktor)
+    # ohne Verbrauchssensor bietet das Panel "Zaehler anlegen" an
+    payload["hat_zaehler"] = bool(sensor_id)
     payload["verbrauch_einheit"] = "kWh" if str(unit or "").strip().lower() in ("wh", "mwh") else unit
     # verknuepfte Paperless-Dokumente: nur Verweise; Vorschau und Download prueft die Paperless-Integration
     payload["dokumente"] = dokumente.payload(entry.data)

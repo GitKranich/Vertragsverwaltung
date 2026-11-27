@@ -56,6 +56,13 @@
           source: v.verbrauch !== undefined ? "manual" : "statistics", sensors: ["sensor.strom_haus"], months: 11.99 };
       }
       if (message.type === "tariffy/objekt_aktiv") return { ok: true };
+      if (message.type === "tariffy/zaehler_vorschlag") return { name: "Stromzähler Haus", ablesung: "Ablesung", unit: "kWh", device_class: "energy", step: 0.1 };
+      if (message.type === "input_number/create") return { id: "stromzahler_haus_ablesung", name: message.name };
+      if (message.type === "input_number/delete") return null;
+      if (message.type === "tariffy/zaehler_anlegen") {
+        if (params.get("zaehler") === "fail") throw Object.assign(new Error("template"), { code: "template" });
+        return { sensor: "sensor.stromzahler_haus", eingabe: "input_number.stromzahler_haus_ablesung" };
+      }
       if (message.type === "tariffy/objekt_save") {
         if (!String(message.name || "").trim()) throw Object.assign(new Error("invalid_name"), { code: "invalid_name" });
         const hit = objekte.find((o) => o.id === message.objekt_id);

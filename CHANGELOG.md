@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.43.0-beta.4] - 2026-11-27
+
+### Added
+
+- **Create a meter from the panel:** an electricity, gas or water contract without a consumption sensor has the button **Create meter** in its details (tab Contracts, administrators). It creates two **real Home Assistant helpers** and assigns them to the contract: a number helper "<name> Ablesung" for the readings (created like the helper settings do, starting at the current reading) and a template sensor "<name>" with `total_increasing`, device class and unit of the contract (gas `gas`, water `water`, electricity/kWh `energy`) that keeps the long-term statistics. The proposed name is the meter kind and the property, e.g. "Gaszähler Bahnhofstraße", editable. The helpers belong to Home Assistant: they and their statistics stay when the contract is deleted or Tariffy is removed, and a next contract can use the same meter. Afterwards "Record meter reading", "Import history" and "Correct a reading" work as with every meter. Not for two-rate electricity (HT/NT). New WebSocket commands `tariffy/zaehler_vorschlag` and `tariffy/zaehler_anlegen`.
+- After the update reload the browser page once (Ctrl+F5).
+
 ## [1.43.0-beta.3] - 2026-11-27
 
 ### Changed

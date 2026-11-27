@@ -59,6 +59,7 @@ export const STYLE = `
 .obj-name .t2 { display: block; font-size: 12px; color: var(--muted); }
 .obj-new-title { margin-top: 16px; }
 .state .btn { display: inline-flex; align-items: center; gap: 8px; }
+.zok { color: var(--green); font-weight: 600; margin: 8px 0; }
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px; }
 @container (min-width: 1100px) { .summary { grid-template-columns: repeat(4, 1fr); } }

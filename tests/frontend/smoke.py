@@ -230,6 +230,44 @@ def properties(browser, base: str) -> None:
     page.close()
 
 
+def create_meter(browser, base: str) -> None:
+    """A metered contract without a meter: "Create meter" creates a number helper and a template sensor."""
+    root = "window.__panel.shadowRoot"
+    for variant in ("ok", "fail"):
+        page, errors = open_page(browser, f"{base}?lang=de&zaehler={variant}")
+        # the fixtures have no live metered contract without a meter: take the gas contract's meter away
+        page.evaluate("""() => { const p = window.__panel; const c = p._all.find((x) => x.sparte === 'gas' && !x.archiviert);
+          Object.assign(c, { hat_zaehler: false, zaehlerstand_eingabe: null }); p._open = new Set(p._all.map((x) => x.entry_id)); }""")
+        click_tab(page, 2)
+        buttons = page.evaluate(f"() => [...{root}.querySelectorAll('.once-add .btn')].filter((b) => b.textContent.includes('Zähler anlegen')).length")
+        check(buttons == 1, f"{variant}: only the contract without a meter offers \"Zähler anlegen\"")
+        page.evaluate(f"() => [...{root}.querySelectorAll('.once-add .btn')].find((b) => b.textContent.includes('Zähler anlegen')).click()")
+        page.wait_for_timeout(200)
+        shown = page.evaluate(f"() => {root}.querySelector('.overlay').textContent")
+        check("Stromzähler Haus Ablesung" in shown, f"{variant}: the dialog names both helpers")
+        check(page.evaluate(f"() => {root}.querySelector('.overlay [name=name]').value") == "Stromzähler Haus",
+              f"{variant}: the name is proposed")
+        page.evaluate(f"() => [...{root}.querySelectorAll('.overlay .actions .btn.go')].pop().click()")
+        page.wait_for_timeout(150)
+        check(shadow_count(page, ".overlay .bad") == 1, f"{variant}: the current reading is required")
+        page.evaluate(f"() => {{ const i = {root}.querySelector('.overlay [name=stand]'); i.value = '12345,6';"
+                      " i.dispatchEvent(new Event('input')); }")
+        page.evaluate(f"() => [...{root}.querySelectorAll('.overlay .actions .btn.go')].pop().click()")
+        page.wait_for_timeout(300)
+        calls = [c for c in page.evaluate("() => window.__calls") if "zaehler" in c["type"] or "input_number" in c["type"]]
+        create = next((c for c in calls if c["type"] == "input_number/create"), {})
+        check(create.get("initial") == 12345.6 and create.get("unit_of_measurement") == "kWh",
+              f"{variant}: the number helper starts at the current reading")
+        shown = page.evaluate(f"() => {root}.querySelector('.overlay').textContent")
+        if variant == "ok":
+            check("angelegt und zugeordnet" in shown, "the meter is created and assigned")
+        else:
+            check("Template-Sensor nicht angelegt" in shown, "a failure is shown")
+            check(any(c["type"] == "input_number/delete" for c in calls), "and the number helper is removed again")
+        check(not errors, f"create meter ({variant}): no browser error {errors}")
+        page.close()
+
+
 def main() -> int:
     server, base = serve()
     try:
@@ -240,6 +278,7 @@ def main() -> int:
             long_names(browser, base)
             dialogs(browser, base)
             properties(browser, base)
+            create_meter(browser, base)
             browser.close()
     finally:
         server.shutdown()

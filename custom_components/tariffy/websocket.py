@@ -17,7 +17,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from . import ablesung, backup, dokumente, history, meter_import, objekte
+from . import ablesung, backup, dokumente, history, meter_import, objekte, zaehler
 from .const import CONF_VERBRAUCH_SENSOR, CONF_ZAEHLERSTAND_EINGABE, DOMAIN
 from .panel import SIGNAL_CONTRACTS, async_notify, async_snapshot
 
@@ -709,6 +709,48 @@ async def ws_objekt_aktiv(hass: HomeAssistant, connection, msg: dict[str, Any]) 
     connection.send_result(msg["id"], {"ok": True})
 
 
+# ------------------------------------------------------------------ Zaehler anlegen
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {vol.Required("type"): "tariffy/zaehler_vorschlag", vol.Required("entry_id"): str}
+)
+@callback
+def ws_zaehler_vorschlag(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Name, Einheit und Schrittweite fuer einen neuen Zaehler (Zahl-Helfer und Template-Sensor)."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    try:
+        connection.send_result(msg["id"], zaehler.vorschlag(hass, entry))
+    except zaehler.ZaehlerFehler as err:
+        connection.send_error(msg["id"], err.code, err.code)
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "tariffy/zaehler_anlegen",
+        vol.Required("entry_id"): str,
+        vol.Required("eingabe"): str,
+        vol.Required("name"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_zaehler_anlegen(hass: HomeAssistant, connection, msg: dict[str, Any]) -> None:
+    """Legt zum (vom Panel angelegten) Zahl-Helfer den Template-Sensor an und ordnet beide dem Vertrag zu."""
+    entry = _loaded_entry(hass, msg["entry_id"])
+    if entry is None:
+        connection.send_error(msg["id"], "not_found", "Contract not found or not loaded")
+        return
+    try:
+        result = await zaehler.async_zaehler_anlegen(hass, entry, msg["eingabe"], msg["name"])
+    except zaehler.ZaehlerFehler as err:
+        connection.send_error(msg["id"], err.code, err.code)
+        return
+    connection.send_result(msg["id"], result)
+
+
 COMMANDS = (
     ws_contracts,
     ws_subscribe,
@@ -739,6 +781,8 @@ COMMANDS = (
     ws_objekt_delete,
     ws_objekt_default,
     ws_objekt_aktiv,
+    ws_zaehler_vorschlag,
+    ws_zaehler_anlegen,
 )
 
 

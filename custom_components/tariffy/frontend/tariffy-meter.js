@@ -2,7 +2,7 @@
  * Part of the Tariffy panel: tariffy-panel.js loads it with its own version and copies the methods onto the
  * panel element. The methods are written as in the class (they use `this` of the panel). */
 
-export default ({ h, icon, isNum }) => class {
+export default ({ h, icon, isNum, I18N }) => class {
   /* ----- meter reading entered by hand (number helper behind a template sensor) ----- */
   _meterState(c) {
     const st = c.zaehlerstand_eingabe && this._hass && this._hass.states[c.zaehlerstand_eingabe];
@@ -18,7 +18,7 @@ export default ({ h, icon, isNum }) => class {
   }
 
   _meterSection(c) {
-    if (!c.zaehlerstand_eingabe) return null;
+    if (!c.zaehlerstand_eingabe) return this._noMeterSection(c);
     const m = this._meterState(c);
     const text = !m ? this._t("meterMissing", { e: c.zaehlerstand_eingabe })
       : m.value === null ? this._t("meterNone")
@@ -33,6 +33,119 @@ export default ({ h, icon, isNum }) => class {
       }, icon("plus"), this._t("impOpen")), m && m.value !== null ? h("button", {
         class: "btn", type: "button", onclick: () => this._openFix(c),
       }, icon("meter"), this._t("fixOpen")) : null) : null);
+  }
+
+  /* ----- no meter yet: create a number helper and a template sensor in Home Assistant (administrators) ----- */
+  _noMeterSection(c) {
+    if (!this._isAdmin || c.hat_zaehler || !["electricity", "gas", "water"].includes(c.sparte)) return null;
+    return h("div", { class: "sec" }, h("h4", { text: this._t("secMeter") }),
+      h("p", { class: "hint", text: this._t("zNoMeter") }),
+      h("div", { class: "once-add" }, h("button", { class: "btn", type: "button", onclick: () => this._openZaehler(c) },
+        icon("plus"), this._t("zCreate"))));
+  }
+
+  async _openZaehler(c) {
+    this._closeFlow();
+    let plan = null;
+    let problem = null;
+    try {
+      plan = await this._hass.callWS({ type: "tariffy/zaehler_vorschlag", entry_id: c.entry_id });
+    } catch (err) {
+      problem = this._zError(err);
+      plan = { name: "", ablesung: "", unit: this._unit(c), step: 0.001 };
+    }
+    this._dlg = {
+      mode: "zaehler", stage: "form", id: c.entry_id, title: c.title, plan, flowId: null, localize: () => "", asking: null,
+      fields: [
+        { name: "name", kind: "string", label: this._t("zName"), required: true, min: null, domains: [], custom: false, options: [], initial: plan.name },
+        { name: "stand", kind: "number", label: `${this._t("zStart")} (${plan.unit})`, required: true, min: 0, domains: [], custom: false, options: [], initial: "" },
+      ],
+      values: { name: plan.name, stand: "" }, fieldErrors: {}, message: problem, blocked: Boolean(problem),
+    };
+    this._renderZaehlerDialog();
+  }
+
+  _zError(err) {
+    const code = String((err && (err.code || (err.body && err.body.code))) || "");
+    const key = `zErr_${code}`;
+    return I18N[this._lang][key] || I18N.en[key] ? this._t(key) : `${this._t("zErr")}${err && err.message ? ` (${err.message})` : ""}`;
+  }
+
+  async _saveZaehler() {
+    const dlg = this._dlg;
+    const { values, errors } = this._collectFlow(dlg);
+    dlg.fieldErrors = errors;
+    dlg.message = null;
+    const name = String(values.name || "").trim();
+    if (!errors.name && (!name || name.length > 60)) dlg.fieldErrors.name = this._t("zErr_name");
+    if (!errors.stand && (!isNum(values.stand) || values.stand <= 0)) dlg.fieldErrors.stand = this._t("meterInvalid");
+    if (Object.keys(dlg.fieldErrors).length) { this._renderZaehlerDialog(); return; }
+    dlg.stage = "saving";
+    this._renderZaehlerDialog();
+    const plan = dlg.plan;
+    let helper = null;
+    try {
+      // the number helper, the same way the helper settings of Home Assistant create it
+      helper = await this._hass.callWS({
+        type: "input_number/create", name: `${name} ${plan.ablesung}`, min: 0, max: 999999999, step: plan.step,
+        mode: "box", unit_of_measurement: plan.unit, initial: values.stand, icon: "mdi:counter",
+      });
+      // the template sensor with the statistics, and both assigned to the contract
+      await this._hass.callWS({ type: "tariffy/zaehler_anlegen", entry_id: dlg.id, eingabe: helper.id, name });
+    } catch (err) {
+      if (helper && helper.id) { // do not leave half a meter behind
+        try { await this._hass.callWS({ type: "input_number/delete", input_number_id: helper.id }); } catch (_e) { /* stays a helper */ }
+      }
+      if (this._dlg !== dlg) return;
+      dlg.stage = "form";
+      dlg.message = this._zError(err);
+      this._renderZaehlerDialog();
+      return;
+    }
+    if (this._dlg !== dlg) return;
+    dlg.stage = "done";
+    dlg.done = name;
+    this._renderZaehlerDialog();
+  }
+
+  _renderZaehlerDialog() {
+    const dlg = this._dlg;
+    if (!dlg) return;
+    const busy = dlg.stage === "saving";
+    if (dlg.stage === "done") {
+      this._mountDialog(dlg, [
+        h("h2", { id: "dlg-title", text: this._t("zCreate") }),
+        h("p", { class: "zok", role: "status", text: this._t("zDone", { name: dlg.done }) }),
+        h("p", { class: "hint", text: this._t("zStartHint") }),
+        h("div", { class: "actions" }, h("button", { class: "btn go", type: "button", text: this._t("dlgClose"), onclick: () => this._closeFlow() })),
+      ], false);
+      const button = this._dlgEl.querySelector(".actions .btn");
+      if (button) button.focus();
+      return;
+    }
+    const name = String(dlg.values.name || dlg.plan.name).trim();
+    const body = [
+      h("h2", { id: "dlg-title", text: this._t("zCreate") }),
+      h("p", { class: "hint", text: dlg.title }),
+      h("p", { class: "hint", text: this._t("zHint", { input: `${name} ${dlg.plan.ablesung}`, sensor: name }) }),
+      h("div", { class: "fields" }, dlg.fields.map((f) => {
+        const error = dlg.fieldErrors[f.name];
+        return h("label", { class: `fld${error ? " bad" : ""}`, for: `f-${f.name}` },
+          h("span", { class: "lbl", text: f.label }), this._fieldInput(dlg, f),
+          error ? h("div", { class: "ferr", text: error }) : null);
+      })),
+      h("p", { class: "hint", text: this._t("zStartHint") }),
+    ];
+    if (dlg.message) body.push(h("div", { class: "err", role: "alert", text: dlg.message }));
+    body.push(h("div", { class: "actions" },
+      dlg.blocked ? null : h("button", { class: "btn go", type: "button", disabled: busy ? "" : null, text: this._t(busy ? "dlgSaving" : "zCreateGo"), onclick: () => this._saveZaehler() }),
+      h("button", { class: "btn", type: "button", disabled: busy ? "" : null, text: this._t("actCancel"), onclick: () => this._closeFlow() })));
+    this._mountDialog(dlg, body, busy);
+    if (!dlg.focused) {
+      dlg.focused = true;
+      const first = this._dlgEl.querySelector("[name=stand]");
+      if (first) first.focus();
+    }
   }
 
   /* ----- import historical meter readings into the sensor's long-term statistics ----- */

@@ -327,6 +327,7 @@ export default ({ h, icon, isNum, FLOWS, ownIcon }) => class {
     if (dlg.mode === "aussen") { this._renderAussenDialog(); return; }
     if (dlg.mode === "doc") { this._renderDocDialog(); return; }
     if (dlg.mode === "objekte") { this._renderObjekteDialog(); return; }
+    if (dlg.mode === "zaehler") { this._renderZaehlerDialog(); return; }
     const busy = dlg.stage === "saving";
     const body = [h("h2", { id: "dlg-title", text: this._t({ edit: "dlgTitleEdit", create: "dlgTitleCreate", next: "dlgTitle" }[dlg.mode], { name: dlg.name }) })];
     const buttons = [];
